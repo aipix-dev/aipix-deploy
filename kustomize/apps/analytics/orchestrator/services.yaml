@@ -1,0 +1,24 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: orchestrator
+    app.kubernetes.io/component: orchestrator
+    app.kubernetes.io/part-of: analytics
+    global-app-name: vsaas
+  name: orchestrator
+  namespace: vsaas-analytics
+spec:
+  ports:
+    - name: "orchestrator"
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app.kubernetes.io/name: orchestrator
+    app.kubernetes.io/component: orchestrator
+    app.kubernetes.io/part-of: analytics
+    global-app-name: vsaas
+  type: LoadBalancer
+

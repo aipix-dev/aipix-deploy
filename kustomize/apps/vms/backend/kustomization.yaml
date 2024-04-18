@@ -1,0 +1,5 @@
+resources:
+- pvcs.yaml
+- deployments.yaml
+- services.yaml
+- ingressroutes.yaml

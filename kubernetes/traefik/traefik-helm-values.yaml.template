@@ -1,0 +1,43 @@
+deployment:
+  replicas: 1
+
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1
+
+additionalArguments:
+  - --providers.kubernetesingress.labelselector=app.kubernetes.io/instance=traefik-traefik-v2
+  - --providers.kubernetescrd.labelselector=app.kubernetes.io/instance=traefik-traefik-v2
+  - --providers.kubernetescrd.allowexternalnameservices=true
+  - --accesslog=true
+  - --log.level=DEBUG
+#  - --accesslog.format=json
+  - --accesslog.fields.headers.defaultmode=keep
+  - --serversTransport.insecureSkipVerify=true
+  - --entrypoints.controller-rtsp.address=:8888/tcp
+
+ingressRoute:
+  dashboard:
+    entryPoints: ["traefik", "websecure"]
+    matchRule: Host(`${TRAEFIK_DOMAIN}`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+    tls:
+      secretName: certificate
+
+service:
+  spec:
+    sessionAffinity: ClientIP
+    externalTrafficPolicy: Cluster
+
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: '{{ template "traefik.name" . }}'
+            app.kubernetes.io/instance: '{{ .Release.Name }}-{{ .Release.Namespace }}'
+        topologyKey: kubernetes.io/hostname
+
+nodeSelector:
+  traefik: "true"

@@ -1,0 +1,13 @@
+- op: add
+  path: /spec/template/spec/volumes/-
+  value:
+    name: push1st-orchestrator
+    configMap:
+      name: push1st-orchestrator
+- op: add
+  path: /spec/template/spec/containers/0/volumeMounts/-
+  value:
+    name: push1st-orchestrator
+    mountPath: /opt/push1st/apps/orchestrator.yml
+    subPath: orchestrator.yml
+    readOnly: true

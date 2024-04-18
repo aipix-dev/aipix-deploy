@@ -1,0 +1,82 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: mysql-server
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: mysql-server
+  namespace: vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mysql-server
+      app.kubernetes.io/component: database
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mysql-server
+        app.kubernetes.io/component: database
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      containers:
+        - name: mysql-server
+          envFrom:
+            - configMapRef:
+                name: mysql-server-env
+          image: mysql:8.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3306
+              name: mysql
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-data
+            - name: mysql-cnf
+              mountPath: /etc/my.cnf
+              subPath: my.cnf
+              readOnly: true
+          livenessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - |-
+                    MYSQL_PWD=${MYSQL_ROOT_PASSWORD} mysql -hlocalhost -uroot -e status
+            initialDelaySeconds: 20
+            failureThreshold: 10
+            periodSeconds: 15
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - |-
+                    MYSQL_PWD=${MYSQL_ROOT_PASSWORD} mysql -hlocalhost -uroot -e status
+            initialDelaySeconds: 5
+            failureThreshold: 3
+            periodSeconds: 10
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 40m
+              memory: 700Mi
+      hostname: mysql-server
+      restartPolicy: Always
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-data
+        - name: mysql-cnf
+          configMap:
+            name: mysql-cnf

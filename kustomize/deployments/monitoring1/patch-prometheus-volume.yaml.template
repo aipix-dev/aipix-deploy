@@ -1,0 +1,6 @@
+- op: replace
+  path: /spec/template/spec/volumes/1
+  value:
+    name: prometheus-storage-volume
+    persistentVolumeClaim:
+      claimName: prometheus-storage

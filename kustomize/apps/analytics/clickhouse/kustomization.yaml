@@ -1,0 +1,4 @@
+resources:
+- pvcs.yaml
+- deployments.yaml
+- services.yaml

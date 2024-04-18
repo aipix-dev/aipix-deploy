@@ -1,0 +1,6 @@
+resources:
+- portal.yaml
+- portal-stub.yaml
+- services.yaml
+- pvcs.yaml
+- ingressroutes.yaml

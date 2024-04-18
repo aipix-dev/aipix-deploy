@@ -1,0 +1,48 @@
+namespace: ${NS_A}
+resources:
+- ../../apps/analytics/analytics-worker
+- ../../apps/analytics/orchestrator
+- ../../apps/analytics/clickhouse
+- ../../apps/analytics/tarantool
+- ../../apps/analytics/vectorizator
+${ADD_RESOURCE1}
+components:
+- ../../components/storage-class-local-storage
+images:
+- name: download.aipix.ai:8443/analytics-worker/release
+  newName: download.aipix.ai:8443/analytics-worker/release
+  newTag: 24.03.0.0
+- name: download.aipix.ai:8443/analytics-ovms/release
+  newName: download.aipix.ai:8443/analytics-ovms/release
+  newTag: 24.03.0.0
+- name: download.aipix.ai:8443/analytics-orchestrator-server/release
+  newName: download.aipix.ai:8443/analytics-orchestrator-server/release
+  newTag: 24.03.0.0
+- name: download.aipix.ai:8443/analytics-tarantool/release
+  newName: download.aipix.ai:8443/analytics-tarantool/release
+  newTag: 24.03.0.0
+- name: download.aipix.ai:8443/analytics-face-vectorization-service/release
+  newName: download.aipix.ai:8443/analytics-face-vectorization-service/release
+  newTag: latest
+- name: download.aipix.ai:8443/analytics-licensing/release
+  newName: download.aipix.ai:8443/analytics-licensing/release
+  newTag: latest
+- name: download.aipix.ai:8443/analytics-metrics-pusher/release
+  newName: download.aipix.ai:8443/analytics-metrics-pusher/dev
+  newTag: latest
+${CUSTOM_IMAGES}
+
+patches:
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: analytics-worker
+  path: patch-analytics-worker-tolerations.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: orchestrator
+  path: patch-ingressroute-orchestrator.yaml
+${CUSTOM_PATCHES}

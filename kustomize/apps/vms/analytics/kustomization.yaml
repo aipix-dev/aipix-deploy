@@ -1,0 +1,3 @@
+resources:
+- analytics-events.yaml
+- analytics-statistics.yaml

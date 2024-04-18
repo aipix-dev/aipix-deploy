@@ -1,0 +1,67 @@
+[server]
+    node-id		            = 1
+    node-host			    =
+    cluster-enable                  = false
+    cluster-id			    = 1
+    cluster-controller              = http://backend/api/v1/mediaserver/callback
+    cluster-warming-up              = 60s # startup timeout. for warming-up all cluster nodes
+    cluster-tolerance               = 180s # time interval after last check when node start grab the secondary cameras
+    cluster-ping-interval           = 10s # time interval in seconds between health checking
+
+    sys-limit                       = 81920 # set fd limitis
+    sys-umask                       = 777 # set file\folder creation mask
+
+    threads-medium		    = 10 # Number of medium worker threads
+    threads-media		    = 10 # Number of media worker threads
+    threads-web			    = 5  # Number of web worker threads
+    threads-sched                   = 5 # Number of scheduler threads
+
+    [[stream]]
+            enable                  = true          # true | false | rtsp,publish,web
+            rtsp                    = *:554:/      # rtsp streaming endpoint
+            publish                 = *:7554:/      # push rtsp endpoint
+            web                     = *:444/        # hls\mse\etc... streaming endpoint
+            whitelist-access        = #media client rtsp\http\https whitelist
+            whitelist-publishers    = #127.0.0.1/24 rtsp pushers whitelist
+            auth-module             = modules/auth/validate.lua
+            auth-secret             = "}2F+fUnU8!@(<`5]9@]6P3,rkwD&XRvV[Rr`;CQR^wr$h#79SQw-[[>amr7ZX(dN"
+            ssl-enable              = true
+            ssl-cert                = /opt/ssl/cert.pem
+            ssl-key                 = /opt/ssl/key.pem
+            reconnect-numbers       = 500         # number of reconnects, before turn off stream
+            reconnect-timeout       = 10s         # timeout before reconnect attempt
+            reconnect-interval      = 30m        # maximum timeout interval
+            reconnect-invalid       = 10          # number of bad packets before camera go in state invalid
+
+    [[module]]
+            listen                  = *:8080
+            cpanel-enable           = true # enable\disable web module
+            cpanel-baseurl          = /cpanel
+            cpanel-module           = modules/cpanel/cpanel.lua
+            cpanel-whitelist        = #127.0.0.1/24
+            cpanel-auth             = basic # basic, none
+            api-enable              = true # enable\disable web module
+            api-baseurl             = /api
+            api-module              = modules/api/api.v2.lua
+            api-whitelist           = # 192.168.1.150/28, 192.168.1.1
+            ssl-enable              = true
+            ssl-cert                = /opt/ssl/cert.pem
+            ssl-key                 = /opt/ssl/key.pem
+            [[[users]]]
+                #   role = <login>:[<plain-password>]
+                #   role - root, admin, guest, user, if leave empty, role is disabled
+                admin               = siteadmin:nssiteadmin
+                root                =
+                user                =
+                guest               =
+[dvr]
+        record-tmp-dir              = /storage/tmp  #temporary directory to export records
+[streams]
+        include                     = streams/*.ini
+
+[nodes]
+        include                     = media-server.nodes
+
+[storages]
+        default                     = /storage
+

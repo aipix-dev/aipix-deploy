@@ -1,0 +1,132 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: orchestrator
+    app.kubernetes.io/component: orchestrator
+    app.kubernetes.io/part-of: analytics
+    global-app-name: vsaas
+  name: orchestrator
+  namespace: vsaas-analytics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: orchestrator
+      app.kubernetes.io/component: orchestrator
+      app.kubernetes.io/part-of: analytics
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: orchestrator
+        app.kubernetes.io/component: orchestrator
+        app.kubernetes.io/part-of: analytics
+        global-app-name: vsaas
+    spec:
+      containers:
+        - name: django
+          args:
+            - scripts/django.sh
+          image: download.aipix.ai:8443/analytics-orchestrator-server/release:latest
+          imagePullPolicy: Always
+          env:
+            - name: TARANTOOL_PORT
+              value: "3301"
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - name: analytics-env
+              mountPath: /opt/analytics-orchestrator-server/.env
+              subPath: .env
+              readOnly: true
+        - name: celery
+          args:
+            - scripts/celery.sh
+          image: download.aipix.ai:8443/analytics-orchestrator-server/release:latest
+          imagePullPolicy: Always
+          env:
+            - name: TARANTOOL_PORT
+              value: "3301"
+          volumeMounts:
+            - name: analytics-env
+              mountPath: /opt/analytics-orchestrator-server/.env
+              subPath: .env
+              readOnly: true
+        - name: matcher
+          args:
+            - scripts/matcher.sh
+          image: download.aipix.ai:8443/analytics-orchestrator-server/release:latest
+          imagePullPolicy: Always
+          env:
+            - name: TARANTOOL_PORT
+              value: "3301"
+          volumeMounts:
+            - name: analytics-env
+              mountPath: /opt/analytics-orchestrator-server/.env
+              subPath: .env
+              readOnly: true
+        - name: stats-processor
+          args:
+            - scripts/stats_processor.sh
+          image: download.aipix.ai:8443/analytics-orchestrator-server/release:latest
+          imagePullPolicy: Always
+          env:
+            - name: TARANTOOL_PORT
+              value: "3301"
+          volumeMounts:
+            - name: analytics-env
+              mountPath: /opt/analytics-orchestrator-server/.env
+              subPath: .env
+              readOnly: true
+        - name: events-collector
+          args:
+            - scripts/events_collector.sh
+          image: download.aipix.ai:8443/analytics-orchestrator-server/release:latest
+          imagePullPolicy: Always
+          env:
+            - name: TARANTOOL_PORT
+              value: "3301"
+          volumeMounts:
+            - name: analytics-env
+              mountPath: /opt/analytics-orchestrator-server/.env
+              subPath: .env
+              readOnly: true
+        - name: analytics-licensing
+          args:
+            - /bin/sh
+            - -c
+            - ./analytics_licensing.aot -c config.yaml
+          image: download.aipix.ai:8443/analytics-licensing/release:latest
+          imagePullPolicy: Always
+          env:
+            - name: TARANTOOL_PORT
+              value: "3301"
+          volumeMounts:
+            - name: a-licensing-yaml
+              mountPath: /opt/analytics-licensing/config.yaml
+              subPath: licensing.yaml
+              readOnly: true
+            - name: a-license-json
+              mountPath: /opt/analytics-licensing/license.json
+              subPath: license.json
+              readOnly: true
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: orchestrator
+      restartPolicy: Always
+      volumes:
+        - name: analytics-env
+          configMap:
+            name: analytics-env
+        - name: a-licensing-yaml
+          configMap:
+            name: a-licensing-yaml
+        - name: a-license-json
+          configMap:
+            name: a-license-json

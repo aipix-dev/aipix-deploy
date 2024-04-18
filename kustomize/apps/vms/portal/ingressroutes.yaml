@@ -1,0 +1,61 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  namespace: vms
+  name: portal-backend
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host (`example.com`) && ( PathPrefix(`/portal/storage`) || PathPrefix(`/api/portal`) || PathPrefix(`/nova-api/`) || PathPrefix(`/portal/admin`) || PathPrefix(`/vendor/nova`) || PathPrefix(`/nova-vendor/`) )
+    services:
+    - kind: Service
+      name: portal-backend
+      port: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  namespace: vms
+  name: portal-stub
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host (`example.com`) && PathPrefix(`/portal-stub`)
+    middlewares:
+    - name : strip-prefix-portal-stub
+    services:
+    - kind: Service
+      name: portal-stub
+      port: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  namespace: vms
+  name: portal
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host (`example.com`) && PathPrefix(`/portal`)
+    middlewares:
+    - name : strip-prefix-portal
+    services:
+    - kind: Service
+      name: portal-frontend-client
+      port: 80

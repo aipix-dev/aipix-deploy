@@ -1,0 +1,81 @@
+apiVersion: v1
+items:
+- apiVersion: ceph.rook.io/v1
+  kind: CephCluster
+  metadata:
+    name: rook-ceph
+    namespace: rook-ceph
+  spec:
+    cephVersion:
+      image: quay.io/ceph/ceph:v17.2.5
+    cleanupPolicy:
+      sanitizeDisks:
+        dataSource: zero
+        iteration: 1
+        method: quick
+    crashCollector: {}
+    dashboard:
+      enabled: true
+      ssl: true
+    dataDirHostPath: /var/lib/rook
+    disruptionManagement:
+      machineDisruptionBudgetNamespace: openshift-machine-api
+      managePodBudgets: true
+      osdMaintenanceTimeout: 30
+    external: {}
+    healthCheck:
+      daemonHealth:
+        mon:
+          interval: 45s
+        osd:
+          interval: 1m0s
+        status:
+          interval: 1m0s
+      livenessProbe:
+        mgr: {}
+        mon: {}
+        osd: {}
+      startupProbe:
+        mgr: {}
+        mon: {}
+        osd: {}
+    logCollector:
+      enabled: true
+      maxLogSize: 500M
+      periodicity: daily
+    mgr:
+      count: 2
+      modules:
+      - enabled: true
+        name: pg_autoscaler
+    mon:
+      count: 3
+    monitoring: {}
+    network:
+      connections:
+        compression: {}
+        encryption: {}
+    placement:
+      mon:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
+        tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+    priorityClassNames:
+      mgr: system-cluster-critical
+      mon: system-node-critical
+      osd: system-node-critical
+    security:
+      kms: {}
+    storage:
+      deviceFilter: ^sd[b-e]
+      useAllDevices: true
+      useAllNodes: true
+    waitTimeoutForHealthyOSDInMinutes: 10
+

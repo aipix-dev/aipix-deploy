@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: vectorizator
+    app.kubernetes.io/component: vectorizator
+    app.kubernetes.io/part-of: analytics
+    global-app-name: vsaas
+  name: vectorizator
+  namespace: vsaas-analytics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vectorizator
+      app.kubernetes.io/component: vectorizator
+      app.kubernetes.io/part-of: analytics
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vectorizator
+        app.kubernetes.io/component: vectorizator
+        app.kubernetes.io/part-of: analytics
+        global-app-name: vsaas
+    spec:
+      containers:
+        - name: vectorizator
+          image: download.aipix.ai:8443/analytics-face-vectorization-service/release:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+              name: http
+              protocol: TCP
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: vectorizator
+      restartPolicy: Always

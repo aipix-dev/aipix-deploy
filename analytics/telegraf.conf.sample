@@ -1,0 +1,25 @@
+[agent]
+  interval = "20s"
+  round_interval = false
+  metric_batch_size = 1000
+  metric_buffer_limit = 1000
+  collection_jitter = "15s"
+  flush_interval = "20s"
+  flush_jitter = "0s"
+  debug = true
+  quiet = false
+  hostname = ""
+  omit_hostname = false
+
+
+[[outputs.influxdb_v2]]
+  urls = ["http://vsaas-influxdb2.monitoring.svc"]
+  token = "${INFLUX_TOKEN}"
+  organization = "influxdata"
+  bucket = "telegraf"
+
+
+[[inputs.http_listener_v2]]
+  service_address = ":8080"
+  paths = ["/telegraf"]
+  data_format = "influx"

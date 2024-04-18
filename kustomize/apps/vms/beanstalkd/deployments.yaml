@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: beanstalkd
+    app.kubernetes.io/component: message-broker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: beanstalkd
+  namespace: vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: beanstalkd
+      app.kubernetes.io/component: message-broker
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: beanstalkd
+        app.kubernetes.io/component: message-broker
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      containers:
+        - name: beanstalkd
+          image: schickling/beanstalkd:latest
+          command:
+            - /usr/bin/beanstalkd
+            - -z
+            - "524280"
+          ports:
+            - containerPort: 11300
+              name: beanstalkd
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: 11300
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 10m
+              memory: 25Mi
+      hostname: beanstalkd
+      restartPolicy: Always

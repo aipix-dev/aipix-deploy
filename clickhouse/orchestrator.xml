@@ -1,0 +1,12 @@
+<clickhouse>
+    <users>
+        <orchestrator>
+            <profile>default</profile>
+                <networks>
+                    <ip>::/0</ip>
+                </networks>
+            <password>orchestrator</password>
+            <quota>default</quota>
+        </orchestrator>
+    </users>
+</clickhouse>

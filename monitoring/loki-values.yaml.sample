@@ -1,0 +1,41 @@
+loki:
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 1
+  storage:
+    type: 'filesystem'
+  compactor:
+    compaction_interval: 10m
+    retention_enabled: true
+    retention_delete_delay: 2h
+    delete_request_cancel_period: 10m
+  limits_config:
+    retention_period: 3d
+singleBinary:
+  replicas: 1
+  tolerations:
+  - effect: NoSchedule
+    key: monitoring
+    operator: Exists
+  affinity: |-
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: monitoring
+            operator: In
+            values:
+            - "true"
+  persistence:
+    storageClass: local-storage
+test:
+  enabled: false
+monitoring:
+  dashboards:
+    enabled: false
+  lokiCanary:
+    enabled: false
+  selfMonitoring:
+    enabled: false
+    grafanaAgent:
+      installOperator: false

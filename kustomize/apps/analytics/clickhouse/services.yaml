@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: clickhouse-server
+    app.kubernetes.io/component: db
+    app.kubernetes.io/part-of: analytics
+    global-app-name: vsaas
+  name: clickhouse-server
+  namespace: vsaas-analytics
+spec:
+  ports:
+    - name: "http"
+      port: 8123
+      protocol: TCP
+      targetPort: 8123
+    - name: "client"
+      port: 9000
+      protocol: TCP
+      targetPort: 9000
+  selector:
+    app.kubernetes.io/name: clickhouse-server
+    app.kubernetes.io/component: db
+    app.kubernetes.io/part-of: analytics
+    global-app-name: vsaas
+

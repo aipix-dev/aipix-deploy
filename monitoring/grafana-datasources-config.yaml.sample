@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: monitoring
+data:
+  prometheus.yaml: |-
+    {
+        "apiVersion": 1,
+        "datasources": [
+            {
+               "access":"proxy",
+                "editable": true,
+                "name": "prometheus",
+                "orgId": 1,
+                "type": "prometheus",
+                "url": "http://prometheus-service.monitoring.svc:8080",
+                "version": 1
+            }
+        ]
+    }
+  influxdb.yaml: |-
+    apiVersion: 1
+    datasources:
+      - name: influxdb
+        type: influxdb
+        access: proxy
+        url: http://vsaas-influxdb2.monitoring.svc
+        editable: true
+        jsonData:
+          dbName: telegraf
+          httpMode: GET
+          httpHeaderName1: Authorization
+        secureJsonData:
+          httpHeaderValue1: "Token ${INFLUX_TOKEN}"
+  loki.yaml: |-
+    apiVersion: 1
+    datasources:
+      - name: loki
+        type: loki
+        access: proxy
+        orgId: 1
+        url: http://loki.monitoring.svc.cluster.local:3100
+        basicAuth: false
+        version: 1
+        isDefault: false
+        editable: true

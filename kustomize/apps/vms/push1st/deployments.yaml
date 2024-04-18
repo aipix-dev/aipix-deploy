@@ -1,0 +1,76 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: push1st
+    app.kubernetes.io/component: message-broker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: push1st
+  namespace: vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: push1st
+      app.kubernetes.io/component: message-broker
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: push1st
+        app.kubernetes.io/component: message-broker
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      containers:
+        - name: push1st
+          args:
+            - /opt/push1st/push1st
+            - -c
+            - /opt/push1st/server.yml
+            - -V6
+          image: download.aipix.ai:8443/push1st/release:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6002
+              name: api
+              protocol: TCP
+            - containerPort: 6003
+              name: server
+              protocol: TCP
+          volumeMounts:
+            - name: push1st-server
+              mountPath: /opt/push1st/server.yml
+              subPath: server.yml
+              readOnly: true
+            - name: push1st-app
+              mountPath: /opt/push1st/apps/app.yml
+              subPath: app.yml
+              readOnly: true
+          livenessProbe:
+            tcpSocket:
+              port: 6002
+          readinessProbe:
+            tcpSocket:
+              port: 6003
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 20m
+              memory: 30Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: push1st
+      restartPolicy: Always
+      volumes:
+        - name: push1st-server
+          configMap:
+            name: push1st-server
+        - name: push1st-app
+          configMap:
+            name: push1st-app

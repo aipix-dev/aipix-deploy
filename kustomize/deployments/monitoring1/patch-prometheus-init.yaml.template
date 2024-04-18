@@ -1,0 +1,13 @@
+- op: add
+  path: /spec/template/spec/initContainers
+  value:
+  - name: inint-prometheus
+    image: alpine:3
+    command:
+    - chown
+    - -R
+    - 65534:65534
+    - /prometheus/
+    volumeMounts:
+    - name: prometheus-storage-volume
+      mountPath: /prometheus/

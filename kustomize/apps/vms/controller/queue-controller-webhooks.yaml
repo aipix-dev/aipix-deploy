@@ -1,0 +1,90 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: queue-controller-webhooks
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: queue-controller-webhooks
+  namespace: vms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: queue-controller-webhooks
+      app.kubernetes.io/component: worker
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: queue-controller-webhooks
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: queue-controller-webhooks
+                  app.kubernetes.io/component: worker
+                  app.kubernetes.io/part-of: vms
+                  global-app-name: vsaas
+              topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+      containers:
+        - name: queue-controller-webhooks
+          args:
+            - php
+            - /var/www/api/artisan
+            - queue:work
+            - --queue=controller_webhook
+            - --sleep=3
+            - --tries=1
+            - --timeout=900
+          envFrom:
+            - configMapRef:
+                name: vms-backend-env
+          image: download.aipix.ai:8443/vms-backend/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: storage
+              mountPath: /var/www/api/storage
+            - name: vms-fcm-json
+              mountPath: /var/www/api/fcm.json
+              subPath: fcm.json
+              readOnly: true
+            - name: vms-voip-p8
+              mountPath: /var/www/api/voip.p8
+              subPath: voip.p8
+              readOnly: true
+          resources:
+            requests:
+              cpu: 80m
+              memory: 400Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: queue-controller-webhooks
+      restartPolicy: Always
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: storage
+        - name: vms-fcm-json
+          configMap:
+            name: vms-fcm-json
+        - name: vms-voip-p8
+          configMap:
+            name: vms-voip-p8
+

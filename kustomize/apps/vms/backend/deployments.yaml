@@ -1,0 +1,565 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: backend
+  namespace: vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: backend
+      app.kubernetes.io/component: backend
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: backend
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: backend
+                  app.kubernetes.io/component: backend
+                  app.kubernetes.io/part-of: vms
+                  global-app-name: vsaas
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: backend
+          args:
+            - /usr/sbin/php-fpm8.1
+            - --nodaemonize
+            - --fpm-config
+            - '/etc/php/8.1/fpm/php-fpm.conf'
+          envFrom:
+            - configMapRef:
+                name: vms-backend-env
+          image: download.aipix.ai:8443/vms-backend/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: storage
+              mountPath: /var/www/api/storage
+            - name: run-php
+              mountPath: /var/run/php/
+            - name: public
+              mountPath: /var/www/api/public/
+          resources:
+            requests:
+              cpu: 5m
+              memory: 120Mi
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - name: storage
+              mountPath: /var/www/api/storage
+            - name: vms-backend-nginx-conf
+              readOnly: true
+              mountPath: /etc/nginx/nginx.conf
+              subPath: vms-backend-nginx.conf
+            - name: vms-backend-nginx-server-conf
+              readOnly: true
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: vms-backend-nginx-server.conf
+            - name: run-php
+              mountPath: /var/run/php/
+            - name: public
+              mountPath: /var/www/api/public/
+          resources:
+            requests:
+              cpu: 5m
+              memory: 35Mi
+      initContainers:
+        - name: init-backend
+          command: ["/bin/sh", "-c"]
+          args:
+            - cp -Rp /var/www/api/storage/* /mnt/storage/;
+              chown -R www-data:www-data /mnt/storage/;
+              cp -Rp /var/www/api/public/* /mnt/public/
+          envFrom:
+            - configMapRef:
+                name: vms-backend-env
+          image: download.aipix.ai:8443/vms-backend/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: storage
+              mountPath: /mnt/storage
+            - name: public
+              mountPath: /mnt/public
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: backend
+      restartPolicy: Always
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: storage
+        - name: run-php
+          emptyDir: {}
+        - name: public
+          emptyDir: {}
+        - name: vms-backend-nginx-conf
+          configMap:
+            name: vms-backend-nginx-conf
+        - name: vms-backend-nginx-server-conf
+          configMap:
+            name: vms-backend-nginx-server-conf
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: cron
+    app.kubernetes.io/component: job-scheduler
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: cron
+  namespace: vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cron
+      app.kubernetes.io/component: job-scheduler
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cron
+        app.kubernetes.io/component: job-scheduler
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      containers:
+        - name: cron
+          args:
+            - scripts/docker/cron.sh
+          envFrom:
+            - configMapRef:
+                name: vms-backend-env
+          image: download.aipix.ai:8443/vms-backend/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: storage
+              mountPath: /var/www/api/storage
+            - name: vms-fcm-json
+              mountPath: /var/www/api/fcm.json
+              subPath: fcm.json
+              readOnly: true
+            - name: vms-voip-p8
+              mountPath: /var/www/api/voip.p8
+              subPath: voip.p8
+              readOnly: true
+          resources:
+            requests:
+              cpu: 5m
+              memory: 40Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: cron
+      restartPolicy: Always
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: storage
+        - name: vms-fcm-json
+          configMap:
+            name: vms-fcm-json
+        - name: vms-voip-p8
+          configMap:
+            name: vms-voip-p8
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: schedule
+    app.kubernetes.io/component: job-scheduler
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: schedule
+  namespace: vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: schedule
+      app.kubernetes.io/component: job-scheduler
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: schedule
+        app.kubernetes.io/component: job-scheduler
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      securityContext:
+        runAsUser: 33
+      containers:
+        - name: schedule
+          args:
+            - php
+            - artisan
+            - schedule:work
+          envFrom:
+            - configMapRef:
+                name: vms-backend-env
+          image: download.aipix.ai:8443/vms-backend/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: storage
+              mountPath: /var/www/api/storage
+          resources:
+            requests:
+              cpu: 50m
+              memory: 100Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: schedule
+      restartPolicy: Always
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: storage
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: queue
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: queue
+  namespace: vms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: queue
+      app.kubernetes.io/component: worker
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: queue
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: queue
+                  app.kubernetes.io/component: worker
+                  app.kubernetes.io/part-of: vms
+                  global-app-name: vsaas
+              topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+      containers:
+        - name: queue
+          args:
+            - /bin/bash
+            - -c
+            - >-
+              php artisan queue:work --queue=vms --sleep=3 --tries=3
+              2>&1 >> /var/www/api/storage/logs/worker.log
+          envFrom:
+            - configMapRef:
+                name: vms-backend-env
+          image: download.aipix.ai:8443/vms-backend/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: storage
+              mountPath: /var/www/api/storage
+            - name: vms-fcm-json
+              mountPath: /var/www/api/fcm.json
+              subPath: fcm.json
+              readOnly: true
+            - name: vms-voip-p8
+              mountPath: /var/www/api/voip.p8
+              subPath: voip.p8
+              readOnly: true
+          resources:
+            requests:
+              cpu: 80m
+              memory: 400Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: queue
+      restartPolicy: Always
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: storage
+        - name: vms-fcm-json
+          configMap:
+            name: vms-fcm-json
+        - name: vms-voip-p8
+          configMap:
+            name: vms-voip-p8
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: archive
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: archive
+  namespace: vms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: archive
+      app.kubernetes.io/component: worker
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: archive
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: archive
+                  app.kubernetes.io/component: worker
+                  app.kubernetes.io/part-of: vms
+                  global-app-name: vsaas
+              topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+      containers:
+        - name: archive
+          args:
+            - php
+            - artisan
+            - queue:work
+            - --queue=archive_generation
+            - --sleep=3
+            - --tries=3
+            - --timeout=600
+          envFrom:
+            - configMapRef:
+                name: vms-backend-env
+          image: download.aipix.ai:8443/vms-backend/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: storage
+              mountPath: /var/www/api/storage
+          resources:
+            requests:
+              cpu: 5m
+              memory: 150Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: archive
+      restartPolicy: Always
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: storage
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: reports
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: reports
+  namespace: vms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: reports
+      app.kubernetes.io/component: worker
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: reports
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: reports
+                  app.kubernetes.io/component: worker
+                  app.kubernetes.io/part-of: vms
+                  global-app-name: vsaas
+              topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+      containers:
+        - name: reports
+          args:
+            - php
+            - artisan
+            - queue:work
+            - --queue=reports
+            - --sleep=3
+            - --max-jobs=1
+          envFrom:
+            - configMapRef:
+                name: vms-backend-env
+          image: download.aipix.ai:8443/vms-backend/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: storage
+              mountPath: /var/www/api/storage
+          resources:
+            requests:
+              cpu: 5m
+              memory: 150Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: reports
+      restartPolicy: Always
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: storage
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: set-configs
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: set-configs
+  namespace: vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: set-configs
+      app.kubernetes.io/component: worker
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: set-configs
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: set-configs
+                  app.kubernetes.io/component: worker
+                  app.kubernetes.io/part-of: vms
+                  global-app-name: vsaas
+              topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+      containers:
+        - name: set-configs
+          args:
+            - php
+            - artisan
+            - queue:work
+            - --queue=set_configs
+            - --sleep=3
+          envFrom:
+            - configMapRef:
+                name: vms-backend-env
+          image: download.aipix.ai:8443/vms-backend/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: storage
+              mountPath: /var/www/api/storage
+          resources:
+            requests:
+              cpu: 5m
+              memory: 150Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: set-configs
+      restartPolicy: Always
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: storage
+
+

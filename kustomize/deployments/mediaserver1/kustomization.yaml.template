@@ -1,0 +1,23 @@
+namespace: ${NS_MS}
+resources:
+- ../../apps/mediaserver/
+images:
+- name: download.aipix.ai:8443/media-server/release
+  newName: download.aipix.ai:8443/media-server/release
+  newTag: latest
+${CUSTOM_IMAGES}
+
+patches:
+- target:
+    group: apps
+    version: v1
+    kind: DaemonSet
+    name: (mediaserver)
+  path: patch-mounts.yaml
+- target:
+    group: apps
+    version: v1
+    kind: DaemonSet
+    name: (mediaserver)
+  path: patch-args.yaml
+${CUSTOM_PATCHES}

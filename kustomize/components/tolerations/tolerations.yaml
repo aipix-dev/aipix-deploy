@@ -1,0 +1,18 @@
+- op: replace
+  path: /spec/template/spec/tolerations
+  value:
+  - effect: NoSchedule
+    key: monitoring
+    operator: Exists
+  - effect: NoSchedule
+    key: analytics
+    operator: Exists
+  - effect: NoSchedule
+    key: mediaserver
+    operator: Exists
+  - effect: NoSchedule
+    key: storage
+    operator: Exists
+  - effect: NoSchedule
+    key: db
+    operator: Exists

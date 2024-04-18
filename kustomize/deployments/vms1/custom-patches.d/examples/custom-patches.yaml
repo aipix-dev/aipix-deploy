@@ -1,0 +1,18 @@
+- target:
+    group: ""
+    version: v1
+    kind: Service
+    name: (controller-control-plane-hls|controller-control-plane-rtsp|nginx)
+  path: ./custom-patches.d/patch-services-type.yaml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: (analytic-.*|archive|beanstalkd|controller-.*|cron|frontend-.*|mysql-server|nginx|push1st|queue|queue-controller-webhooks|redis-server|reports|schedule|set-configs)
+  path: ./custom-patches.d/patch-image-pull-policy.yaml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: (backend|controller)
+  path: ./custom-patches.d/patch-image-pull-policy-init.yaml

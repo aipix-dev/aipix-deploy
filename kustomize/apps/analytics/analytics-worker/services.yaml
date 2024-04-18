@@ -1,0 +1,27 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app.kubernetes.io/name: analytics-worker
+    app.kubernetes.io/component: analytics-worker
+    app.kubernetes.io/part-of: analytics
+    global-app-name: vsaas
+  name: analytics-worker
+  namespace: vsaas-analytics
+spec:
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
+      name: grpc
+    - port: 8081
+      protocol: TCP
+      targetPort: 8081
+      name: rest
+  selector:
+    app.kubernetes.io/name: analytics-worker
+    app.kubernetes.io/component: analytics-worker
+    app.kubernetes.io/part-of: analytics
+    global-app-name: vsaas
+  type: LoadBalancer

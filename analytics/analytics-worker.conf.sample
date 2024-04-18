@@ -1,0 +1,24 @@
+REGISTRATION_ENDPOINT=http://orchestrator/api/worker_registration/
+UPDATE_PARAMS_ENDPOINT=http://orchestrator/api/case_types/
+EVENTS_CHANNEL=raw-events
+EVENTS_PROCESSING_THREADS=0
+STATS_CHANNEL=stats
+WEB_SOCKERS_ENDPOINT=ws://push1st:6003/ws/app/app-key
+
+STATS_PUSH_PERIOD=3
+
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+OVMS_ADDRESS=localhost:8080
+
+LOGS_DIR=/var/log/ovms-client
+
+#Monitoring
+#PUSH_ERRORS_MONITORING_ENDPOINT=http://metrics-pusher:8080/telegraf
+#PUSH_ERRORS_PERIOD=20
+
+# MinIO configuration:
+MINIO_URL=192.168.208.144:9000
+MINIO_ACCESS_KEY=4aNb6zJ1ZQXANV49
+MINIO_SECRET_KEY=GnYCa1fDHYPlfduihDqLabqWp4P1a3TT
+MINIO_BUCKET_NAME=store

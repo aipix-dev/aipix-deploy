@@ -1,0 +1,3 @@
+# map of node-id = node-hostname
+10110 		= test1.example.com
+10111 		= test2.example.com

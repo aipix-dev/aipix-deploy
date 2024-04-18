@@ -1,0 +1,77 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: clickhouse-server
+    app.kubernetes.io/component: db
+    app.kubernetes.io/part-of: analytics
+    global-app-name: vsaas
+  name: clickhouse-server
+  namespace: vsaas-analytics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: clickhouse-server
+      app.kubernetes.io/component: db
+      app.kubernetes.io/part-of: analytics
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: clickhouse-server
+        app.kubernetes.io/component: db
+        app.kubernetes.io/part-of: analytics
+        global-app-name: vsaas
+    spec:
+      containers:
+        - name: clickhouse-server
+          image: clickhouse/clickhouse-server:latest
+          ports:
+            - containerPort: 8123
+              name: http
+              protocol: TCP
+            - containerPort: 9000
+              name: client
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: clickhouse
+              mountPath: /var/lib/clickhouse/
+            - name: clickhouse-orchestrator
+              mountPath: /etc/clickhouse-server/users.d/orchestrator.xml
+              subPath: orchestrator.xml
+              readOnly: true
+            - name: clickhouse-timezone
+              mountPath: /etc/clickhouse-server/config.d/timezone.xml
+              subPath: timezone.xml
+              readOnly: true
+            - name: clickhouse-disable-logs
+              mountPath: /etc/clickhouse-server/config.d/disable_logs.xml
+              subPath: disable_logs.xml
+              readOnly: true
+            - name: clickhouse-scheme
+              mountPath: /docker-entrypoint-initdb.d/scheme.sql
+              subPath: scheme.sql
+              readOnly: true
+      hostname: clickhouse-server
+      restartPolicy: Always
+      volumes:
+        - name: clickhouse
+          persistentVolumeClaim:
+            claimName: clickhouse
+        - name: clickhouse-orchestrator
+          configMap:
+            name: clickhouse-orchestrator
+        - name: clickhouse-timezone
+          configMap:
+            name: clickhouse-timezone
+        - name: clickhouse-scheme
+          configMap:
+            name: clickhouse-scheme
+        - name: clickhouse-disable-logs
+          configMap:
+            name: clickhouse-disable-logs

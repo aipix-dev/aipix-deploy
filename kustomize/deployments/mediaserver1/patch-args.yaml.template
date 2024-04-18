@@ -1,0 +1,12 @@
+- op: replace
+  path: /spec/template/spec/containers/0/args
+  value:
+    - /bin/sh
+    - -c
+    - >
+       export $(grep -vE "^(#.*|\s*)$" /opt/aipix/media-server/.env);
+       echo LICENSE_SOURCE=${DOLLAR}{LICENSE_SOURCE} >> ~/.bashrc;
+       /opt/aipix/media-server/media-server -c /opt/aipix/media-server/media-server.ini
+       -L ${DOLLAR}{LICENSE_SOURCE} -V4
+       2>/var/log/media-server/media-server.err
+       1>/var/log/media-server/media-server.log

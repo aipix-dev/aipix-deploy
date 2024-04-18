@@ -1,0 +1,35 @@
+- op: replace
+  path: /spec/template/spec/volumes/0/hostPath
+  value:
+    path: /opt/${MS_TYPE}/mediaserver/configs/media-server.ini
+- op: replace
+  path: /spec/template/spec/volumes/1/hostPath
+  value:
+    path: /opt/${MS_TYPE}/mediaserver/configs/media-server.nodes
+- op: replace
+  path: /spec/template/spec/volumes/2/hostPath
+  value:
+    path: /opt/${MS_TYPE}/mediaserver/configs/.env
+- op: replace
+  path: /spec/template/spec/volumes/5/hostPath
+  value:
+    path: /opt/${MS_TYPE}/mediaserver/licenses
+- op: replace
+  path: /spec/template/spec/volumes/8/hostPath
+  value:
+    path: /opt/${MS_TYPE}/mediaserver/streams
+- op: replace
+  path: /spec/template/spec/containers/0/volumeMounts/0/mountPath
+  value: /opt/aipix/media-server/media-server.ini
+- op: replace
+  path: /spec/template/spec/containers/0/volumeMounts/1/mountPath
+  value: /opt/aipix/media-server/media-server.nodes
+- op: replace
+  path: /spec/template/spec/containers/0/volumeMounts/2/mountPath
+  value: /opt/aipix/media-server/.env
+- op: replace
+  path: /spec/template/spec/containers/0/volumeMounts/5/mountPath
+  value: /etc/aipix/media-server
+- op: replace
+  path: /spec/template/spec/containers/0/volumeMounts/8/mountPath
+  value: /opt/aipix/media-server/streams

@@ -1,0 +1,21 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  namespace: vms
+  name: portal-landing
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host (`example.com`) && PathPrefix(`/portal/landing`)
+    middlewares:
+    - name : strip-prefix-portal-landing
+    services:
+    - kind: Service
+      name: portal-landing
+      port: 80

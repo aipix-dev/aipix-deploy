@@ -1,0 +1,56 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: analytic-events
+    app.kubernetes.io/component: analytic-events
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: analytic-events
+  namespace: vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: analytic-events
+      app.kubernetes.io/component: analytic-events
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: analytic-events
+        app.kubernetes.io/component: analytic-events
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      securityContext:
+        runAsUser: 33
+      containers:
+        - name: analytic-events
+          args:
+            - ./artisan
+            - orchestrator:socket:connect
+          envFrom:
+            - configMapRef:
+                name: vms-backend-env
+          image: download.aipix.ai:8443/vms-backend/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: storage
+              mountPath: /var/www/api/storage
+          resources:
+            requests:
+              cpu: 10m
+              memory: 50Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: analytic-events
+      restartPolicy: Always
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: storage

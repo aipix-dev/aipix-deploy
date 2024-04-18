@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: tarantool
+    app.kubernetes.io/component: db
+    app.kubernetes.io/part-of: analytics
+    global-app-name: vsaas
+  name: tarantool
+  namespace: vsaas-analytics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tarantool
+      app.kubernetes.io/component: db
+      app.kubernetes.io/part-of: analytics
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tarantool
+        app.kubernetes.io/component: db
+        app.kubernetes.io/part-of: analytics
+        global-app-name: vsaas
+    spec:
+      containers:
+        - name: tarantool
+          image: download.aipix.ai:8443/analytics-tarantool/release:latest
+          env:
+            - name: TARANTOOL_PORT
+              value: "3301"
+          ports:
+            - containerPort: 3301
+              name: tarantool
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: tarantool
+              mountPath: /var/lib/tarantool
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: tarantool
+      restartPolicy: Always
+      volumes:
+        - name: tarantool
+          persistentVolumeClaim:
+            claimName: tarantool
+

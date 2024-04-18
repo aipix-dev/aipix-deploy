@@ -1,0 +1,58 @@
+#!/bin/bash -e
+
+###Beginning of the VSaaS base config ###
+
+export TRAEFIK_DOMAIN=traefik-dashboard.aipix.ai    #Domain name for traefik dashboard
+export TRAEFIK_NAMESPACE=traefik-v2     #k8s namespace for traefik application
+export VMS_DOMAIN=                      #Domain name for VMS
+export ANALYTICS_DOMAIN=                #Domain name for orchestrator
+export NS_VMS=vsaas-vms				    #k8s namespace for vms application
+export NS_MS=vsaas-ms 				    #k8s namespace for mediaservers
+export NS_A=vsaas-analytics 			#k8s namespace for analytics
+export NS_MINIO=minio-single            #k8s namespace for minio s3
+
+export RWO_STORAGE=local-storage        # storage classname for ReadWriteOnce
+                                        # for GKE use standard-rwo
+export RWX_STORAGE=openebs-kernel-nfs   # storage classname for ReadWriteMany
+                                        # for GKE use  standard-rwx
+
+export ANALYTICS=no 				#If analytics will be deployed ("yes" or "no")
+export TYPE=single 				##Installations options
+						  #1) "single" - single node demo installation plus one node for analytics if enabled
+
+export VMS_LIC_OFFLINE=no 			#If vms offline license will be used ("yes" or "no")
+export MS_LIC_OFFLINE=no 			#If mediaserver offline license will be used ("yes" or "no")
+export A_LIC_OFFLINE=yes 			#If analytics offline license will be used ("yes" or "no")
+
+#S3 minio basic deployment parameters for analytics:
+export MINIO_CONSOLE_DOMAIN=						#define minio console domain name
+export MINIO_USR=minioadmin						#define minio admin username
+export MINIO_PSW=miniopassword 						#define minio admin password
+export MINIO_BACKEND_ACCESS_KEY=N2OK6ONUEH7CZ8R13H48 				#define minio access key used for acccess backend S3 storage bucket (use letters and numbers only)
+export MINIO_ANALYTICS_ACCESS_KEY=Y4RJU1RNFGK48LGO9I2S 				#define minio access key used for acccess analytics S3 storage bucket (use letters and numbers only)
+export MINIO_SECRET_KEY=aZ6d6WCmTV0vJ0Q2q441VeJOGnEcyfYYHPKD0LZS	#define minio secret key used for acccess S3 storage bucket (use letters and numbers only)
+export BACKEND_BUCKET_NAME=backend-store 					#minio bucket name for backend
+export ANALYTICS_BUCKET_NAME=analytics-store 					#minio bucket name for analytics
+
+#Monitoring parameters
+export MONITORING=no                            				#If monitoring will be deployed ("yes" or "no")
+export PROVISION_DASHBOARDS=yes							#If grafana dashboards will be provisioned automaticaly ("yes" or "no")
+export INFLUX_USR=admin 							#define influxdb admin user
+export INFLUX_PSW=0hmSYYaRci6yJblARc6aHbHZ4YelTXTo				#define influxdb admin userpassword (use letters and numbers only)
+export INFLUX_TOKEN=2pORp9tDo40Lm32oGUKFLL8r1UuNbgUT				#define influxdb API token (use letters and numbers only)
+
+#Portal parameters
+export PORTAL=no                            				#If portal will be deployed ("yes" or "no")
+
+###END of the VSaaS base config ###
+
+
+if [ ${TYPE} == "single" ]; then
+    VMS_TEMPLATE="vms1"
+    MS_TEMPLATE="mediaserver1"
+    A_TEMPLATE="analytics1"
+    MINIO_TEMPLATE="minio1"
+else
+    echo >&2  "ERROR: Variable TYPE is not correct"
+    exit 2
+fi

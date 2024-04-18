@@ -1,0 +1,4 @@
+resources:
+- frontend-client.yaml
+- services.yaml
+- ingressroutes.yaml

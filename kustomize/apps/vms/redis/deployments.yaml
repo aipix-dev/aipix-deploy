@@ -1,0 +1,56 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: redis-server
+    app.kubernetes.io/component: message-broker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: redis-server
+  namespace: vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis-server
+      app.kubernetes.io/component: message-broker
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: redis-server
+        app.kubernetes.io/component: message-broker
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      containers:
+        - name: redis-server
+          args:
+            - redis-server
+            - --save
+            - ""
+            - --appendonly
+            - "no"
+          image: redis:alpine
+          ports:
+            - containerPort: 6379
+              name: redis
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - redis-cli ping
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 5m
+              memory: 20Mi
+      hostname: redis-server
+      restartPolicy: Always

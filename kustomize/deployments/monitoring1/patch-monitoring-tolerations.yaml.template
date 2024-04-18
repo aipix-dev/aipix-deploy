@@ -1,0 +1,6 @@
+- op: replace
+  path: /spec/template/spec/tolerations
+  value:
+  - effect: NoSchedule
+    key: monitoring
+    operator: Exists

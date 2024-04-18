@@ -1,0 +1,131 @@
+namespace: ${NS_VMS}
+resources:
+- ../../apps/vms/nginx
+- ../../apps/vms/backend
+- ../../apps/vms/mysql-server
+- ../../apps/vms/beanstalkd
+- ../../apps/vms/redis
+- ../../apps/vms/push1st
+- ../../apps/vms/frontend-client
+- ../../apps/vms/frontend-admin
+- ../../apps/vms/controller
+- ../../apps/controller
+${ADD_RESOURCE1}
+${ADD_RESOURCE2}
+components:
+- ../../components/single-replica
+- ../../components/middlewares/cors-middleware
+- ../../components/middlewares/https-redirect-middleware
+- ../../components/middlewares/strip-prefixes-controller
+- ../../components/middlewares/strip-prefixes-frontend-admin
+${ADD_COMPONENT1}
+${ADD_COMPONENT2}
+${ADD_COMPONENT3}
+images:
+- name: download.aipix.ai:8443/vms-backend/release
+  newName: download.aipix.ai:8443/vms-backend/release
+  newTag: 24.03.0.0
+- name: download.aipix.ai:8443/vms-frontend-admin/release
+  newName: download.aipix.ai:8443/vms-frontend-admin/release
+  newTag: 24.03.0.0
+- name: download.aipix.ai:8443/vms-frontend-client/release
+  newName: download.aipix.ai:8443/vms-frontend-client/release
+  newTag: 24.03.0.0
+- name: download.aipix.ai:8443/controller/release
+  newName: download.aipix.ai:8443/controller/release
+  newTag: 24.03.0.0
+- name: download.aipix.ai:8443/vms-portal-backend/release
+  newName: download.aipix.ai:8443/vms-portal-backend/release
+  newTag: 24.03.0.0
+- name: download.aipix.ai:8443/vms-portal-frontend-client/release
+  newName: download.aipix.ai:8443/vms-portal-frontend-client/release
+  newTag: 24.03.0.0
+- name: download.aipix.ai:8443/vms-portal-stub/release
+  newName: download.aipix.ai:8443/vms-portal-stub/release
+  newTag: latest
+- name: download.aipix.ai:8443/vms-portal-landing/release
+  newName: download.aipix.ai:8443/vms-portal-landing/release
+  newTag: 24.03.0.0
+${CUSTOM_IMAGES}
+
+patches:
+- target:
+    group: ""
+    version: v1
+    kind: PersistentVolumeClaim
+    name: (storage|controller-storage|portal-storage)
+  path: patch-storage-pvc.yaml
+- target:
+    group: ""
+    version: v1
+    kind: PersistentVolumeClaim
+    name: mysql-data
+  path: patch-mysql-pvc.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: controller-api
+  path: patch-ingressroute-controller-api.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: control-plane-hls
+  path: patch-ingressroute-controller-hls.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: grafana
+  path: patch-ingressroute-monitoring.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: backend
+  path: patch-ingressroute-backend.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: frontend-admin
+  path: patch-ingressroute-frontend-admin.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: frontend-client
+  path: patch-ingressroute-frontend-client.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: frontend-client
+  path: patch-ingressroute-frontend-client.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: portal
+  path: patch-ingressroute-portal.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: portal-stub
+  path: patch-ingressroute-portal-stub.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: portal-landing
+  path: patch-ingressroute-portal-landing.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: push1st
+  path: patch-ingressroute-push1st.yaml
+${CUSTOM_PATCHES}
+

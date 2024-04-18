@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/name: mysql-data
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: mysql-data
+  namespace: vms
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: rook-cephfs
+

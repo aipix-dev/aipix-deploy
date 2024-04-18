@@ -1,0 +1,62 @@
+apiVersion: v1
+items:
+- apiVersion: ceph.rook.io/v1
+  kind: CephObjectStore
+  metadata:
+    name: my-store
+    namespace: rook-ceph
+  spec:
+    dataPool:
+      erasureCoded:
+        codingChunks: 0
+        dataChunks: 0
+      failureDomain: host
+      mirroring: {}
+      parameters:
+        compression_mode: none
+      quotas: {}
+      replicated:
+        requireSafeReplicaSize: true
+        size: 3
+      statusCheck:
+        mirror: {}
+    gateway:
+      instances: 2
+      placement:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - rook-ceph-rgw
+            topologyKey: kubernetes.io/hostname
+      port: 80
+      priorityClassName: system-cluster-critical
+      resources: {}
+    healthCheck:
+      bucket:
+        interval: 1m0s
+      livenessProbe: {}
+      readinessProbe: {}
+      startupProbe: {}
+    metadataPool:
+      erasureCoded:
+        codingChunks: 0
+        dataChunks: 0
+      failureDomain: host
+      mirroring: {}
+      parameters:
+        compression_mode: none
+      quotas: {}
+      replicated:
+        requireSafeReplicaSize: true
+        size: 3
+      statusCheck:
+        mirror: {}
+    zone:
+      name: ""
+kind: List
+metadata:
+  resourceVersion: ""

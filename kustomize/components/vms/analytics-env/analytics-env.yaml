@@ -1,0 +1,7 @@
+- op: add
+  path: /spec/template/spec/containers/0/env
+  value:
+    - name: ANALYTIC_ORCHESTRATOR_SOCKET_EVENT_ENDPOINT
+      value: ws://$(PUSH1ST_SERVICE_HOST):6003/ws/app/app-key/events/?session=session
+    - name: ANALYTIC_ORCHESTRATOR_SOCKET_STAT_ENDPOINT
+      value: ws://$(PUSH1ST_SERVICE_HOST):6003/ws/app/app-key/stats/?session=session

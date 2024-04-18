@@ -1,0 +1,70 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: controller-api
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/part-of: controller
+    global-app-name: vsaas
+  name: controller-api
+  namespace: controller
+spec:
+  ports:
+    - name: "http"
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app.kubernetes.io/name: controller
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/part-of: controller
+    global-app-name: vsaas
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: controller-control-plane-hls
+    app.kubernetes.io/component: controller-control-plane-hls
+    app.kubernetes.io/part-of: controller
+    global-app-name: vsaas
+  name: controller-control-plane-hls
+  namespace: controller
+spec:
+  ports:
+    - name: "hls"
+      port: 8888
+      protocol: TCP
+      targetPort: 8888
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: controller-control-plane-hls
+    app.kubernetes.io/component: controller-control-plane-hls
+    app.kubernetes.io/part-of: controller
+    global-app-name: vsaas
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: controller-control-plane-rtsp
+    app.kubernetes.io/component: controller-control-plane-rtsp
+    app.kubernetes.io/part-of: controller
+    global-app-name: vsaas
+  name: controller-control-plane-rtsp
+  namespace: controller
+spec:
+  ports:
+    - name: "rtsp"
+      port: 5554
+      protocol: TCP
+      targetPort: 5554
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: controller-control-plane-rtsp
+    app.kubernetes.io/component: controller-control-plane-rtsp
+    app.kubernetes.io/part-of: controller
+    global-app-name: vsaas

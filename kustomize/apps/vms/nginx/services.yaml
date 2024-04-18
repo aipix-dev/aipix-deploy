@@ -1,0 +1,28 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/component: reverse-proxy
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: nginx
+  namespace: vms
+spec:
+  ports:
+    - name: "http"
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    - name: "https"
+      port: 443
+      protocol: TCP
+      targetPort: 443
+  selector:
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/component: reverse-proxy
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  type: LoadBalancer
+

@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: vectorizator
+    app.kubernetes.io/component: vectorizator
+    app.kubernetes.io/part-of: analytics
+    global-app-name: vsaas
+  name: vectorizator
+  namespace: vsaas-analytics
+spec:
+  ports:
+    - name: "vectorizator"
+      port: 80
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    app.kubernetes.io/name: vectorizator
+    app.kubernetes.io/component: vectorizator
+    app.kubernetes.io/part-of: analytics
+    global-app-name: vsaas
