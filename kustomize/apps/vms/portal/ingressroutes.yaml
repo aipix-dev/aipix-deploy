@@ -13,6 +13,10 @@ spec:
   routes:
   - kind: Rule
     match: Host (`example.com`) && ( PathPrefix(`/portal/storage`) || PathPrefix(`/api/portal`) || PathPrefix(`/nova-api/`) || PathPrefix(`/portal/admin`) || PathPrefix(`/vendor/nova`) || PathPrefix(`/nova-vendor/`) )
+    middlewares:
+    - name: upgrade-insecure-requests
+    - name: gzip-middleware
+    - name: max-body-size
     services:
     - kind: Service
       name: portal-backend
@@ -31,9 +35,11 @@ spec:
   - websecure
   routes:
   - kind: Rule
-    match: Host (`example.com`) && PathPrefix(`/portal-stub`)
+    match: Host (`example-stub.com`)
     middlewares:
-    - name : strip-prefix-portal-stub
+    - name: upgrade-insecure-requests
+    - name: gzip-middleware
+    - name: max-body-size
     services:
     - kind: Service
       name: portal-stub
@@ -54,7 +60,8 @@ spec:
   - kind: Rule
     match: Host (`example.com`) && PathPrefix(`/portal`)
     middlewares:
-    - name : strip-prefix-portal
+    - name: strip-prefix-portal
+    - name: upgrade-insecure-requests
     services:
     - kind: Service
       name: portal-frontend-client

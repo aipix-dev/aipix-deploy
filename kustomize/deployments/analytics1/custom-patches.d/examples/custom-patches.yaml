@@ -22,3 +22,9 @@
     kind: Deployment
     name: (orchestrator)
   path: ./custom-patches.d/patch-image-pull-policy6.yaml
+- target:
+    group: ""
+    version: v1
+    kind: Service
+    name: (analytics-worker|orchestrator)
+  path: ./custom-patches.d/patch-services-type.yaml

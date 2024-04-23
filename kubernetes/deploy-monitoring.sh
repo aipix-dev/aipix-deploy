@@ -40,8 +40,7 @@ keep your credentials in safe place !
 
 URL to access Grafana is
 http://${GRAFANA_IP}:3000
+https://${VMS_DOMAIN}/monitoring
 Default credentials are admin/admin.
 Replace them during first login.
-
-
 "

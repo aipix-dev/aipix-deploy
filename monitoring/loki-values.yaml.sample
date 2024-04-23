@@ -1,9 +1,11 @@
+#deploymentMode: SingleBinary
 loki:
   auth_enabled: false
   commonConfig:
     replication_factor: 1
   storage:
     type: 'filesystem'
+  schemaConfig: {}
   compactor:
     compaction_interval: 10m
     retention_enabled: true
@@ -11,6 +13,15 @@ loki:
     delete_request_cancel_period: 10m
   limits_config:
     retention_period: 3d
+#  schemaConfig:
+#    configs:
+#    - from: "2022-01-11"
+#      index:
+#        period: 24h
+#        prefix: loki_index_
+#      object_store: filesystem
+#      schema: v12
+#      store: boltdb-shipper
 singleBinary:
   replicas: 1
   tolerations:
@@ -28,6 +39,12 @@ singleBinary:
             - "true"
   persistence:
     storageClass: local-storage
+#write:
+#  replicas: 0
+#read:
+#  replicas: 0
+#backend:
+#  replicas: 0
 test:
   enabled: false
 monitoring:

@@ -9,8 +9,8 @@ source ./sources.sh
 kubectl create ns ${NS_VMS} || true
 kubectl create secret docker-registry download-aipix-ai --namespace=${NS_VMS} \
                                                         --docker-server=https://download.aipix.ai:8443 \
-                                                        --docker-username=reader \
-                                                        --docker-password=reader1
+                                                        --docker-username=${DOCKER_USERNAME} \
+                                                        --docker-password=${DOCKER_PASSWORD}
 kubectl create secret tls vms-nginx-cert --namespace=${NS_VMS} \
                                         --cert=../nginx/ssl/tls.crt \
                                         --key=../nginx/ssl/tls.key
@@ -87,8 +87,9 @@ fi
 
 VMS_IP=$(kubectl get service/nginx -n ${NS_VMS} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 echo """
-Deployment script was finished successfuly!
+Deployment script completed successfuly!
+
 Access your VMS with the following URL:
-https://${VMS_IP}/admin
-https://${VMS_DOMAIN}/admin
+http://${VMS_IP}/admin
+https://${VMS_DOMAIN}/admin (${VMS_DOMAIN} should be resolved on DNS-server)
 """

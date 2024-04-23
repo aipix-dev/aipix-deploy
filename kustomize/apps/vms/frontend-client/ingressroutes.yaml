@@ -13,6 +13,8 @@ spec:
   routes:
   - kind: Rule
     match: Host (`example.com`) && PathPrefix(`/`)
+    middlewares:
+    - name: gzip-middleware
     services:
     - kind: Service
       name: frontend-client

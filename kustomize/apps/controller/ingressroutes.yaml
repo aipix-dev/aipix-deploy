@@ -13,6 +13,9 @@ spec:
   routes:
   - kind: Rule
     match: Host (`example.com`) && PathPrefix(`/controller/api`)
+    middlewares:
+    - name: gzip-middleware
+    - name: max-body-size
     services:
     - kind: Service
       name: controller-api
@@ -34,10 +37,27 @@ spec:
   - kind: Rule
     match: Host (`example.com`) && PathPrefix(`/controller-hls`)
     middlewares:
-    - name : cors-middleware
-    - name : strip-prefix-controller-hls
+    - name: cors-middleware
+    - name: strip-prefix-controller-hls
     services:
     - kind: Service
       name: controller-control-plane-hls
       port: 8888
       scheme: http
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  name: control-plane-rtsp
+  namespace: vms
+spec:
+  entryPoints:
+  - controller-rtsp
+  routes:
+  - match: HostSNI(`*`)
+    services:
+    - name: controller-control-plane-rtsp
+      port: 5554

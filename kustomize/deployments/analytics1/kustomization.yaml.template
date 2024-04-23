@@ -28,7 +28,7 @@ images:
   newName: download.aipix.ai:8443/analytics-licensing/release
   newTag: latest
 - name: download.aipix.ai:8443/analytics-metrics-pusher/release
-  newName: download.aipix.ai:8443/analytics-metrics-pusher/dev
+  newName: download.aipix.ai:8443/analytics-metrics-pusher/release
   newTag: latest
 ${CUSTOM_IMAGES}
 

@@ -13,7 +13,10 @@ fi
 kubectl create ns ${NS_A} || true
 
 
-kubectl create secret docker-registry download-aipix-ai --namespace=${NS_A} --docker-server=https://download.aipix.ai:8443  --docker-username=reader --docker-password=reader1
+kubectl create secret docker-registry download-aipix-ai --namespace=${NS_A} \
+                                                        --docker-server=https://download.aipix.ai:8443 \
+                                                        --docker-username=${DOCKER_USERNAME} \
+                                                        --docker-password=${DOCKER_PASSWORD}
 kubectl create configmap analytics-env --namespace=${NS_A} --from-file=../analytics/.env
 kubectl create configmap a-licensing-yaml --namespace=${NS_A} --from-file=../analytics/licensing.yaml
 kubectl create configmap a-license-json --namespace=${NS_A} --from-file=../analytics/license.json
@@ -34,23 +37,15 @@ fi
 ../kustomize/deployments/${A_TEMPLATE}/update-kustomization.sh || exit 1
 kubectl apply -k ../kustomize/deployments/${A_TEMPLATE}
 
-
 # Waiting for starting containers
-wait_period=0
 while true
 do
-    wait_period=$(($wait_period+10))
-    if [ $wait_period -gt 300 ];then
-       echo "The script ran for 5 minutes to start containers, exiting now.."
-       exit 1
-    else
-       if [[ $(kubectl get  deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] && \
-          [[ $(kubectl get  deployment orchestrator -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]
-       then break
-       fi
-       echo "Waiting for starting orchestrator and mysql containers ..."
-       sleep 10
-    fi
+   if [[ $(kubectl get  deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] && \
+      [[ $(kubectl get  deployment orchestrator -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]
+   then break
+   fi
+   sleep 10
+   echo "Waiting for starting orchestrator and mysql containers ..."
 done
 sleep 10
 
@@ -68,10 +63,9 @@ kubectl -n ${NS_A} annotate service analytics-worker prometheus.io/scrape="true"
 
 ORCH_IP=$(kubectl get service/orchestrator -n ${NS_A} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 echo """
+Deployment script completed successfuly!
 
-Deployment script is finished successfuly!
 Access your ORCHESTRATOR with the following URL:
 http://${ORCH_IP}/orch-admin/
 https://${ANALYTICS_DOMAIN}/orch-admin/ (${ANALYTICS_DOMAIN} should be resolved on DNS-server)
-
 """

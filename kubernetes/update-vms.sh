@@ -5,6 +5,9 @@ cd "$scriptdir"
 
 source ./sources.sh
 
+# Delete registry secrets
+kubectl delete secret download-aipix-ai --namespace=${NS_VMS} || true
+
 # Delete VMS configs
 kubectl delete secret vms-nginx-cert --namespace=${NS_VMS} || true
 kubectl delete configmap vms-nginx-conf --namespace=${NS_VMS} || true
@@ -31,6 +34,12 @@ if [ ${PORTAL} == "yes" ]; then
   kubectl delete configmap vms-portal-stub-env --namespace=${NS_VMS} || true
 fi
 
+# Create registry secrets
+kubectl create secret docker-registry download-aipix-ai --namespace=${NS_VMS} \
+                                                        --docker-server=https://download.aipix.ai:8443 \
+                                                        --docker-username=${DOCKER_USERNAME} \
+                                                        --docker-password=${DOCKER_PASSWORD}
+
 # Create VMS configmsps
 kubectl create secret tls vms-nginx-cert --namespace=${NS_VMS} \
   --cert=../nginx/ssl/tls.crt \
@@ -44,8 +53,8 @@ kubectl create configmap vms-backend-env --namespace=${NS_VMS} --from-env-file=.
 kubectl create configmap vms-fcm-json  --namespace=${NS_VMS} --from-file=../vms-backend/certificates/fcm.json
 kubectl create configmap vms-voip-p8 --namespace=${NS_VMS} --from-file=../vms-backend/certificates/voip.p8
 kubectl create configmap vms-frontend-env --namespace=${NS_VMS} \
---from-env-file=../vms-frontend/admin.env \
---from-env-file=../vms-frontend/client.env
+                                          --from-env-file=../vms-frontend/admin.env \
+                                          --from-env-file=../vms-frontend/client.env
 kubectl create configmap mysql-server-env --namespace=${NS_VMS} --from-env-file=../mysql-server/mysql-server.env
 kubectl create configmap mysql-cnf --namespace=${NS_VMS} --from-file=../mysql-server/my.cnf
 kubectl create configmap push1st-server --namespace=${NS_VMS} --from-file=server.yml=../push1st/server.yml
@@ -86,6 +95,8 @@ do
   echo "Waiting for updating containers ..."
 done
 
+sleep 10
+
 kubectl -n ${NS_VMS} exec deployment.apps/backend -- scripts/docker/update.sh
 kubectl -n ${NS_VMS} exec deployment.apps/backend -- chown www-data:www-data -R storage/logs
 kubectl -n ${NS_VMS} exec deployment.apps/controller -- ./scripts/update.sh
@@ -100,7 +111,7 @@ VMS_IP=$(kubectl get service/nginx -n ${NS_VMS} -o jsonpath='{.status.loadBalanc
 echo "
 Your containers are updated successfully!
 
-Update script was finished successfuly!
+Update script completed successfuly!
 Access your VMS with the following URL:
 https://${VMS_IP}/admin
 https://${VMS_DOMAIN}/admin

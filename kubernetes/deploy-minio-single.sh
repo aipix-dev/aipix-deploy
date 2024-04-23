@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source ./sources.sh
+source ./k8s-onprem/sources.sh
 
 export PATH=$PATH:$HOME/minio-binaries/
 kubectl create ns ${NS_MINIO}
@@ -26,10 +27,10 @@ until [[ $(kubectl get deployments.apps minio -n ${NS_MINIO} -o jsonpath='{.stat
   fi
 done
 
-export MINIO_IP=$(kubectl -n ${NS_MINIO} get service/minio -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')
+# export MINIO_IP=$(kubectl -n ${NS_MINIO} get service/minio -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')
+export MINIO_IP=${K8S_API_ENDPOINT}
 
-#mc config host add local http://${MINIO_IP}:9000 ${MINIO_USR} ${MINIO_PSW}
-mc alias set local http://${MINIO_IP}:9000 ${MINIO_USR} ${MINIO_PSW}
+mc alias set local http://${MINIO_IP}:30900 ${MINIO_USR} ${MINIO_PSW}
 mc mb -p local/${BACKEND_BUCKET_NAME}
 mc mb -p local/${ANALYTICS_BUCKET_NAME}
 
@@ -80,9 +81,9 @@ mc anonymous set download local/${ANALYTICS_BUCKET_NAME}
 mc ilm rule add local/${ANALYTICS_BUCKET_NAME} --expire-days "2"
 
 echo "
+Deployment script completed successfuly!
 
 Minio console can be reached with the following URL:
-http://${MINIO_IP}:9090
-https://${MINIO_CONSOLE_DOMAIN}
-
+http://${MINIO_IP}:30090
+https://${MINIO_CONSOLE_DOMAIN} (${MINIO_CONSOLE_DOMAIN} should be resolved on DNS-server)
 "

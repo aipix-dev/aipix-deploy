@@ -19,10 +19,9 @@ fi
 
 ORCH_IP=$(kubectl get service/orchestrator -n ${NS_A} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 echo """
+Update script completed successfuly!
 
-Deployment script is finished successfuly!
 Access your ORCHESTRATOR with the following URL:
 http://${ORCH_IP}/orch-admin/
 https://${ANALYTICS_DOMAIN}/orch-admin/ (${ANALYTICS_DOMAIN} should be resolved on DNS-server)
-
 """

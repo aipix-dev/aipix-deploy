@@ -20,4 +20,4 @@ The VSaaS (Video Surveillance as a Service) platform – a high-performance plat
 
 ### Install ###
 
-Kubernetes Installation [guide](https://docs.aipix.ai).
+Kubernetes Installation [guide](https://docs.aipix.ai/){:target="_blank"}.

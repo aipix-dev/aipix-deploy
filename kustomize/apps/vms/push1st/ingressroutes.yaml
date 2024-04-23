@@ -13,6 +13,8 @@ spec:
   routes:
   - kind: Rule
     match: Host (`example.com`) && PathPrefix(`/pusher`)
+    middlewares:
+    - name: upgrade-insecure-requests
     services:
     - kind: Service
       name: push1st

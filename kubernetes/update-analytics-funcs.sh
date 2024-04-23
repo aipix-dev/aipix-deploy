@@ -4,8 +4,11 @@ source ./sources.sh
 
 update_secrets () {
 	set -e
-	kubectl delete secret download-aipix-ai --namespace=${NS_A}
-	kubectl create secret docker-registry download-aipix-ai --namespace=${NS_A} --docker-server=https://download.aipix.ai:8443  --docker-username=reader --docker-password=reader1
+	kubectl delete secret download-aipix-ai --namespace=${NS_A} || true
+	kubectl create secret docker-registry download-aipix-ai --namespace=${NS_A} \
+                                                            --docker-server=https://download.aipix.ai:8443 \
+                                                            --docker-username=${DOCKER_USERNAME} \
+                                                            --docker-password=${DOCKER_PASSWORD}
 }
 
 update_analytics-worker () {
@@ -15,20 +18,13 @@ update_analytics-worker () {
     TargetReplicas=$(kubectl get  deployment analytics-worker --namespace=${NS_A} -o jsonpath='{.status.replicas}')
     kubectl -n ${NS_A} rollout restart deployment analytics-worker
     # Waiting for starting containers
-    wait_period=0
     while true
     do
-        wait_period=$(($wait_period+10))
-        if [ $wait_period -gt 300 ];then
-            echo "The script ran for 5 minutes to start containers, exiting now.."
-            exit 1
-        else
-            if [[ $(kubectl get  deployment analytics-worker -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge ${TargetReplicas} ]]
-            then break
-            fi
-            echo "Waiting for starting ${TargetReplicas} analytics-worker PODs (max 5 minutes) ..."
-            sleep 10
+        if [[ $(kubectl get  deployment analytics-worker -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge ${TargetReplicas} ]]
+        then break
         fi
+        sleep 10
+        echo "Waiting for starting ${TargetReplicas} analytics-worker PODs (max 5 minutes) ..."
     done
     sleep 10
 
@@ -43,25 +39,19 @@ update_orchestrator () {
 	kubectl create configmap a-licensing-yaml --namespace=${NS_A} --from-file=../analytics/licensing.yaml
 	kubectl create configmap a-license-json --namespace=${NS_A} --from-file=../analytics/license.json
 	kubectl -n ${NS_A} rollout restart deployment orchestrator
-        # Waiting for starting containers
-        wait_period=0
-        while true
-        do
-            wait_period=$(($wait_period+10))
-            if [ $wait_period -gt 300 ];then
-                echo "The script ran for 5 minutes to start containers, exiting now.."
-                exit 1
-            else
-                if [[ $(kubectl get  deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] && \
-                   [[ $(kubectl get  deployment orchestrator -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]
-                then break
-                fi
-	        echo "Waiting for starting orchestrator and mysql containers (max 5 minutes) ..."
-                sleep 10
-            fi
-        done
+    # Waiting for starting containers
+    while true
+    do
+        if [[ $(kubectl get  deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] && \
+            [[ $(kubectl get  deployment orchestrator -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]
+        then break
+        fi
+        echo "Waiting for starting orchestrator and mysql containers (max 5 minutes) ..."
         sleep 10
-        kubectl exec -n ${NS_A} deployment.apps/orchestrator -c django --  python manage.py migrate
+        
+    done
+    sleep 10
+    kubectl exec -n ${NS_A} deployment.apps/orchestrator -c django --  python manage.py migrate
 }
 
 update_tarantool () {

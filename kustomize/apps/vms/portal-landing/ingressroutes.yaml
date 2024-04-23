@@ -14,7 +14,8 @@ spec:
   - kind: Rule
     match: Host (`example.com`) && PathPrefix(`/portal/landing`)
     middlewares:
-    - name : strip-prefix-portal-landing
+    - name: strip-prefix-portal-landing
+    - name: upgrade-insecure-requests
     services:
     - kind: Service
       name: portal-landing

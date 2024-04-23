@@ -37,8 +37,9 @@ Traefik helm values are applied!
 TRAEFIK_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
 echo """
-Deployment script was finished successfuly!
+Deployment script completed successfuly!
+
 Access your Traefik dashboard with the following URL:
-https://${TRAEFIK_IP}/dashboard/
-https://${TRAEFIK_DOMAIN}/dashboard/
+http://${TRAEFIK_IP}/dashboard/
+https://${TRAEFIK_DOMAIN}/dashboard/ (${TRAEFIK_DOMAIN} should be resolved on DNS-server)
 """

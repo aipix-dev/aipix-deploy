@@ -14,7 +14,8 @@ spec:
   - kind: Rule
     match: Host (`example.com`) && PathPrefix(`/admin`)
     middlewares:
-    - name : strip-prefix-frontend-admin
+    - name: strip-prefix-frontend-admin
+    - name: gzip-middleware
     services:
     - kind: Service
       name: frontend-admin

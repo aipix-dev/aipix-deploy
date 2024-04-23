@@ -15,5 +15,5 @@ spec:
     match: Host (`example.com`) && PathPrefix(`/monitoring`)
     services:
     - kind: Service
-      name: grafana.monitoring.svc
+      name: grafana
       port: 3000

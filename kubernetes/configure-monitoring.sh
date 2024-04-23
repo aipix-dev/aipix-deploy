@@ -62,7 +62,7 @@ cp  ../monitoring/syslog-service.yaml ../kustomize/deployments/monitoring1/
 
 ## Configure loki
 cp -n ../monitoring/loki-values.yaml.sample ../monitoring/loki-values.yaml
-helm -n monitoring template --debug loki grafana/loki -f ../monitoring/loki-values.yaml > ../kustomize/deployments/monitoring1/loki.yaml
+helm -n monitoring template --debug loki grafana/loki -f ../monitoring/loki-values.yaml --version 5.47.2 > ../kustomize/deployments/monitoring1/loki.yaml
 
 echo """
 

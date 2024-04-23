@@ -155,7 +155,65 @@ spec:
         - name: portal-storage
           persistentVolumeClaim:
             claimName: portal-storage
-
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: portal-scheduler
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: portal-schedule
+  namespace: vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: portal-scheduler
+      app.kubernetes.io/component: backend
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: portal-scheduler
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+      containers:
+        - name: portal-schedule
+          args:
+            - php
+            - artisan
+            - schedule:work
+          envFrom:
+            - configMapRef:
+                name: vms-portal-backend-env
+          image: download.aipix.ai:8443/vms-portal-backend/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: portal-storage
+              mountPath: /opt/api/storage
+          resources:
+            requests:
+              cpu: 5m
+              memory: 120Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: portal-schedule
+      restartPolicy: Always
+      volumes:
+        - name: portal-storage
+          persistentVolumeClaim:
+            claimName: portal-storage
 ---
 apiVersion: apps/v1
 kind: Deployment

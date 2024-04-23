@@ -13,6 +13,9 @@ spec:
   routes:
   - kind: Rule
     match: Host (`example.com`) &&  ( PathPrefix(`/api`) || PathPrefix(`/storage`) || PathPrefix(`/apple-app-site-association`) )
+    middlewares:
+    - name: gzip-middleware
+    - name: max-body-size
     services:
     - kind: Service
       name: backend

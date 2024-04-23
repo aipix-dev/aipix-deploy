@@ -16,7 +16,7 @@ additionalArguments:
 #  - --accesslog.format=json
   - --accesslog.fields.headers.defaultmode=keep
   - --serversTransport.insecureSkipVerify=true
-  - --entrypoints.controller-rtsp.address=:8888/tcp
+  - --entrypoints.controller-rtsp.address=:5554/tcp
 
 ingressRoute:
   dashboard:
@@ -25,10 +25,18 @@ ingressRoute:
     tls:
       secretName: certificate
 
+ports:
+  controller-rtsp:
+    port: 5554
+    protocol: TCP
+    expose:
+      default: true
+    exposedPort: 5554
+
 service:
   spec:
     sessionAffinity: ClientIP
-    externalTrafficPolicy: Cluster
+    externalTrafficPolicy: Local
 
 affinity:
   podAntiAffinity:
@@ -38,6 +46,3 @@ affinity:
             app.kubernetes.io/name: '{{ template "traefik.name" . }}'
             app.kubernetes.io/instance: '{{ .Release.Name }}-{{ .Release.Namespace }}'
         topologyKey: kubernetes.io/hostname
-
-nodeSelector:
-  traefik: "true"

@@ -15,9 +15,11 @@ ${ADD_RESOURCE2}
 components:
 - ../../components/single-replica
 - ../../components/middlewares/cors-middleware
-- ../../components/middlewares/https-redirect-middleware
+- ../../components/middlewares/gzip-middleware
 - ../../components/middlewares/strip-prefixes-controller
 - ../../components/middlewares/strip-prefixes-frontend-admin
+- ../../components/middlewares/upgrade-insecure-requests
+- ../../components/middlewares/max-body-size
 ${ADD_COMPONENT1}
 ${ADD_COMPONENT2}
 ${ADD_COMPONENT3}
@@ -109,6 +111,12 @@ patches:
     kind: IngressRoute
     name: portal
   path: patch-ingressroute-portal.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: portal-backend
+  path: patch-ingressroute-portal-backend.yaml
 - target:
     group: traefik.io
     version: v1alpha1
