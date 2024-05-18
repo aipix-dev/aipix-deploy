@@ -1,5 +1,8 @@
 #!/bin/bash
 
+scriptdir="$(dirname "$0")"
+cd "$scriptdir"
+
 source ./sources.sh
 source ./k8s-onprem/sources.sh
 
@@ -28,7 +31,8 @@ until [[ $(kubectl get deployments.apps minio -n ${NS_MINIO} -o jsonpath='{.stat
 done
 
 # export MINIO_IP=$(kubectl -n ${NS_MINIO} get service/minio -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')
-export MINIO_IP=${K8S_API_ENDPOINT}
+MINIO_IP=${K8S_API_ENDPOINT}
+# MINIO_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
 mc alias set local http://${MINIO_IP}:30900 ${MINIO_USR} ${MINIO_PSW}
 mc mb -p local/${BACKEND_BUCKET_NAME}

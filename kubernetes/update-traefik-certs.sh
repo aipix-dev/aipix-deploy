@@ -1,5 +1,8 @@
 #Create configs and secrets
 
+scriptdir="$(dirname "$0")"
+cd "$scriptdir"
+
 source ./sources.sh
 
 kubectl -n ${TRAEFIK_NAMESPACE} delete secret certificate >/dev/null || true

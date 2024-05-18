@@ -85,7 +85,8 @@ if [ ${PORTAL} == "yes" ]; then
     kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/start.sh
 fi
 
-VMS_IP=$(kubectl get service/nginx -n ${NS_VMS} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+# VMS_IP=$(kubectl get service/nginx -n ${NS_VMS} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+VMS_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 echo """
 Deployment script completed successfuly!
 

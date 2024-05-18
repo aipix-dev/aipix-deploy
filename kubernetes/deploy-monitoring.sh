@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+scriptdir="$(dirname "$0")"
+cd "$scriptdir"
+
 source ./sources.sh
 
 kubectl create ns monitoring || true

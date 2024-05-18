@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+scriptdir="$(dirname "$0")"
+cd "$scriptdir"
+
 source ./sources.sh
 
 update_secrets () {
@@ -51,7 +54,8 @@ update_orchestrator () {
         
     done
     sleep 10
-    kubectl exec -n ${NS_A} deployment.apps/orchestrator -c django --  python manage.py migrate
+    # kubectl exec -n ${NS_A} deployment.apps/orchestrator -c django --  python manage.py migrate
+    kubectl exec -n ${NS_A} deployment.apps/orchestrator -c django --  python manage.py seed
 }
 
 update_tarantool () {

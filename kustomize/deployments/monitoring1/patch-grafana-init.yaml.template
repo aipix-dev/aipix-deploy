@@ -1,7 +1,7 @@
 - op: add
   path: /spec/template/spec/initContainers
   value:
-  - name: inint-grafana
+  - name: init-grafana
     image: alpine:3
     command:
     - chown

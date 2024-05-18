@@ -149,7 +149,8 @@ done
 
 ./install_local_volume_provisioner.sh
 
-helm repo add openebs-nfs https://openebs.github.io/dynamic-nfs-provisioner
+# helm repo add openebs-nfs https://openebs.github.io/dynamic-nfs-provisioner
+helm repo add openebs-nfs https://openebs-archive.github.io/dynamic-nfs-provisioner
 helm repo update
 helm install openebs-nfs openebs-nfs/nfs-provisioner --namespace local-volume  \
 	--set-string nfsStorageClass.backendStorageClass="local-storage"
@@ -157,6 +158,13 @@ helm install openebs-nfs openebs-nfs/nfs-provisioner --namespace local-volume  \
 
 ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa <<<y >/dev/null 2>&1
 cat ~/.ssh/id_rsa.pub | tee -a ~/.ssh/authorized_keys
+
+#Delete midnight commander if installed
+dpkg -s mc > /dev/null 2>&1
+if [ $? = 0 ]; then
+  echo "Removing midnight commander"
+  sudo apt purge -y mc > /dev/null 2>&1
+fi
 
 #Install minio client
 curl https://dl.min.io/client/mc/release/linux-amd64/mc \

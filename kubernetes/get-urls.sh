@@ -1,5 +1,8 @@
 #!/bin/bash
 
+scriptdir="$(dirname "$0")"
+cd "$scriptdir"
+
 source ./sources.sh
 source ./k8s-onprem/sources.sh
 

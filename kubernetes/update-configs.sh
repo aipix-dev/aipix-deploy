@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+scriptdir="$(dirname "$0")"
+cd "$scriptdir"
 ## Begining of the functions definitions
 
 # Reads the file and gather all enviroments variables
@@ -10,10 +12,15 @@ get_env_dict_from_file () {
 	for line in $(cat ${file} | sed -e 's/ *= */=/g'); do
 		set "${line}"
  		for word in "$@"; do
-			IFS='=' read -r key val <<< "$word"
-			if [[ -n "${val}" ]]; then
-				key=$(echo $key | sed -e 's/#//g')
-			       	dict["${key}"]="${val}"
+			if [[ $(echo $word | grep "=") ]]; then
+				IFS='=' read -r key val <<< "$word"
+				if [[ -n "${val}" ]]; then
+					key=$(echo $key | sed -e 's/#//g')
+					dict["${key}"]="${val}"
+				else
+					key=$(echo $key | sed -e 's/#//g')
+					dict["${key}"]=""
+				fi
 			fi
 		done
 	done
@@ -49,10 +56,11 @@ print_new_config_lines () {
 		fi
 	done
 	if [[ ${#new_elements[@]} > 0 ]]; then
-		echo "### New ${#new_elements[@]} line(s) are added by script at $(date +%d-%m-%Y)" >> $current_file;
-		#echo "### New ${#new_elements[@]} line(s) are added by script at $(date +%d-%m-%Y)";
+		echo "" >> $current_file;
+		echo "### New ${#new_elements[@]} line(s) are added by script at $(date +%d-%m-%Y)" >> $current_file
+		#echo "### New ${#new_elements[@]} line(s) are added by script at $(date +%d-%m-%Y)"
 	fi
-	for key in "${!new_elements[@]}"; do cat $sample_file | grep $key >> $current_file; done
+	for key in "${!new_elements[@]}"; do cat $sample_file | grep -w $key >> $current_file; done
 	#for key in "${!new_elements[@]}"; do cat $sample_file | grep $key ; done
 }
 

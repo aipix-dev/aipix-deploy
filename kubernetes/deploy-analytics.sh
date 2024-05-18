@@ -61,7 +61,9 @@ kubectl exec -n ${NS_A} deployment.apps/orchestrator -c django --  python manage
 kubectl -n ${NS_A} annotate service analytics-worker prometheus.io/port="8081"
 kubectl -n ${NS_A} annotate service analytics-worker prometheus.io/scrape="true"
 
-ORCH_IP=$(kubectl get service/orchestrator -n ${NS_A} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+# ORCH_IP=$(kubectl get service/orchestrator -n ${NS_A} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+ORCH_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
 echo """
 Deployment script completed successfuly!
 

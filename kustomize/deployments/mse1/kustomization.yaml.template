@@ -1,0 +1,17 @@
+namespace: ${NS_MS}
+resources:
+- ../../apps/mse/
+images:
+- name: download.aipix.ai:8443/vsaas-media-engine/release
+  newName: download.aipix.ai:8443/vsaas-media-engine/release
+  newTag: 24.03.0.0
+${CUSTOM_IMAGES}
+
+patches:
+- target:
+    group: apps
+    version: v1
+    kind: DaemonSet
+    name: (mse)
+  path: patch-mounts.yaml
+${CUSTOM_PATCHES}

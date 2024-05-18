@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+scriptdir="$(dirname "$0")"
+cd "$scriptdir"
+
 source ./sources.sh
 
 git -C ../kustomize/apps/monitoring clone https://github.com/techiescamp/kubernetes-prometheus.git || true

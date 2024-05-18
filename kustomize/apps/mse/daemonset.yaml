@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app.kubernetes.io/name: mediaserver
+    app.kubernetes.io/component: mediaserver
+    app.kubernetes.io/part-of: mediaserver
+    global-app-name: vsaas
+  name: mse
+  namespace: vsaas-ms
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mediaserver
+      app.kubernetes.io/component: mediaserver
+      app.kubernetes.io/part-of: mediaserver
+      global-app-name: vsaas
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mediaserver
+        app.kubernetes.io/component: mediaserver
+        app.kubernetes.io/part-of: mediaserver
+        global-app-name: vsaas
+    spec:
+      tolerations:
+      - key: mediaserver
+        operator: Exists
+        effect: NoSchedule
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: mediaserver
+                operator: In
+                values:
+                - "true"
+      hostNetwork: true
+      containers:
+      - name: mse
+        image: download.aipix.ai:8443/vsaas-media-engine/release:latest
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: server-json
+          mountPath: /opt/vsaas/services/server.json
+          readOnly: true
+        - name: streams-json
+          mountPath: /opt/vsaas/services/streams.json
+          readOnly: false
+        - name: licenses
+          mountPath: /etc/vsaas/license
+        - name: fstab
+          mountPath: /etc/fstab
+          readOnly: true
+        - name: machine-id
+          mountPath: /etc/machine-id
+          readOnly: true
+        - name: mse-key-pem
+          mountPath: /opt/ssl/key.pem
+          subPath: key.pem
+          readOnly: true
+        - name: mse-cert-pem
+          mountPath: /opt/ssl/cert.pem
+          subPath: cert.pem
+          readOnly: true
+        - name: storage
+          mountPath: /storage
+        resources:
+          limits:
+            cpu: "6"
+            memory: 4Gi
+          requests:
+            cpu: "200m"
+            memory: 200Mi
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      hostname: mse
+      imagePullSecrets:
+      - name: download-aipix-ai
+      volumes:
+      - name: server-json
+        hostPath:
+          path: /opt/vsaas/mse/configs/server.json
+      - name: streams-json
+        hostPath:
+          path: /opt/vsaas/mse/streams/streams.json
+      - name: licenses
+        hostPath:
+          path: /opt/vsaas/mse/licenses
+      - name: fstab
+        hostPath:
+          path: /etc/fstab
+      - name: machine-id
+        hostPath:
+          path: /etc/machine-id
+      - name: mse-key-pem
+        secret:
+          secretName: mse-key-pem
+      - name: mse-cert-pem
+        secret:
+          secretName: mse-cert-pem
+      - name: storage
+        hostPath:
+          path: /storage

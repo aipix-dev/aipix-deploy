@@ -1,0 +1,65 @@
+{
+  "rtsp": {
+    "listen": "*:8554:/",
+    "workers": 2,
+    "poll": 256,
+    "ip": 4
+  },
+  "streams": "./streams.json",
+  "media": {
+    "listen": "*:8443:/",
+    "ip": 4,
+    "workers": 2,
+    "poll": 64,
+    "ssl": true
+  },
+  "api": {
+    "listen": "*:8665:/api/",
+    "workers": 2,
+    "poll": 64,
+    "ssl": true,
+    "ip": 4
+  },
+  "ssl": {
+    "key": "/opt/ssl/key.pem",
+    "cert": "/opt/ssl/cert.pem"
+  },
+  "cluster": {
+    "webhook": "http://localhost:8080/event/mediaserver/",
+    "events": [
+      "service:up",
+      "service:down",
+      "service:pulse",
+      "service:emergency",
+      "stream:create",
+      "stream:state",
+      "stream:pulse",
+      "stream:reconnect",
+      "stream:delete",
+      "stream:dvr",
+      "server:capture",
+      "server:release"
+    ]
+  },
+  "#storage": {
+    "driver": "local",
+    "volume": {
+      "name": "vstorage",
+      "option": "disable-root-write;",
+      "bucket": {
+        "/storage": {
+          "capacity": 99999
+        }
+      }
+    }
+  },
+  "license": "<url or path to license files>",
+  "secret": "I9REYLxj*YCG44hvEKjXP(b5TCh)xmFxZPN+Dxuwfw2*tkRxnLQH6nuPMv#99@8e",
+  "max-io-events": 1024,
+  "max-fd-limit": 4096,
+  "hostname": "example.com",
+  "log": {
+    "verbose": "7",
+    "out": "stdout|syslog.user"
+  }
+}

@@ -1,0 +1,21 @@
+- op: replace
+  path: /spec/template/spec/volumes/0/hostPath
+  value:
+    path: /opt/${MS_TYPE}/mse/configs/server.json
+- op: replace
+  path: /spec/template/spec/volumes/1/hostPath
+  value:
+    path: /opt/${MS_TYPE}/mse/streams/streams.json
+- op: replace
+  path: /spec/template/spec/volumes/2/hostPath
+  value:
+    path: /opt/${MS_TYPE}/mse/licenses
+- op: replace
+  path: /spec/template/spec/containers/0/volumeMounts/0/mountPath
+  value: /opt/vsaas/services/server.json
+- op: replace
+  path: /spec/template/spec/containers/0/volumeMounts/1/mountPath
+  value: /opt/vsaas/services/streams.json
+- op: replace
+  path: /spec/template/spec/containers/0/volumeMounts/2/mountPath
+  value: /etc/vsaas/license

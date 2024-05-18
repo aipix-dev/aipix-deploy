@@ -6,13 +6,14 @@ source ./update-analytics-funcs.sh
 
 apply_manifests
 
+update_push1st
 update_secrets
-update_orchestrator
-update_analytics-worker
 update_tarantool
 update_vectorizator
 update_clickhouse
-update_push1st
+update_orchestrator
+update_analytics-worker
+
 if [ ${MONITORING} == "yes" ]; then
   update_metrics-pusher
 fi
