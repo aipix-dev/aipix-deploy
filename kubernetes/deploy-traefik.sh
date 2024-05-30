@@ -27,8 +27,7 @@ done
 sleep 5
 
 # Apply helm values
-envsubst < ./traefik/traefik-helm-values.yaml.template > ./traefik/traefik-helm-values.yaml
-helm upgrade -n ${TRAEFIK_NAMESPACE} traefik traefik/traefik -f ./traefik/traefik-helm-values.yaml >/dev/null
+helm upgrade -n ${TRAEFIK_NAMESPACE} traefik traefik/traefik -f ../traefik/traefik-helm-values.yaml >/dev/null
 
 echo "
 Traefik helm values are applied!

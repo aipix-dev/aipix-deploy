@@ -11,7 +11,7 @@ kubectl -n ${TRAEFIK_NAMESPACE} create secret tls certificate \
    --key=../nginx/ssl/tls.key >/dev/null
 
 kubectl -n ${TRAEFIK_NAMESPACE} delete ingressroutes.traefik.io traefik-dashboard >/dev/null
-helm upgrade -n ${TRAEFIK_NAMESPACE} traefik traefik/traefik -f ./traefik/traefik-helm-values.yaml >/dev/null
+helm upgrade -n ${TRAEFIK_NAMESPACE} traefik traefik/traefik -f ../traefik/traefik-helm-values.yaml >/dev/null
 
 echo """
 Certificates were successfully updated

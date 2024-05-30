@@ -97,7 +97,7 @@ done
 
 sleep 10
 
-kubectl -n ${NS_VMS} exec deployment.apps/backend -- scripts/docker/update.sh
+kubectl -n ${NS_VMS} exec deployment.apps/backend -- ./scripts/update.sh
 kubectl -n ${NS_VMS} exec deployment.apps/backend -- chown www-data:www-data -R storage/logs
 kubectl -n ${NS_VMS} exec deployment.apps/controller -- ./scripts/update.sh
 
@@ -106,7 +106,7 @@ if [ ${PORTAL} == "yes" ]; then
   kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/update.sh
 fi
 
-VMS_IP=$(kubectl get service/nginx -n ${NS_VMS} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+VMS_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
 echo "
 Your containers are updated successfully!

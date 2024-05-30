@@ -36,7 +36,7 @@ if [[ ${CONFIGURE} == "configure" ]]; then
 	ssh -p ${PORT} ${SSH_OPTIONS} ${USERNAME}@${MS} sudo mkdir -p /opt/${MS_TYPE}/mse/streams
 	ssh -p ${PORT} ${SSH_OPTIONS} ${USERNAME}@${MS} sudo mkdir -p /opt/${MS_TYPE}/mse/configs
 	rsync -e "ssh -p ${PORT} ${SSH_OPTIONS}" --rsync-path="sudo rsync" ../mse/server.json.${MS}.${MS_TYPE} ${USERNAME}@${MS}:/opt/${MS_TYPE}/mse/configs/server.json
-	rsync -e "ssh -p ${PORT} ${SSH_OPTIONS}" --rsync-path="sudo rsync" ../mse/streams.json.${MS}.${MS_TYPE} ${USERNAME}@${MS}:/opt/${MS_TYPE}/mse/streams/streams.json
+	rsync -e "ssh -p ${PORT} ${SSH_OPTIONS}" --ignore-existing --rsync-path="sudo rsync" ../mse/streams.json.${MS}.${MS_TYPE} ${USERNAME}@${MS}:/opt/${MS_TYPE}/mse/streams/streams.json
 	rsync -e "ssh -p ${PORT} ${SSH_OPTIONS}" --rsync-path="sudo rsync" ../mse/license.json ${USERNAME}@${MS}:/opt/${MS_TYPE}/mse/licenses/license.json || true
 	rsync -e "ssh -p ${PORT} ${SSH_OPTIONS}" --rsync-path="sudo rsync" ../mse/public.key ${USERNAME}@${MS}:/opt/${MS_TYPE}/mse/licenses/public.key || true
 

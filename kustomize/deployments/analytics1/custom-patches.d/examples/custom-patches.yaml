@@ -28,3 +28,9 @@
     kind: Service
     name: (analytics-worker|orchestrator)
   path: ./custom-patches.d/patch-services-type.yaml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: (analytics-worker)
+  path: ./custom-patches.d/analytics-worker-resources.yaml

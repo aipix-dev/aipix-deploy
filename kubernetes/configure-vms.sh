@@ -12,7 +12,7 @@ sed -i "s@BASE_ENDPOINT_S3_STORAGE=.*@BASE_ENDPOINT_S3_STORAGE=https://${VMS_DOM
 sed -i "s@AWS_ACCESS_KEY_ID=.*@AWS_ACCESS_KEY_ID=${MINIO_BACKEND_ACCESS_KEY}@g" ../vms-backend/environments/.env
 sed -i "s@AWS_SECRET_ACCESS_KEY=.*@AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}@g" ../vms-backend/environments/.env
 sed -i "s@AWS_BUCKET=.*@AWS_BUCKET=${BACKEND_BUCKET_NAME}@g" ../vms-backend/environments/.env
-sed -i "s@AWS_ENDPOINT=.*@AWS_ENDPOINT=https://${VMS_DOMAIN}/s3@g" ../vms-backend/environments/.env
+sed -i "s@AWS_ENDPOINT=.*@AWS_ENDPOINT=https://${VMS_DOMAIN}/s3/@g" ../vms-backend/environments/.env
 cp -n ../controller/environments/env.sample ../controller/environments/.env
 sed -i "s@CONTROL_PLAIN_HLS_REDIRECT_ENDPOINT=.*@CONTROL_PLAIN_HLS_REDIRECT_ENDPOINT=${VMS_DOMAIN}/controller-hls@g" ../controller/environments/.env
 sed -i "s@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT=.*@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT=${VMS_DOMAIN}:5554@g" ../controller/environments/.env
