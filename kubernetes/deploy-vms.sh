@@ -71,8 +71,8 @@ do
 done
 sleep 10
 
-kubectl exec -n ${NS_VMS} deployment.apps/backend -- scripts/docker/create_db.sh
-kubectl exec -n ${NS_VMS} deployment.apps/backend -- scripts/docker/start.sh
+kubectl exec -n ${NS_VMS} deployment.apps/backend -- ./scripts/create_db.sh
+kubectl exec -n ${NS_VMS} deployment.apps/backend -- ./scripts/start.sh
 kubectl exec -n ${NS_VMS} deployment.apps/backend  -- chown www-data:www-data -R storage/logs
 
 kubectl exec -n ${NS_VMS} deployment.apps/controller -- ./scripts/create_db.sh
