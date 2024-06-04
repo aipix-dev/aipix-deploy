@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/name: a-license-config
+    app.kubernetes.io/component: config
+    app.kubernetes.io/part-of: analytics
+    global-app-name: vsaas
+  name: a-license-config
+  namespace: vsaas-analytics
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+  storageClassName: local-storage

@@ -17,6 +17,7 @@ additionalArguments:
   - --accesslog.fields.headers.defaultmode=keep
   - --serversTransport.insecureSkipVerify=true
   - --entrypoints.controller-rtsp.address=:5554/tcp
+  - --entryPoints.web.http.redirections.entryPoint.to=:443
 
 ingressRoute:
   dashboard:

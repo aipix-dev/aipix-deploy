@@ -1,8 +1,6 @@
 namespace: ${NS_MINIO}
 resources:
 - ../../apps/minio/minio-single-node
-components:
-- ../../components/middlewares/strip-prefixes-s3
 images:
 ${CUSTOM_IMAGES}
 
@@ -13,11 +11,5 @@ patches:
     kind: IngressRoute
     name: minio-api
   path: patch-ingressroute-minio-api.yaml
-- target:
-    group: traefik.io
-    version: v1alpha1
-    kind: IngressRoute
-    name: minio-console
-  path: patch-ingressroute-minio-console.yaml
 ${CUSTOM_PATCHES}
 
