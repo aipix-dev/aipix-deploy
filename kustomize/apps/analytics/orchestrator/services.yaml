@@ -20,5 +20,3 @@ spec:
     app.kubernetes.io/component: orchestrator
     app.kubernetes.io/part-of: analytics
     global-app-name: vsaas
-  type: LoadBalancer
-

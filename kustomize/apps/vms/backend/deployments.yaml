@@ -466,7 +466,7 @@ spec:
             - queue:work
             - --queue=reports
             - --sleep=3
-            - --max-jobs=1
+            # - --max-jobs=1
           envFrom:
             - configMapRef:
                 name: vms-backend-env

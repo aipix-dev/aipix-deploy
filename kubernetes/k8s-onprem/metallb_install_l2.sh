@@ -1,6 +1,6 @@
 #!/bin/bash
 
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.5/config/manifests/metallb-native.yaml
 echo "Waiting for 30 sec to start MeetalLB containers"
 sleep 30
 
@@ -24,6 +24,13 @@ metadata:
 spec:
   ipAddressPools:
   - first-pool
+#  nodeSelectors:
+#  - matchLabels:
+#      kubernetes.io/hostname: k8s-worker-01
+#  - matchLabels:
+#      kubernetes.io/hostname: k8s-worker-02
+#  - matchLabels:
+#      kubernetes.io/hostname: k8s-worker-03
 EOF
 
 

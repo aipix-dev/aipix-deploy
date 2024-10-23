@@ -1,0 +1,10 @@
+- op: replace
+  path: /spec/type
+  value: NodePort
+- op: replace
+  path: /spec/ports/0
+  value:
+    nodePort: 31000
+    port: 8086
+    protocol: TCP
+    targetPort: 8086

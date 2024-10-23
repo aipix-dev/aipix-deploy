@@ -1,0 +1,36 @@
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: (clickhouse-server|tarantool|vectorizator)
+  path: ./custom-patches.d/patch-image-pull-policy1.yaml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: (metrics-pusher)
+  path: ./custom-patches.d/patch-image-pull-policy2.yaml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: (analytics-worker)
+  path: ./custom-patches.d/patch-image-pull-policy4.yaml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: (orchestrator)
+  path: ./custom-patches.d/patch-image-pull-policy6.yaml
+- target:
+    group: ""
+    version: v1
+    kind: Service
+    name: (analytics-worker|orchestrator)
+  path: ./custom-patches.d/patch-services-type.yaml
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: (analytics-worker)
+  path: ./custom-patches.d/analytics-worker-resources.yaml

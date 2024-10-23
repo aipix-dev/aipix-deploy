@@ -33,12 +33,12 @@ patches:
     kind: Deployment
     name: (prometheus-deployment|kube-state-metrics|grafana|.*influxdb2)
   path: patch-monitoring-tolerations.yaml
-- target:
-    group: ""
-    version: v1
-    kind: Service
-    name: (prometheus-service|grafana|.*influxdb2)
-  path: patch-service.yaml
+#- target:
+#    group: ""
+#    version: v1
+#    kind: Service
+#    name: (prometheus-service|grafana|.*influxdb2)
+#  path: patch-service.yaml
 
 # Prometheus
 - target:
@@ -61,6 +61,12 @@ patches:
     kind: PersistentVolumeClaim
     name: (.*influxdb2)
   path: patch-influx-sc.yaml
+- target:
+    group: ""
+    version: v1
+    kind: Service
+    name: (.*influxdb2)
+  path: patch-influx-service.yaml
 
 # Node-exporter
 - target:

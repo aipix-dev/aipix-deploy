@@ -31,7 +31,7 @@ etcd:
     dataDir: /var/lib/etcd
 imageRepository: registry.k8s.io
 kind: ClusterConfiguration
-kubernetesVersion: v1.28.8
+kubernetesVersion: v1.28.10
 networking:
   dnsDomain: cluster.local
   podSubnet: ${POD_SUBNET}
@@ -51,6 +51,7 @@ K8S_HOST=$(kubectl get node -o json | jq -c '.items[].metadata.name' | tr -d \")
 echo ${K8S_HOST}
 kubectl taint nodes ${K8S_HOST} node-role.kubernetes.io/control-plane:NoSchedule-
 kubectl label nodes ${K8S_HOST} mediaserver=true
+kubectl label node ${K8S_HOST} node.kubernetes.io/exclude-from-external-load-balancers-
 
 echo "
 Waiting for 20 sec for starting containers
@@ -61,9 +62,9 @@ sleep 20
 
 #Calico instalation
 
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.3/manifests/tigera-operator.yaml
 
-curl https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/custom-resources.yaml -O
+curl https://raw.githubusercontent.com/projectcalico/calico/v3.27.3/manifests/custom-resources.yaml -O
 
 sed -i  "s@cidr:.*@cidr: ${POD_SUBNET}@g" custom-resources.yaml # Update your podSubnet
 
@@ -72,6 +73,9 @@ sleep 30
 
 kubectl create -f custom-resources.yaml
 
+sleep 10
+
+kubectl patch  Installation default --type 'json' -p '[{"op": "replace", "path": "/spec/calicoNetwork/nodeAddressAutodetectionV4", "value": {kubernetes: NodeInternalIP}}]'
 
 #Helm
 curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
@@ -82,7 +86,7 @@ sudo helm completion bash | sudo tee  /etc/bash_completion.d/helm >/dev/null
 
 
 #Install MetalLB
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.5/config/manifests/metallb-native.yaml
 
 # Waiting for starting MetalLB
 wait_period=0
@@ -106,7 +110,37 @@ kubectl create -f - <<EOF
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
-  name: first-pool
+  name: traefik-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - ${TRAEFIK_ADVERTISEMENT_RANGE}
+  serviceAllocation:
+    priority: 50
+    serviceSelectors:
+    - matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+        - traefik
+EOF
+
+kubectl create -f - <<EOF
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: traefik-advertisement
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - traefik-pool
+EOF
+
+kubectl create -f - <<EOF
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: service-pool
   namespace: metallb-system
 spec:
   addresses:
@@ -117,13 +151,12 @@ kubectl create -f - <<EOF
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
-  name: advertisement-1
+  name: service-advertisement
   namespace: metallb-system
 spec:
   ipAddressPools:
-  - first-pool
+  - service-pool
 EOF
-
 
 #Metric Server
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
@@ -138,8 +171,8 @@ sudo mkfs.ext4 /dev/sdc
 sudo mount /dev/sdb /mnt/disk-sdb
 sudo mount /dev/sdc /storage
 
-echo /dev/sdb /mnt/disk-sdb ext4 defaults 0 1 | sudo tee -a /etc/fstab
-echo /dev/sdc /storage ext4 defaults 0 1 | sudo tee -a /etc/fstab
+echo /dev/sdb /mnt/disk-sdb ext4 defaults,nofail 0 2 | sudo tee -a /etc/fstab
+echo /dev/sdc /storage ext4 defaults,nofail 0 2 | sudo tee -a /etc/fstab
 
 for i in $(seq 1 20); do
   sudo mkdir -p /mnt/disk-sdb/vol${i} /mnt/disks/disk_vol${i}

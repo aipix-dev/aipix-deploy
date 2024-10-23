@@ -1,6 +1,8 @@
 namespace: ${NS_MINIO}
 resources:
 - ../../apps/minio/minio-single-node
+components:
+- ../../components/middlewares/strip-prefixes-s3
 images:
 ${CUSTOM_IMAGES}
 
@@ -9,7 +11,19 @@ patches:
     group: traefik.io
     version: v1alpha1
     kind: IngressRoute
-    name: minio-api
-  path: patch-ingressroute-minio-api.yaml
+    name: minio-public
+  path: patch-ingressroute-minio-public.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: minio-console
+  path: patch-ingressroute-minio-console.yaml
+- target:
+    group: ""
+    version: v1
+    kind: PersistentVolumeClaim
+    name: minio-data
+  path: patch-pvc.yaml
 ${CUSTOM_PATCHES}
 

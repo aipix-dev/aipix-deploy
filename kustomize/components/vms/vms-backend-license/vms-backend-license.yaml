@@ -5,7 +5,7 @@
     configMap:
       name: vms-backend-license
 - op: add
-  path: /spec/template/spec/initContainers/0/volumeMounts/-
+  path: /spec/template/spec/containers/0/volumeMounts/-
   value:
     name: vms-backend-license
     mountPath: /var/www/api/storage/license.json

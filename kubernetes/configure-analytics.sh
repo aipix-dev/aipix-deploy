@@ -10,6 +10,12 @@ if [ ${ANALYTICS} != "yes" ]; then
   exit 1
 fi
 
+if [ ${TYPE} == "prod" ]; then
+    S3_PORT_INTERNAL=""
+else
+    S3_PORT_INTERNAL=":9000"
+fi
+
 #Creating configs for orchestrator and analytics-worker
 cp -n ./sources.sh.sample ./sources.sh
 cp -n ../analytics/env.sample ../analytics/.env
@@ -30,10 +36,10 @@ cp -n ../analytics/license.json.sample ../analytics/license.json
 cp -n ../analytics/analytics-worker.conf.sample ../analytics/analytics-worker.conf
 sed -i "s@://push1st.*:@://push1st.${NS_VMS}.svc:@g" ../analytics/analytics-worker.conf
 sed -i "s@^PUSH_ERRORS_@#PUSH_ERRORS_@g" ../analytics/analytics-worker.conf
-sed -i "s@MINIO_URL=.*@MINIO_URL=minio.minio-single.svc:9000@g" ../analytics/analytics-worker.conf
+sed -i "s@MINIO_URL=.*@MINIO_URL=minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../analytics/analytics-worker.conf
 sed -i "s@MINIO_ACCESS_KEY=.*@MINIO_ACCESS_KEY=${MINIO_ANALYTICS_ACCESS_KEY}@g" ../analytics/analytics-worker.conf
-sed -i "s@MINIO_SECRET_KEY=.*@MINIO_SECRET_KEY=${MINIO_SECRET_KEY}@g" ../analytics/analytics-worker.conf
-sed -i "s@MINIO_BUCKET_NAME=.*@MINIO_BUCKET_NAME=${ANALYTICS_BUCKET_NAME}@g" ../analytics/analytics-worker.conf
+sed -i "s@MINIO_SECRET_KEY=.*@MINIO_SECRET_KEY=${MINIO_ANALYTICS_SECRET_KEY}@g" ../analytics/analytics-worker.conf
+sed -i "s@MINIO_BUCKET_NAME=.*@MINIO_BUCKET_NAME=${MINIO_ANALYTICS_BUCKET_NAME}@g" ../analytics/analytics-worker.conf
 
 if [ ${MONITORING} == "yes" ]; then
   sed -i 's@^#MONITORING_@MONITORING_@g' ../analytics/.env

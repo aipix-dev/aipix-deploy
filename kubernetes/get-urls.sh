@@ -6,15 +6,16 @@ cd "$scriptdir"
 source ./sources.sh
 source ./k8s-onprem/sources.sh
 
-VMS_IP=$(kubectl get service/nginx -n ${NS_VMS} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-ORCH_IP=$(kubectl get service/orchestrator -n ${NS_A} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-GRAFANA_IP=$(kubectl get service/grafana -n monitoring -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+PROMETHEUS_PORT=$(kubectl get service/prometheus-service -n monitoring -o jsonpath='{.spec.ports[0].nodePort}')
+INFLUX_PORT=$(kubectl get service/vsaas-influxdb2 -n monitoring -o jsonpath='{.spec.ports[0].nodePort}')
 
 echo """
-VMS URL for admins: https://${VMS_IP}/admin
-VMS URL dor clients: https://${VMS_IP}/  
-Mediaserver URL: https://${MS1_IP}:8080/cpanel/
-Analytics Orchestrator URL: http://${ORCH_IP}/orch-admin/
-Monitoring URL: http://${GRAFANA_IP}:3000
+VMS URL for admins: https://${VMS_DOMAIN}/admin
+VMS URL dor clients: https://${VMS_DOMAIN}/  
+MINIO DOMAIN: https://${MINIO_CONSOLE_DOMAIN}
+Analytics Orchestrator URL: https://${ANALYTICS_DOMAIN}/orch-admin/
+Monitoring URL: https://${VMS_DOMAIN}/monitoring
+Prometheus: http://${K8S_API_ENDPOINT}:${PROMETHEUS_PORT}
+InflixDB: http://${K8S_API_ENDPOINT}:${INFLUX_PORT}
 """
 

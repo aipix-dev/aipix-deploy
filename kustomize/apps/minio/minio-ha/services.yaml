@@ -1,0 +1,60 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: minio
+  name: minio
+  namespace: minio-ha
+spec:
+  externalName: traefik.traefik-v2.svc.cluster.local
+  ports:
+  - name: web
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  type: ExternalName
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: minio-1
+  name: minio-1
+  namespace: minio-ha
+spec:
+  ports:
+    - name: "console"
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
+    - name: "api"
+      port: 9000
+      protocol: TCP
+      targetPort: 9000
+  selector:
+    app: minio-1
+  type: LoadBalancer 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: minio-2
+  name: minio-2
+  namespace: minio-ha
+spec:
+  ports:
+    - name: "console"
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
+    - name: "api"
+      port: 9000
+      protocol: TCP
+      targetPort: 9000
+  selector:
+    app: minio-2
+  type: LoadBalancer

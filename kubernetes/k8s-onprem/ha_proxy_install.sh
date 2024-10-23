@@ -12,8 +12,8 @@ defaults
     log global
     retries 2
     timeout connect 3000ms
-    timeout server 5000ms
-    timeout client 5000ms
+    timeout server 1h
+    timeout client 1h
 frontend kubernetes
     bind 192.168.205.12:6443
     option tcplog

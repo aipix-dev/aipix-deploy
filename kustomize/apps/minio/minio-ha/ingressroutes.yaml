@@ -1,0 +1,82 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  namespace: minio-ha
+  name: minio
+spec:
+  entryPoints:
+  - web
+  routes:
+  - kind: Rule
+    match: Host (`minio.minio-ha.svc`)
+    services:
+    - kind: TraefikService
+      name: minio@file
+      port: 9000
+    priority: 200
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  namespace: minio-ha
+  name: minio-public
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host (`vms.example.com`) && PathPrefix(`/s3`)
+    middlewares:
+    - name: strip-prefix-s3
+    - name: add-host-header
+    services:
+    - kind: TraefikService
+      name: minio@file
+      port: 9000
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  namespace: minio-ha
+  name: minio-console-1
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host (`minio-console-1.example.com`)
+    services:
+    - kind: Service
+      name: minio-1
+      port: 9090
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  namespace: minio-ha
+  name: minio-console-2
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - kind: Rule
+    match: Host (`minio-console-2.example.com`)
+    services:
+    - kind: Service
+      name: minio-2
+      port: 9090

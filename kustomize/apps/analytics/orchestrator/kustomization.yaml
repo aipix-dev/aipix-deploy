@@ -2,4 +2,4 @@ resources:
 - deployments.yaml
 - services.yaml
 - ingressroutes.yaml
-- pvc.yaml
+- pvcs.yaml

@@ -68,9 +68,17 @@ print_new_config_lines () {
 ## End of the functions definitions
 
 if [ -f ./sources.sh ]; then print_new_config_lines ./sources.sh ./sources.sh.sample; fi
+if [ -f ./k8s-onprem/sources.sh ]; then print_new_config_lines ./k8s-onprem/sources.sh ./k8s-onprem/sources.sh.sample; fi
 if [ -f ../vms-backend/environments/.env ]; then print_new_config_lines ../vms-backend/environments/.env ../vms-backend/environments/env.sample; fi
 if [ -f ../controller/environments/.env ]; then print_new_config_lines ../controller/environments/.env ../controller/environments/env.sample; fi
+if [ -f ../portal/environments/.env ]; then print_new_config_lines ../portal/environments/.env ../portal/environments/env.sample; fi
+if [ -f ../portal/environments-stub/.env ]; then print_new_config_lines ../portal/environments-stub/.env ../portal/environments-stub/env.sample; fi
 if [ -f ../analytics/.env ]; then print_new_config_lines ../analytics/.env ../analytics/env.sample; fi
 if [ -f ../analytics/analytics-worker.conf ]; then print_new_config_lines ../analytics/analytics-worker.conf ../analytics/analytics-worker.conf.sample; fi
 if [ -f ../analytics/metrics-pusher.env ]; then print_new_config_lines ../analytics/metrics-pusher.env ../analytics/metrics-pusher.env.sample; fi
 
+echo """
+
+Configurations script is finished successfuly!
+
+"""

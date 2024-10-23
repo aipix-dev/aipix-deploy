@@ -1,0 +1,126 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: minio-1
+  name: minio-1
+  namespace: minio-ha
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio-1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: minio-1
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: storage
+                operator: In
+                values:
+                - storage-1
+      containers:
+        - name: minio-1
+          env:
+          - name: MINIO_ROOT_USER
+            valueFrom:
+              secretKeyRef:
+                name: minio-secret
+                key: username
+          - name: MINIO_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: minio-secret
+                key: password
+          image: quay.io/minio/minio:latest
+          command:
+            - /bin/bash
+            - -c
+          args:
+            - minio server /data --console-address :9090
+          volumeMounts:
+            - mountPath: /data
+              name: localvolume
+      hostname: minio-1
+      restartPolicy: Always
+      tolerations:
+      - effect: NoSchedule
+        key: storage
+        operator: Exists
+      volumes:
+        - name: localvolume
+          persistentVolumeClaim:
+            claimName: minio-data-1
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: minio-2
+  name: minio-2
+  namespace: minio-ha
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio-2
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: minio-2
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: storage
+                operator: In
+                values:
+                - storage-2
+      containers:
+        - name: minio-2
+          env:
+          - name: MINIO_ROOT_USER
+            valueFrom:
+              secretKeyRef:
+                name: minio-secret
+                key: username
+          - name: MINIO_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: minio-secret
+                key: password
+          image: quay.io/minio/minio:latest
+          command:
+            - /bin/bash
+            - -c
+          args:
+            - minio server /data --console-address :9090
+          volumeMounts:
+            - mountPath: /data
+              name: localvolume
+      hostname: minio-2
+      restartPolicy: Always
+      tolerations:
+      - effect: NoSchedule
+        key: storage
+        operator: Exists
+      volumes:
+        - name: localvolume
+          persistentVolumeClaim:
+            claimName: minio-data-2
+
+
+

@@ -24,5 +24,3 @@ spec:
     app.kubernetes.io/component: reverse-proxy
     app.kubernetes.io/part-of: vms
     global-app-name: vsaas
-  type: LoadBalancer
-

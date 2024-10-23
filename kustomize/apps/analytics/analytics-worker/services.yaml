@@ -24,4 +24,3 @@ spec:
     app.kubernetes.io/component: analytics-worker
     app.kubernetes.io/part-of: analytics
     global-app-name: vsaas
-  type: LoadBalancer

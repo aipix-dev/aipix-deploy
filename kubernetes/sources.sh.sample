@@ -1,50 +1,65 @@
 #!/bin/bash -e
 
 ###Beginning of the VSaaS base config ###
-export DOCKER_USERNAME=aipix                        #Username to login into nexus docker-registry
-export DOCKER_PASSWORD=aipix                        #Password to login into nexus docker-registry
-export TRAEFIK_DOMAIN=traefik-dashboard.aipix.ai    #Domain name for traefik dashboard
-export TRAEFIK_NAMESPACE=traefik-v2                 #k8s namespace for traefik application
-export VMS_DOMAIN=                                  #Domain name for VMS
-export ANALYTICS_DOMAIN=                            #Domain name for orchestrator
-export NS_VMS=vsaas-vms				                #k8s namespace for vms application
-export NS_MS=vsaas-ms 				                #k8s namespace for mediaservers
-export NS_A=vsaas-analytics 			            #k8s namespace for analytics
-export NS_MINIO=minio-single                        #k8s namespace for minio s3
+export DOCKER_USERNAME=aipix                        	#Username to login into nexus docker-registry
+export DOCKER_PASSWORD=aipix                        	#Password to login into nexus docker-registry
+export TRAEFIK_DOMAIN=traefik-dashboard.example.com    	#Domain name for traefik dashboard
+export TRAEFIK_NAMESPACE=traefik-v2                 	#k8s namespace for traefik application
+export VMS_DOMAIN=vms.example.com                    	#Domain name for VMS
+export ANALYTICS_DOMAIN=orch.example.com                #Domain name for orchestrator
+export NS_VMS=vsaas-vms				        #k8s namespace for vms application
+export NS_MS=vsaas-ms 				        #k8s namespace for mediaservers
+export NS_A=vsaas-analytics 			        #k8s namespace for analytics
+export NS_MINIO=minio-single                        	#k8s namespace for minio s3
+                                                    	#use for example "minio-single" for demo installation or "minio-ha" for production
 
-export RWO_STORAGE=local-storage                    # storage classname for ReadWriteOnce
-                                                    # for GKE use standard-rwo
-export RWX_STORAGE=openebs-kernel-nfs               # storage classname for ReadWriteMany
-                                                    # for GKE use  standard-rwx
+export RWO_STORAGE=local-storage                    	# storage classname for ReadWriteOnce
+                                                    	# for GKE use standard-rwo
+export RWX_STORAGE=openebs-kernel-nfs               	# storage classname for ReadWriteMany
+                                                    	# for GKE use  standard-rwx
 
 export ANALYTICS=no 				                #If analytics will be deployed ("yes" or "no")
-export TYPE=single 				                    ##Installations options
-						                            #1) "single" - single node demo installation plus one node for analytics if enabled
+export TYPE=single                                              ##Installations options
+                                                                            #1) "single" - single node demo installation plus one node for analytics if enabled
+                                                                            #2) "prod" - multinode production installation with HA
 
 export VMS_LIC_OFFLINE=no 			                #If vms offline license will be used ("yes" or "no")
 export MS_LIC_OFFLINE=no 			                #If mediaserver offline license will be used ("yes" or "no")
 export A_LIC_OFFLINE=yes 			                #If analytics offline license will be used ("yes" or "no")
 
-#S3 minio basic deployment parameters for analytics:
-export MINIO_CONSOLE_DOMAIN=						#define minio console domain name
-export MINIO_USR=minioadmin						    #define minio admin username
+#S3 minio basic deployment parameters:
+export BACKEND_STORAGE_TYPE=s3        				#backend storage type for demo installation: s3, disk or s3_and_disk (for migration to s3)
+export MINIO_CONSOLE_DOMAIN=minio-console.example.com                   #define minio console domain name for single installation
+export MINIO_CONSOLE_DOMAIN_1=minio-console-1.example.com               #define minio console domain name for redundant installation
+export MINIO_CONSOLE_DOMAIN_2=minio-console-2.example.com               #define minio console domain name for redundant installation
+export MINIO_USR=minioadmin					        #define minio admin username
 export MINIO_PSW=miniopassword 						#define minio admin password
-export MINIO_BACKEND_ACCESS_KEY=N30K6ONUEH7CZ8R13H48 				#define minio access key used for acccess backend S3 storage bucket (use letters and numbers only)
-export MINIO_ANALYTICS_ACCESS_KEY=Y4RJU1RNFGK48LGO9I2S 				#define minio access key used for acccess analytics S3 storage bucket (use letters and numbers only)
-export MINIO_SECRET_KEY=aZ6d6WCmTV0vJ0Q2q441VeJOGnEcyfYYHPKD0LZS	#define minio secret key used for acccess S3 storage bucket (use letters and numbers only)
-export BACKEND_BUCKET_NAME=backend-store 			#minio bucket name for backend
-export ANALYTICS_BUCKET_NAME=analytics-store 		#minio bucket name for analytics
+export MINIO_BACKEND_BUCKET_NAME=vms-store                                       #minio public bucket name for vms backend
+export MINIO_BACKEND_ACCESS_KEY=P30F6ONUEH7CZ8513H4S                                 #define minio access key for vms backend public bucket (use letters and numbers only)
+export MINIO_BACKEND_SECRET_KEY=gZ6s6WCmTVfvJ062q4U4VeJOGnEcyfYYHPKD0Lr6             #define minio secret key for vms backend public bucket (use letters and numbers only)
+export MINIO_BACKEND_BUCKET_NAME_PRIV=vms-store-priv                             #minio private bucket name for vms backend
+export MINIO_BACKEND_ACCESS_KEY_PRIV=O30F6ONUEH7CZ8R13H49                            #define minio access key for vms backend private bucket (use letters and numbers only)
+export MINIO_BACKEND_SECRET_KEY_PRIV=lZ4d6RCmTVfvJ062q4U1VesOGnEcyfYYHPKD0Ye3        #define minio secret key for vms backend private bucket (use letters and numbers only)
+export MINIO_PORTAL_BUCKET_NAME=portal-store                                         #minio public bucket name for portal
+export MINIO_PORTAL_ACCESS_KEY=X4076ONYEH7CZ8D13H73                                  #define minio access key for portal public bucket (use letters and numbers only)
+export MINIO_PORTAL_SECRET_KEY=eC6d6WCmTsfvJ03lq4U1VeJOGnEcyfYYHPKD0es9              #define minio secret key for portal public bucket (use letters and numbers only)
+export MINIO_PORTAL_BUCKET_NAME_PRIV=portal-store-priv                               #minio private bucket name for portal
+export MINIO_PORTAL_ACCESS_KEY_PRIV=T30d8OSUEH7CZ8R1HS6A                             #define minio access key for portal private bucket (use letters and numbers only)
+export MINIO_PORTAL_SECRET_KEY_PRIV=pA6d6RsmTVfvJ066q4U1VeJOGnEdyf4YHPKD0gsT         #define minio secret key for portal private bucket (use letters and numbers only)
+export MINIO_ANALYTICS_BUCKET_NAME=analytics-store                                   #minio bucket name for analytics
+export MINIO_ANALYTICS_ACCESS_KEY=Y4RJU1RNFGK48LGO9I2S                               #define minio access key for analytics bucket (use letters and numbers only)
+export MINIO_ANALYTICS_SECRET_KEY=qV6drWCmTV0vJ0Q2q921VeJOGnEcyfYYHPKD0k7R           #define minio secret key for analytics bucket (use letters and numbers only)
 
 #Monitoring parameters
-export MONITORING=no                            	#If monitoring will be deployed ("yes" or "no")
+export MONITORING=no  			                          	#If monitoring will be deployed ("yes" or "no")
 export PROVISION_DASHBOARDS=yes						#If grafana dashboards will be provisioned automaticaly ("yes" or "no")
-export INFLUX_USR=admin 							#define influxdb admin user
-export INFLUX_PSW=0hmSYYaRci6yJblARc6aHbHZ4YelTXTo				#define influxdb admin userpassword (use letters and numbers only)
+export INFLUX_USR=admin 						#define influxdb admin user
+export INFLUX_PSW=0hmSYYaRci6yJblARc6aHbHZ4YelTXTo			#define influxdb admin userpassword (use letters and numbers only)
 export INFLUX_TOKEN=2pORp9tDo40Lm32oGUKFLL8r1UuNbgUT			#define influxdb API token (use letters and numbers only)
 
 #Portal parameters
-export PORTAL=no                            		#If portal will be deployed ("yes" or "no")
-export PORTAL_STUB_DOMAIN=                          #define portal-stub domain name
+export PORTAL=no                            				#If portal will be deployed ("yes" or "no")
+export PORTAL_STUB_DOMAIN=portal.example.com                          	#define portal-stub domain name
 
 ###END of the VSaaS base config ###
 
@@ -55,7 +70,14 @@ if [ ${TYPE} == "single" ]; then
     MSE_TEMPLATE="mse1"
     A_TEMPLATE="analytics1"
     MINIO_TEMPLATE="minio1"
+elif [ ${TYPE} == "prod" ]; then
+    VMS_TEMPLATE="vms2"
+    MS_TEMPLATE="mediaserver1"
+    MSE_TEMPLATE="mse1"
+    A_TEMPLATE="analytics2"
+    MINIO_TEMPLATE="minio2"
 else
     echo >&2  "ERROR: Variable TYPE is not correct"
     exit 2
 fi
+

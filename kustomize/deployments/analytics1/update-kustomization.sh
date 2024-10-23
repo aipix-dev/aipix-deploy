@@ -12,6 +12,7 @@ fi
 
 export CUSTOM_IMAGES="$(cat ./custom-images.d/*.yaml 2>/dev/null)"
 export CUSTOM_PATCHES="$(cat ./custom-patches.d/custom-patches.yaml 2>/dev/null)"
+export patch='$patch'
 
 files=$(ls | grep ".*.template$")
 for file in $files; do

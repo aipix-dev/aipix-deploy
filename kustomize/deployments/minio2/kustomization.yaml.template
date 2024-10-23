@@ -1,0 +1,35 @@
+namespace: ${NS_MINIO}
+resources:
+- ../../apps/minio/minio-ha
+components:
+- ../../components/middlewares/strip-prefixes-s3
+images:
+${CUSTOM_IMAGES}
+
+patches:
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: minio
+  path: patch-ingressroute-minio.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: minio-public
+  path: patch-ingressroute-minio-public.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: minio-console-1
+  path: patch-ingressroute-minio-console-1.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: minio-console-2
+  path: patch-ingressroute-minio-console-2.yaml
+${CUSTOM_PATCHES}
+

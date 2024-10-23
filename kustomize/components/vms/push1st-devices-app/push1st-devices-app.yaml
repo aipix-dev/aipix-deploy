@@ -1,0 +1,13 @@
+- op: add
+  path: /spec/template/spec/volumes/-
+  value:
+    name: push1st-devices
+    configMap:
+      name: push1st-devices
+- op: add
+  path: /spec/template/spec/containers/0/volumeMounts/-
+  value:
+    name: push1st-devices
+    mountPath: /opt/push1st/apps/devices.yml
+    subPath: devices.yml
+    readOnly: true

@@ -1,0 +1,7 @@
+pm = static
+pm.max_children = 200
+pm.start_servers = 8
+pm.min_spare_servers = 6
+pm.max_spare_servers = 12
+pm.max_requests = 500
+

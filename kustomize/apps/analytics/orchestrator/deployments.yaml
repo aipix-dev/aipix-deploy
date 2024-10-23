@@ -134,4 +134,4 @@ spec:
             name: a-license-json
         - name: a-license-config
           persistentVolumeClaim:
-            claimName: a-license-config  
+            claimName: a-license-config

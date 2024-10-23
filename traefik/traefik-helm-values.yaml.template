@@ -17,10 +17,14 @@ additionalArguments:
   - --accesslog.fields.headers.defaultmode=keep
   - --serversTransport.insecureSkipVerify=true
   - --entrypoints.controller-rtsp.address=:5554/tcp
-  - --entryPoints.web.http.redirections.entryPoint.to=:443
+  - --entrypoints.contr-onvif.address=:8080/tcp
+  - --entryPoints.web.http.redirections.entryPoint.to=websecure
+  - --entrypoints.web.http.redirections.entrypoint.scheme=https
+  - --entrypoints.web.http.redirections.entrypoint.priority=100
 
 ingressRoute:
   dashboard:
+    enabled: true
     entryPoints: ["traefik", "websecure"]
     matchRule: Host(`${TRAEFIK_DOMAIN}`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
     tls:
@@ -33,6 +37,12 @@ ports:
     expose:
       default: true
     exposedPort: 5554
+  contr-onvif:
+    port: 8080
+    protocol: TCP
+    expose:
+      default: true
+    exposedPort: 8080
 
 service:
   spec:

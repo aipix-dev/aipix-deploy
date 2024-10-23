@@ -34,9 +34,7 @@ if [ -z "${CONFIGURE}" ]; then
 fi
 
 if [[ ${CONFIGURE} == "configure" ]]; then
-	ssh -p ${PORT} ${SSH_OPTIONS} ${USERNAME}@${MS} sudo mkdir -p /opt/${MS_TYPE}/mediaserver/licenses
-	ssh -p ${PORT} ${SSH_OPTIONS} ${USERNAME}@${MS} sudo mkdir -p /opt/${MS_TYPE}/mediaserver/streams
-	ssh -p ${PORT} ${SSH_OPTIONS} ${USERNAME}@${MS} sudo mkdir -p /opt/${MS_TYPE}/mediaserver/configs
+	ssh -p ${PORT} ${SSH_OPTIONS} ${USERNAME}@${MS} sudo mkdir -p /opt/${MS_TYPE}/mediaserver/{licenses,streams,configs}
 	rsync -e "ssh -p ${PORT} ${SSH_OPTIONS}" --rsync-path="sudo rsync" ../mediaserver/media-server.ini.${MS}.${MS_TYPE} ${USERNAME}@${MS}:/opt/${MS_TYPE}/mediaserver/configs/media-server.ini
 	rsync -e "ssh -p ${PORT} ${SSH_OPTIONS}" --rsync-path="sudo rsync" ../mediaserver/media-server.nodes.${MS}.${MS_TYPE} ${USERNAME}@${MS}:/opt/${MS_TYPE}/mediaserver/configs/media-server.nodes
 	rsync -e "ssh -p ${PORT} ${SSH_OPTIONS}" --rsync-path="sudo rsync" ../mediaserver/.env.${MS}.${MS_TYPE} ${USERNAME}@${MS}:/opt/${MS_TYPE}/mediaserver/configs/.env

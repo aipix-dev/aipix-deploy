@@ -21,6 +21,10 @@ if [ ${PORTAL} == "yes" ]; then
 - ../../apps/vms/portal-landing"
 fi
 
+if [[ ${BACKEND_STORAGE_TYPE} == "s3" ]]; then
+    export ADD_PATCH1="$(cat ./patch-backends-for-s3-storage.yaml.kustomize 2>/dev/null)"
+fi
+
 export CUSTOM_IMAGES="$(cat ./custom-images.d/*.yaml 2>/dev/null)"
 export CUSTOM_PATCHES="$(cat ./custom-patches.d/custom-patches.yaml 2>/dev/null)"
 

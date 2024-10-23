@@ -1,0 +1,23 @@
+- op: replace
+  path: "/spec/template/spec/containers/0/imagePullPolicy"
+  value: Never
+
+- op: replace
+  path: "/spec/template/spec/containers/1/imagePullPolicy"
+  value: Never
+
+- op: replace
+  path: "/spec/template/spec/containers/2/imagePullPolicy"
+  value: Never
+
+- op: replace
+  path: "/spec/template/spec/containers/3/imagePullPolicy"
+  value: Never
+
+- op: replace
+  path: "/spec/template/spec/containers/4/imagePullPolicy"
+  value: Never
+
+- op: replace
+  path: "/spec/template/spec/containers/5/imagePullPolicy"
+  value: Never

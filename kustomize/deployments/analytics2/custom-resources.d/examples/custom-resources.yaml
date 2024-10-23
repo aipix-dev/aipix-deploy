@@ -1,0 +1,2 @@
+- ./custom-resources.d/clickhouse-endpoints.yaml
+- ./custom-resources.d/clickhouse-service.yaml

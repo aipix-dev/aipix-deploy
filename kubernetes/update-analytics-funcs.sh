@@ -45,11 +45,11 @@ update_orchestrator () {
     # Waiting for starting containers
     while true
     do
-        if [[ $(kubectl get  deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] && \
+        if ([[ ${TYPE} == "prod" ]] || [[ $(kubectl get  deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]) && \
             [[ $(kubectl get  deployment orchestrator -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]
         then break
         fi
-        echo "Waiting for starting orchestrator and mysql containers (max 5 minutes) ..."
+        echo "Waiting for starting orchestrator and mysql container if presents (max 5 minutes) ..."
         sleep 10
         
     done
@@ -94,7 +94,7 @@ update_metrics-pusher () {
 	kubectl delete configmap metrics-pusher-env --namespace=${NS_A} || true
 	kubectl delete configmap telegraf-conf --namespace=${NS_A} || true
 	kubectl create configmap metrics-pusher-env  --namespace=${NS_A}  --from-env-file=../analytics/metrics-pusher.env
-    kubectl create configmap telegraf-conf  --namespace=${NS_A}  --from-file=../analytics/telegraf.conf
+	kubectl create configmap telegraf-conf  --namespace=${NS_A}  --from-file=../analytics/telegraf.conf
 	kubectl -n ${NS_A} rollout restart deployment metrics-pusher
 }
 

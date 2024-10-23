@@ -37,10 +37,11 @@ fi
 ../kustomize/deployments/${A_TEMPLATE}/update-kustomization.sh || exit 1
 kubectl apply -k ../kustomize/deployments/${A_TEMPLATE}
 
+
 # Waiting for starting containers
 while true
 do
-   if [[ $(kubectl get  deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] && \
+   if ([[ ${TYPE} == "prod" ]] || [[ $(kubectl get  deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]) && \
       [[ $(kubectl get  deployment orchestrator -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]
    then break
    fi
@@ -52,22 +53,29 @@ sleep 10
 CREATE_DATABASE="CREATE DATABASE IF NOT EXISTS analytics character set 'utf8mb4' collate 'utf8mb4_unicode_ci';"
 CREATE_USER="CREATE USER IF NOT EXISTS 'orchestrator'@'%' IDENTIFIED BY '456redko';"
 GRANT_PRIVILEGES="GRANT ALL PRIVILEGES ON analytics.* TO 'orchestrator'@'%';FLUSH PRIVILEGES;"
-kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysql --protocol=TCP -u root -pmysql --execute="${CREATE_DATABASE}"
-kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysql --protocol=TCP -u root -pmysql --execute="${CREATE_USER}"
-kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysql --protocol=TCP -u root -pmysql --execute="${GRANT_PRIVILEGES}"
+if [ ${TYPE} != "prod" ]; then
+    kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysql --protocol=TCP -u root -pmysql --execute="${CREATE_DATABASE}"
+    kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysql --protocol=TCP -u root -pmysql --execute="${CREATE_USER}"
+    kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysql --protocol=TCP -u root -pmysql --execute="${GRANT_PRIVILEGES}"
+else
+    IFS="=" read name DB_HOST <<< $(cat ../analytics/.env | grep DB_HOST)
+    IFS="=" read name DB_PORT <<< $(cat ../analytics/.env | grep -i DB_PORT)
+    DB_PORT=$(echo $DB_PORT | tr -d "'\"")
+    DB_HOST=$(echo $DB_HOST | tr -d "'\"")
+    kubectl exec -n ${NS_VMS} deployment.apps/backend -- mysql --protocol=TCP -u root -pmysql -P ${DB_PORT} -h ${DB_HOST} --execute="${CREATE_DATABASE}"
+    kubectl exec -n ${NS_VMS} deployment.apps/backend -- mysql --protocol=TCP -u root -pmysql -P ${DB_PORT} -h ${DB_HOST} --execute="${CREATE_USER}"
+    kubectl exec -n ${NS_VMS} deployment.apps/backend -- mysql --protocol=TCP -u root -pmysql -P ${DB_PORT} -h ${DB_HOST} --execute="${GRANT_PRIVILEGES}"
+fi
+
 sleep 10
 kubectl exec -n ${NS_A} deployment.apps/orchestrator -c django --  python manage.py seed
 
 kubectl -n ${NS_A} annotate service analytics-worker prometheus.io/port="8081"
 kubectl -n ${NS_A} annotate service analytics-worker prometheus.io/scrape="true"
 
-# ORCH_IP=$(kubectl get service/orchestrator -n ${NS_A} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-ORCH_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-
 echo """
 Deployment script completed successfuly!
 
 Access your ORCHESTRATOR with the following URL:
-http://${ORCH_IP}/orch-admin/
 https://${ANALYTICS_DOMAIN}/orch-admin/ (${ANALYTICS_DOMAIN} should be resolved on DNS-server)
 """

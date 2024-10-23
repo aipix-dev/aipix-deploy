@@ -20,37 +20,39 @@ components:
 - ../../components/middlewares/strip-prefixes-frontend-admin
 - ../../components/middlewares/upgrade-insecure-requests
 - ../../components/middlewares/max-body-size
+- ../../components/vms/push1st-devices-app
 ${ADD_COMPONENT1}
 ${ADD_COMPONENT2}
 ${ADD_COMPONENT3}
 images:
 - name: download.aipix.ai:8443/vms-backend/release
   newName: download.aipix.ai:8443/vms-backend/release
-  newTag: 24.03.1.0
+  newTag: 24.09.0.0
 - name: download.aipix.ai:8443/vms-frontend-admin/release
   newName: download.aipix.ai:8443/vms-frontend-admin/release
-  newTag: 24.03.1.0
+  newTag: 24.09.0.0
 - name: download.aipix.ai:8443/vms-frontend-client/release
   newName: download.aipix.ai:8443/vms-frontend-client/release
-  newTag: 24.03.1.0
+  newTag: 24.09.0.0
 - name: download.aipix.ai:8443/controller/release
   newName: download.aipix.ai:8443/controller/release
-  newTag: 24.03.0.1
+  newTag: 24.09.0.0
 - name: download.aipix.ai:8443/vms-portal-backend/release
   newName: download.aipix.ai:8443/vms-portal-backend/release
-  newTag: 24.03.0.0
+  newTag: 24.09.0.0
 - name: download.aipix.ai:8443/vms-portal-frontend-client/release
   newName: download.aipix.ai:8443/vms-portal-frontend-client/release
-  newTag: 24.03.1.0
+  newTag: 24.09.0.0
 - name: download.aipix.ai:8443/vms-portal-stub/release
   newName: download.aipix.ai:8443/vms-portal-stub/release
   newTag: latest
 - name: download.aipix.ai:8443/vms-portal-landing/release
   newName: download.aipix.ai:8443/vms-portal-landing/release
-  newTag: 24.03.1.0
+  newTag: 24.09.0.0
 ${CUSTOM_IMAGES}
 
 patches:
+${ADD_PATCH1}
 - target:
     group: ""
     version: v1

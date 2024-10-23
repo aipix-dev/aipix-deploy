@@ -7,10 +7,11 @@ source ./sources.sh
 
 VALUES="../vgw/values.yaml"
 BRAND=aipix
-REPO="https://download.aipix.ai:8443/repository/charts/"
+REPO="https://download.aipix.ai/repository/charts/"
 REPO_USER=aipix
 REPO_PASSWORD=aipix
 
+helm repo rm "${BRAND}" || true
 helm repo add "${BRAND}" "${REPO}"  --username "${REPO_USER}" --password "${REPO_PASSWORD}"
 helm repo update
 

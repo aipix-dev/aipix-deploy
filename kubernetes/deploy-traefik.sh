@@ -5,16 +5,17 @@ cd "$scriptdir"
 
 source ./sources.sh
 
-# Deploy traefik
-kubectl create ns ${TRAEFIK_NAMESPACE}
-helm repo add traefik https://helm.traefik.io/traefik >/dev/null
-helm repo update >/dev/null
-helm install --namespace=${TRAEFIK_NAMESPACE} traefik traefik/traefik >/dev/null
+# Create traefik namespace
+kubectl create ns ${TRAEFIK_NAMESPACE} || true
 
 # Create secrets from certificates
 kubectl -n ${TRAEFIK_NAMESPACE} create secret tls certificate \
    --cert=../nginx/ssl/tls.crt \
    --key=../nginx/ssl/tls.key >/dev/null
+
+helm repo add traefik https://helm.traefik.io/traefik >/dev/null || true
+helm repo update >/dev/null
+helm install --namespace=${TRAEFIK_NAMESPACE} traefik traefik/traefik -f ../traefik/traefik-helm-values.yaml >/dev/null
 
 while true
 do
@@ -25,13 +26,6 @@ do
     echo "Waiting for starting containers ..."
 done
 sleep 5
-
-# Apply helm values
-helm upgrade -n ${TRAEFIK_NAMESPACE} traefik traefik/traefik -f ../traefik/traefik-helm-values.yaml >/dev/null
-
-echo "
-Traefik helm values are applied!
-"
 
 TRAEFIK_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
