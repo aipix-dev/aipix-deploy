@@ -68,6 +68,9 @@ spec:
   - service-pool
 EOF
 
+kubectl -n metallb-system rollout restart deployment controller
+sleep 5
+
 # Check if Traefik is installed
 if [[ $(kubectl get ns | grep traefik-v2) ]]; then
     echo "
