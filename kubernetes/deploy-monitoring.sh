@@ -9,10 +9,10 @@ source ./k8s-onprem/sources.sh
 kubectl create ns monitoring || true
 
 if [ ${PROVISION_DASHBOARDS} == "yes" ]; then
-  kubectl -n monitoring delete cm grafana-dashboards > /dev/null 2>&1 || true 
-  kubectl -n monitoring delete cm grafana-dashboards-config > /dev/null 2>&1 || true
-  kubectl -n monitoring create cm grafana-dashboards --from-file ../monitoring/grafana-dashboards
-  kubectl -n monitoring create cm grafana-dashboards-config --from-file ../monitoring/grafana-dashboards-config.yaml
+    kubectl -n monitoring delete cm grafana-dashboards > /dev/null 2>&1 || true 
+    kubectl -n monitoring delete cm grafana-dashboards-config > /dev/null 2>&1 || true
+    kubectl -n monitoring create cm grafana-dashboards --from-file ../monitoring/grafana-dashboards
+    kubectl -n monitoring create cm grafana-dashboards-config --from-file ../monitoring/grafana-dashboards-config.yaml
 fi
 
 #copy config-maps 

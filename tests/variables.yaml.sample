@@ -1,0 +1,35 @@
+# Environment
+URL: https://example.com/
+ADMIN_URL: https://example.com/admin/login
+
+# WEB Admin Demo
+ADMIN_LOGIN: admin@mail.com
+ADMIN_PASSWORD: qweasdzxc
+
+# WEB Admin Demo Create New Admin
+RENAME_TEST_ADMIN_LOGIN : rename_test_admin@mail.com
+TEST_ADMIN_LOGIN: test_admin@mail.com
+TEST_ADMIN_PASSWORD: qweasdzxc
+
+# UI tests
+BROWSER: headlesschrome
+
+# Controller
+CONTROLLER_ENDPOINT: https://example.com/controller/api/v1/private/management
+
+#MSE
+INTERNAL_ADDRESS: 
+EXTERNAL_ADDRESS: 
+
+THREADS_LIMIT: 200
+INCOMING_TRAFFIC_LIMIT: 1000
+INTERNAL_PORT: 8665
+EXTERNAL_PORT: 8443
+RTSP_PORT: 8554
+ONVIF_EVENTS_PORT: 8887
+MEDIA_SERVER_TOKEN: 
+
+# CAMERA TREE
+TEST_BRANCH_NAME: test1
+TEST_CAMERA_NAME: cam1
+TEST_ARCHIVE_DAYS: 3

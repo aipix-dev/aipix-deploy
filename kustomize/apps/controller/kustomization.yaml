@@ -1,5 +1,4 @@
 resources:
 - controller.yaml
 - services.yaml
-- pvcs.yaml
 - ingressroutes.yaml

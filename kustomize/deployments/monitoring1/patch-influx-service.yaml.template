@@ -5,6 +5,6 @@
   path: /spec/ports/0
   value:
     nodePort: 31000
-    port: 8086
+    port: 80
     protocol: TCP
     targetPort: 8086

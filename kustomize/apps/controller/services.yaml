@@ -9,15 +9,12 @@ metadata:
     global-app-name: vsaas
   name: controller-api
   namespace: controller
-  # annotations:
-  #   metallb.universe.tf/loadBalancerIPs: 192.168.1.100
 spec:
   ports:
     - name: "http"
       port: 80
       protocol: TCP
       targetPort: 80
-  # type: LoadBalancer
   selector:
     app.kubernetes.io/name: controller-api
     app.kubernetes.io/component: controller

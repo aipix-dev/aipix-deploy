@@ -83,16 +83,16 @@ kubectl create secret generic vms-backend-oauth --namespace=${NS_VMS} \
         --from-file=../vms-backend/certificates/file.key
 
 if [ ${TYPE} != "prod" ]; then
-        kubectl create configmap mysql-server-env --namespace=${NS_VMS} --from-env-file=../mysql-server/mysql-server.env
-        kubectl create configmap mysql-cnf --namespace=${NS_VMS} --from-file=../mysql-server/my.cnf
+    kubectl create configmap mysql-server-env --namespace=${NS_VMS} --from-env-file=../mysql-server/mysql-server.env
+    kubectl create configmap mysql-cnf --namespace=${NS_VMS} --from-file=../mysql-server/my.cnf
 else
-        kubectl create configmap overrides-php-ini --namespace=${NS_VMS} --from-file=../vms-backend/99-overrides-php.ini
-        kubectl create configmap overrides-php-pool-www-conf --namespace=${NS_VMS} --from-file=z-overrides-www.conf=../vms-backend/z-overrides-pool-www.conf
+    kubectl create configmap overrides-php-ini --namespace=${NS_VMS} --from-file=../vms-backend/99-overrides-php.ini
+    kubectl create configmap overrides-php-pool-www-conf --namespace=${NS_VMS} --from-file=z-overrides-www.conf=../vms-backend/z-overrides-pool-www.conf
 fi
 
 if [ ${VMS_LIC_OFFLINE} == "yes" ]; then
-  kubectl delete configmap vms-backend-license --namespace=${NS_VMS}
-  kubectl create configmap vms-backend-license --namespace=${NS_VMS}  --from-file=../vms-backend/license/license.json
+	kubectl delete configmap vms-backend-license --namespace=${NS_VMS}
+	kubectl create configmap vms-backend-license --namespace=${NS_VMS}  --from-file=../vms-backend/license/license.json
 fi
 
 # Create CONTROLLER configmsps
@@ -102,8 +102,8 @@ kubectl create configmap controller-nginx-server-conf --namespace=${NS_VMS} --fr
 
 # Create PORTAL configmsps
 if [ ${PORTAL} == "yes" ]; then
-  kubectl create configmap vms-portal-backend-env --namespace=${NS_VMS} --from-env-file=../portal/environments/.env
-  kubectl create configmap vms-portal-stub-env --namespace=${NS_VMS} --from-env-file=../portal/environments-stub/.env
+	kubectl create configmap vms-portal-backend-env --namespace=${NS_VMS} --from-env-file=../portal/environments/.env
+	kubectl create configmap vms-portal-stub-env --namespace=${NS_VMS} --from-env-file=../portal/environments-stub/.env
 fi
 
 #Reapplying vms
@@ -116,20 +116,22 @@ sleep 5
 wait_period=0
 for deployment in $(kubectl -n ${NS_VMS} get deployment | awk 'NR>1 { print $1 }')
 do
-  wait_period=$(($wait_period+10))
-  if [ $wait_period -gt 500 ];then
-    echo "The script ran for 8 minutes to start containers, exiting now.."
-    break
-  fi
-  replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.replicas}')
-  ready_replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}')
-  while [[ ${replicas} != ${ready_replicas} ]]
-  do
-    echo "Waiting for updating containers ..."
-    sleep 5
-    replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.replicas}')
-    ready_replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}')
-  done
+	wait_period=$(($wait_period+10))
+	if [ $wait_period -gt 500 ];then
+    	echo "The script ran for 8 minutes to start containers, exiting now.."
+    	break
+  	fi
+  	replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.replicas}')
+  	# ready_replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}')
+  	ready_replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.availableReplicas}')
+  	while [[ ${replicas} != ${ready_replicas} ]]
+  	do
+    	echo "Waiting for updating containers ..."
+    	sleep 5
+    	replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.replicas}')
+    	# ready_replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}')
+    	ready_replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.availableReplicas}')
+  	done
 done
 echo "Manifests were successfully aplied"
 
@@ -146,15 +148,15 @@ kubectl -n ${NS_VMS} exec deployment.apps/backend -- chown www-data:www-data -R 
 kubectl -n ${NS_VMS} exec deployment.apps/controller-api -- ./scripts/update.sh
 
 if [ ${PORTAL} == "yes" ]; then
-  kubectl -n ${NS_VMS} exec deployment.apps/portal-backend -- ./scripts/update.sh
-  kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/update.sh
-  kubectl -n ${NS_VMS} rollout status deployment portal-backend >/dev/null
+	kubectl -n ${NS_VMS} exec deployment.apps/portal-backend -- ./scripts/update.sh
+	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/update.sh
+	kubectl -n ${NS_VMS} rollout status deployment portal-backend >/dev/null
 fi
 
 if [[ ${TYPE} == "single" ]] && [[ ${BACKEND_STORAGE_TYPE} == "s3_and_disk" ]]; then
-  kubectl --namespace=${NS_VMS} exec deployments/backend -- cat storage/file.key > ../vms-backend/certificates/file.key
-  kubectl --namespace=${NS_VMS} exec deployments/backend -- cat storage/oauth-public.key > ../vms-backend/certificates/oauth-public.key
-  kubectl --namespace=${NS_VMS} exec deployments/backend -- cat storage/oauth-private.key > ../vms-backend/certificates/oauth-private.key
+	kubectl --namespace=${NS_VMS} exec deployments/backend -- cat storage/file.key > ../vms-backend/certificates/file.key
+	kubectl --namespace=${NS_VMS} exec deployments/backend -- cat storage/oauth-public.key > ../vms-backend/certificates/oauth-public.key
+	kubectl --namespace=${NS_VMS} exec deployments/backend -- cat storage/oauth-private.key > ../vms-backend/certificates/oauth-private.key
 fi
 
 VMS_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
@@ -164,6 +166,5 @@ Your containers are updated successfully!
 
 Update script completed successfuly!
 Access your VMS with the following URL:
-https://${VMS_IP}/admin
 https://${VMS_DOMAIN}/admin
 "

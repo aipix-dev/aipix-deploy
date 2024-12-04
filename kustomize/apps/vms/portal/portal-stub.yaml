@@ -39,6 +39,16 @@ spec:
                   app.kubernetes.io/part-of: vms
                   global-app-name: vsaas
               topologyKey: kubernetes.io/hostname
+      initContainers:
+        - name: init-portal-stub
+          command: ["/bin/sh", "-c"]
+          args:
+            - cp -Rp /var/www/api/public/* /mnt/public/;
+          image: download.aipix.ai:8443/vms-portal-stub/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: portal-stub-public
+              mountPath: /mnt/public
       containers:
         - name: portal-stub
           args:
@@ -54,30 +64,16 @@ spec:
           image: download.aipix.ai:8443/vms-portal-stub/release:latest
           imagePullPolicy: Always
           volumeMounts:
-            - name: portal-stub-storage
-              mountPath: /var/www/api/storage
+            - name: portal-stub-public
+              mountPath: /var/www/api/public/
           resources:
             requests:
               cpu: 5m
               memory: 120Mi
-      initContainers:
-        - name: init-portal-stub
-          command: ["/bin/sh", "-c"]
-          args:
-            - cp -Rp /var/www/api/storage/* /mnt/portal-stub-storage/;
-              chown -R www-data:www-data /mnt/portal-stub-storage/
-          envFrom:
-            - configMapRef:
-                name: vms-portal-backend-env
-          image: download.aipix.ai:8443/vms-portal-stub/release:latest
-          imagePullPolicy: Always
-          volumeMounts:
-            - name: portal-stub-storage
-              mountPath: /mnt/portal-stub-storage
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: portal-stub
       restartPolicy: Always
       volumes:
-        - name: portal-stub-storage
+        - name: portal-stub-public
           emptyDir: {}

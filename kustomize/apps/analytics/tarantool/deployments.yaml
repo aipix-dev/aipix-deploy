@@ -47,6 +47,5 @@ spec:
       restartPolicy: Always
       volumes:
         - name: tarantool
-          persistentVolumeClaim:
-            claimName: tarantool
+          emptyDir: {}
 

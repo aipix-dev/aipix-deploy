@@ -59,8 +59,6 @@ spec:
           image: download.aipix.ai:8443/vms-backend/release:latest
           imagePullPolicy: Always
           volumeMounts:
-            - name: storage
-              mountPath: /var/www/api/storage
             - name: vms-fcm-json
               mountPath: /var/www/api/fcm.json
               subPath: fcm.json
@@ -69,6 +67,18 @@ spec:
               mountPath: /var/www/api/voip.p8
               subPath: voip.p8
               readOnly: true
+            - mountPath: /var/www/api/storage/oauth-private.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-private.key
+            - mountPath: /var/www/api/storage/oauth-public.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-public.key
+            - mountPath: /var/www/api/storage/file.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: file.key
           resources:
             requests:
               cpu: 80m
@@ -78,9 +88,9 @@ spec:
       hostname: queue-controller-webhooks
       restartPolicy: Always
       volumes:
-        - name: storage
-          persistentVolumeClaim:
-            claimName: storage
+        - name: vms-backend-oauth
+          secret:
+            secretName: vms-backend-oauth
         - name: vms-fcm-json
           configMap:
             name: vms-fcm-json

@@ -1,0 +1,25 @@
+# Default values for helm-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+job:
+  image: download.aipix.ai:8443/robot-tests:1.0.0
+  resources:
+    requests:
+      cpu: "150m"
+      memory: "400Mi"
+    limits:
+      cpu: "250m"
+      memory: "600Mi"
+
+imagePullSecrets:
+  name: download-aipix-ai
+
+restartPolicy: OnFailure
+
+imagePullPolicy: Always
+
+configMap: 
+
+# -- This field override the default Release Namespace for Helm.
+namespaceOverride:

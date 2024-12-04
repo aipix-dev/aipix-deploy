@@ -31,5 +31,11 @@ patches:
     kind: IngressRoute
     name: minio-console-2
   path: patch-ingressroute-minio-console-2.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: Middleware
+    name: add-host-header
+  path: patch-host-middleware.yaml
 ${CUSTOM_PATCHES}
 

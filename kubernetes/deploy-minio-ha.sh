@@ -22,13 +22,13 @@ sleep 10
 wait_period=0
 until [[ $(kubectl get deployments.apps minio-1 -n ${NS_MINIO} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] && \
 	[[ $(kubectl get deployments.apps minio-2 -n ${NS_MINIO} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]; do
-  echo "Waiting for starting minio container ..."
-  sleep 10
-  wait_period=$(($wait_period+10))
-  if [ $wait_period -gt 300 ];then
-     echo "The script ran for 5 minutes to start containers, exiting now.."
-     exit 1
-  fi
+    echo "Waiting for starting minio container ..."
+    sleep 10
+    wait_period=$(($wait_period+10))
+    if [ $wait_period -gt 300 ];then
+        echo "The script ran for 5 minutes to start containers, exiting now.."
+        exit 1
+    fi
 done
 
 export MINIO_IP1=$(kubectl -n ${NS_MINIO} get service/minio-1 -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')

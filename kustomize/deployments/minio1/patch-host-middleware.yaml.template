@@ -1,0 +1,3 @@
+- op: replace
+  path: /spec/headers/customRequestHeaders/Host
+  value: minio.${NS_MINIO}.svc:9000

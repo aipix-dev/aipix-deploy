@@ -32,7 +32,8 @@ spec:
       containers:
         - name: analytic-events
           args:
-            - ./artisan
+            - php
+            - artisan
             - orchestrator:socket:connect
           envFrom:
             - configMapRef:
@@ -40,8 +41,18 @@ spec:
           image: download.aipix.ai:8443/vms-backend/release:latest
           imagePullPolicy: Always
           volumeMounts:
-            - name: storage
-              mountPath: /var/www/api/storage
+            - mountPath: /var/www/api/storage/oauth-private.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-private.key
+            - mountPath: /var/www/api/storage/oauth-public.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-public.key
+            - mountPath: /var/www/api/storage/file.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: file.key
           resources:
             requests:
               cpu: 10m
@@ -51,6 +62,6 @@ spec:
       hostname: analytic-events
       restartPolicy: Always
       volumes:
-        - name: storage
-          persistentVolumeClaim:
-            claimName: storage
+        - name: vms-backend-oauth
+          secret:
+            secretName: vms-backend-oauth

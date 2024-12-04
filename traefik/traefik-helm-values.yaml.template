@@ -17,7 +17,7 @@ additionalArguments:
   - --accesslog.fields.headers.defaultmode=keep
   - --serversTransport.insecureSkipVerify=true
   - --entrypoints.controller-rtsp.address=:5554/tcp
-  - --entrypoints.contr-onvif.address=:8080/tcp
+  - --entrypoints.contr-onvif.address=:8888/tcp
   - --entryPoints.web.http.redirections.entryPoint.to=websecure
   - --entrypoints.web.http.redirections.entrypoint.scheme=https
   - --entrypoints.web.http.redirections.entrypoint.priority=100
@@ -38,11 +38,11 @@ ports:
       default: true
     exposedPort: 5554
   contr-onvif:
-    port: 8080
+    port: 8888
     protocol: TCP
     expose:
       default: true
-    exposedPort: 8080
+    exposedPort: 8888
 
 service:
   spec:

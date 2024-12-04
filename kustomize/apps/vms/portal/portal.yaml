@@ -53,35 +53,14 @@ spec:
                 name: vms-portal-backend-env
           image: download.aipix.ai:8443/vms-portal-backend/release:latest
           imagePullPolicy: Always
-          volumeMounts:
-            - name: portal-storage
-              mountPath: /opt/api/storage
           resources:
             requests:
               cpu: 5m
               memory: 120Mi
-      initContainers:
-        - name: init-portal-backend
-          command: ["/bin/sh", "-c"]
-          args:
-            - cp -Rp /opt/api/storage/* /mnt/portal-storage/;
-              chown -R www-data:www-data /mnt/portal-storage/
-          envFrom:
-            - configMapRef:
-                name: vms-portal-backend-env
-          image: download.aipix.ai:8443/vms-portal-backend/release:latest
-          imagePullPolicy: Always
-          volumeMounts:
-            - name: portal-storage
-              mountPath: /mnt/portal-storage
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: portal-backend
       restartPolicy: Always
-      volumes:
-        - name: portal-storage
-          persistentVolumeClaim:
-            claimName: portal-storage
 
 ---
 apiVersion: apps/v1
@@ -140,9 +119,6 @@ spec:
                 name: vms-portal-backend-env
           image: download.aipix.ai:8443/vms-portal-backend/release:latest
           imagePullPolicy: Always
-          volumeMounts:
-            - name: portal-storage
-              mountPath: /opt/api/storage
           resources:
             requests:
               cpu: 5m
@@ -151,10 +127,7 @@ spec:
         - name: download-aipix-ai
       hostname: portal-queue
       restartPolicy: Always
-      volumes:
-        - name: portal-storage
-          persistentVolumeClaim:
-            claimName: portal-storage
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -199,9 +172,6 @@ spec:
                 name: vms-portal-backend-env
           image: download.aipix.ai:8443/vms-portal-backend/release:latest
           imagePullPolicy: Always
-          volumeMounts:
-            - name: portal-storage
-              mountPath: /opt/api/storage
           resources:
             requests:
               cpu: 5m
@@ -210,10 +180,7 @@ spec:
         - name: download-aipix-ai
       hostname: portal-schedule
       restartPolicy: Always
-      volumes:
-        - name: portal-storage
-          persistentVolumeClaim:
-            claimName: portal-storage
+
 ---
 apiVersion: apps/v1
 kind: Deployment

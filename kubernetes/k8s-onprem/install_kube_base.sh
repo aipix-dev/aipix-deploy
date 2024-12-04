@@ -73,7 +73,7 @@ sudo rm cni-plugins-linux-amd64-v1.5.0.tgz
 
 #Install Calico control client for network plugin
 cd /usr/local/bin/
-sudo curl -L https://github.com/projectcalico/calico/releases/download/v3.27.3/calicoctl-linux-amd64 -o calicoctl
+sudo curl -L https://github.com/projectcalico/calico/releases/download/v3.29.1/calicoctl-linux-amd64 -o calicoctl
 
 sudo chmod +x calicoctl
 

@@ -25,5 +25,11 @@ patches:
     kind: PersistentVolumeClaim
     name: minio-data
   path: patch-pvc.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: Middleware
+    name: add-host-header
+  path: patch-host-middleware.yaml
 ${CUSTOM_PATCHES}
 

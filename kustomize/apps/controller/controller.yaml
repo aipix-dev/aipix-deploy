@@ -43,14 +43,10 @@ spec:
         - name: init-backend
           command: ["/bin/sh", "-c"]
           args:
-            - cp -Rp /var/www/api/storage/* /mnt/storage/;
-              chown -R www-data:www-data /mnt/storage/;
-              cp -Rp /var/www/api/public/* /mnt/public/
+            - cp -Rp /var/www/api/public/* /mnt/public/
           image: download.aipix.ai:8443/controller/release:latest
           imagePullPolicy: Always
           volumeMounts:
-            - name: controller-storage
-              mountPath: /mnt/storage
             - name: public
               mountPath: /mnt/public
       containers:
@@ -76,8 +72,6 @@ spec:
               name: http
               protocol: TCP
           volumeMounts:
-            - name: controller-storage
-              mountPath: /var/www/api/storage
             - name: run-php
               mountPath: /var/run/php/
             - name: public
@@ -99,8 +93,6 @@ spec:
               name: http
               protocol: TCP
           volumeMounts:
-            - name: controller-storage
-              mountPath: /var/www/api/storage
             - name: controller-nginx-conf
               readOnly: true
               mountPath: /etc/nginx/nginx.conf
@@ -122,9 +114,6 @@ spec:
       hostname: controller
       restartPolicy: Always
       volumes:
-        - name: controller-storage
-          persistentVolumeClaim:
-            claimName: controller-storage
         - name: run-php
           emptyDir: {}
         - name: public
@@ -185,7 +174,7 @@ spec:
         - name: controller-queue
           args:
             - php
-            - /var/www/api/artisan 
+            - artisan 
             - queue:work
             - --queue=controller
             - --sleep=3
@@ -195,9 +184,6 @@ spec:
                 name: controller-env
           image: download.aipix.ai:8443/controller/release:latest
           imagePullPolicy: Always
-          volumeMounts:
-            - name: controller-storage
-              mountPath: /var/www/api/storage
           resources:
             requests:
               cpu: 80m
@@ -206,10 +192,6 @@ spec:
         - name: download-aipix-ai
       hostname: controller-queue
       restartPolicy: Always
-      volumes:
-        - name: controller-storage
-          persistentVolumeClaim:
-            claimName: controller-storage
 
 ---
 apiVersion: apps/v1
@@ -246,16 +228,13 @@ spec:
         - name: controller-schedule
           args:
             - php
-            - /var/www/api/artisan
+            - artisan
             - schedule:work
           envFrom:
             - configMapRef:
                 name: controller-env
           image: download.aipix.ai:8443/controller/release:latest
           imagePullPolicy: Always
-          volumeMounts:
-            - name: controller-storage
-              mountPath: /var/www/api/storage
           resources:
             requests:
               cpu: 50m
@@ -264,10 +243,6 @@ spec:
         - name: download-aipix-ai
       hostname: controller-schedule
       restartPolicy: Always
-      volumes:
-        - name: controller-storage
-          persistentVolumeClaim:
-            claimName: controller-storage
 
 ---
 apiVersion: apps/v1
@@ -318,9 +293,6 @@ spec:
               name: hls
               protocol: TCP
           imagePullPolicy: Always
-          volumeMounts:
-            - name: controller-storage
-              mountPath: /var/www/api/storage
           resources:
             requests:
               cpu: 50m
@@ -329,10 +301,6 @@ spec:
         - name: download-aipix-ai
       hostname: controller-control-plane-hls
       restartPolicy: Always
-      volumes:
-        - name: controller-storage
-          persistentVolumeClaim:
-            claimName: controller-storage
 
 ---
 apiVersion: apps/v1
@@ -383,9 +351,6 @@ spec:
               name: rtsp
               protocol: TCP
           imagePullPolicy: Always
-          volumeMounts:
-            - name: controller-storage
-              mountPath: /var/www/api/storage
           resources:
             requests:
               cpu: 50m
@@ -394,10 +359,6 @@ spec:
         - name: download-aipix-ai
       hostname: controller-control-plane-rtsp
       restartPolicy: Always
-      volumes:
-        - name: controller-storage
-          persistentVolumeClaim:
-            claimName: controller-storage
 
 ---
 apiVersion: apps/v1
@@ -444,9 +405,6 @@ spec:
                 name: controller-env
           image: download.aipix.ai:8443/controller/release:latest
           imagePullPolicy: Always
-          volumeMounts:
-            - name: controller-storage
-              mountPath: /var/www/api/storage
           resources:
             requests:
               cpu: 50m
@@ -455,7 +413,3 @@ spec:
         - name: download-aipix-ai
       hostname: controller-media-servers-callback-queue
       restartPolicy: Always
-      volumes:
-        - name: controller-storage
-          persistentVolumeClaim:
-            claimName: controller-storage

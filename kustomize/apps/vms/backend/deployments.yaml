@@ -52,12 +52,22 @@ spec:
           image: download.aipix.ai:8443/vms-backend/release:latest
           imagePullPolicy: Always
           volumeMounts:
-            - name: storage
-              mountPath: /var/www/api/storage
             - name: run-php
               mountPath: /var/run/php/
             - name: public
               mountPath: /var/www/api/public/
+            - mountPath: /var/www/api/storage/oauth-private.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-private.key
+            - mountPath: /var/www/api/storage/oauth-public.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-public.key
+            - mountPath: /var/www/api/storage/file.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: file.key
           resources:
             requests:
               cpu: 5m
@@ -69,8 +79,6 @@ spec:
               name: http
               protocol: TCP
           volumeMounts:
-            - name: storage
-              mountPath: /var/www/api/storage
             - name: vms-backend-nginx-conf
               readOnly: true
               mountPath: /etc/nginx/nginx.conf
@@ -91,17 +99,13 @@ spec:
         - name: init-backend
           command: ["/bin/sh", "-c"]
           args:
-            - cp -Rp /var/www/api/storage/* /mnt/storage/;
-              chown -R www-data:www-data /mnt/storage/;
-              cp -Rp /var/www/api/public/* /mnt/public/
+            - cp -Rp /var/www/api/public/* /mnt/public/
           envFrom:
             - configMapRef:
                 name: vms-backend-env
           image: download.aipix.ai:8443/vms-backend/release:latest
           imagePullPolicy: Always
           volumeMounts:
-            - name: storage
-              mountPath: /mnt/storage
             - name: public
               mountPath: /mnt/public
       imagePullSecrets:
@@ -109,9 +113,6 @@ spec:
       hostname: backend
       restartPolicy: Always
       volumes:
-        - name: storage
-          persistentVolumeClaim:
-            claimName: storage
         - name: run-php
           emptyDir: {}
         - name: public
@@ -122,6 +123,9 @@ spec:
         - name: vms-backend-nginx-server-conf
           configMap:
             name: vms-backend-nginx-server-conf
+        - name: vms-backend-oauth
+          secret:
+            secretName: vms-backend-oauth
 
 ---
 apiVersion: apps/v1
@@ -162,8 +166,6 @@ spec:
           image: download.aipix.ai:8443/vms-backend/release:latest
           imagePullPolicy: Always
           volumeMounts:
-            - name: storage
-              mountPath: /var/www/api/storage
             - name: vms-fcm-json
               mountPath: /var/www/api/fcm.json
               subPath: fcm.json
@@ -172,6 +174,18 @@ spec:
               mountPath: /var/www/api/voip.p8
               subPath: voip.p8
               readOnly: true
+            - mountPath: /var/www/api/storage/oauth-private.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-private.key
+            - mountPath: /var/www/api/storage/oauth-public.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-public.key
+            - mountPath: /var/www/api/storage/file.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: file.key
           resources:
             requests:
               cpu: 5m
@@ -181,15 +195,15 @@ spec:
       hostname: cron
       restartPolicy: Always
       volumes:
-        - name: storage
-          persistentVolumeClaim:
-            claimName: storage
         - name: vms-fcm-json
           configMap:
             name: vms-fcm-json
         - name: vms-voip-p8
           configMap:
             name: vms-voip-p8
+        - name: vms-backend-oauth
+          secret:
+            secretName: vms-backend-oauth
 
 ---
 apiVersion: apps/v1
@@ -234,8 +248,18 @@ spec:
           image: download.aipix.ai:8443/vms-backend/release:latest
           imagePullPolicy: Always
           volumeMounts:
-            - name: storage
-              mountPath: /var/www/api/storage
+            - mountPath: /var/www/api/storage/oauth-private.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-private.key
+            - mountPath: /var/www/api/storage/oauth-public.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-public.key
+            - mountPath: /var/www/api/storage/file.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: file.key
           resources:
             requests:
               cpu: 50m
@@ -245,9 +269,9 @@ spec:
       hostname: schedule
       restartPolicy: Always
       volumes:
-        - name: storage
-          persistentVolumeClaim:
-            claimName: storage
+        - name: vms-backend-oauth
+          secret:
+            secretName: vms-backend-oauth
 
 ---
 apiVersion: apps/v1
@@ -297,19 +321,17 @@ spec:
       containers:
         - name: queue
           args:
-            - /bin/bash
-            - -c
-            - >-
-              php artisan queue:work --queue=vms --sleep=3 --tries=3
-              2>&1 >> /var/www/api/storage/logs/worker.log
+            - php
+            - artisan
+            - queue:work 
+            - --queue=vms
+            - --sleep=3
           envFrom:
             - configMapRef:
                 name: vms-backend-env
           image: download.aipix.ai:8443/vms-backend/release:latest
           imagePullPolicy: Always
           volumeMounts:
-            - name: storage
-              mountPath: /var/www/api/storage
             - name: vms-fcm-json
               mountPath: /var/www/api/fcm.json
               subPath: fcm.json
@@ -318,6 +340,18 @@ spec:
               mountPath: /var/www/api/voip.p8
               subPath: voip.p8
               readOnly: true
+            - mountPath: /var/www/api/storage/oauth-private.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-private.key
+            - mountPath: /var/www/api/storage/oauth-public.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-public.key
+            - mountPath: /var/www/api/storage/file.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: file.key
           resources:
             requests:
               cpu: 80m
@@ -327,15 +361,15 @@ spec:
       hostname: queue
       restartPolicy: Always
       volumes:
-        - name: storage
-          persistentVolumeClaim:
-            claimName: storage
         - name: vms-fcm-json
           configMap:
             name: vms-fcm-json
         - name: vms-voip-p8
           configMap:
             name: vms-voip-p8
+        - name: vms-backend-oauth
+          secret:
+            secretName: vms-backend-oauth
 
 ---
 apiVersion: apps/v1
@@ -398,8 +432,18 @@ spec:
           image: download.aipix.ai:8443/vms-backend/release:latest
           imagePullPolicy: Always
           volumeMounts:
-            - name: storage
-              mountPath: /var/www/api/storage
+            - mountPath: /var/www/api/storage/oauth-private.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-private.key
+            - mountPath: /var/www/api/storage/oauth-public.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-public.key
+            - mountPath: /var/www/api/storage/file.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: file.key
           resources:
             requests:
               cpu: 5m
@@ -409,9 +453,9 @@ spec:
       hostname: archive
       restartPolicy: Always
       volumes:
-        - name: storage
-          persistentVolumeClaim:
-            claimName: storage
+        - name: vms-backend-oauth
+          secret:
+            secretName: vms-backend-oauth
 
 ---
 apiVersion: apps/v1
@@ -466,15 +510,24 @@ spec:
             - queue:work
             - --queue=reports
             - --sleep=3
-            # - --max-jobs=1
           envFrom:
             - configMapRef:
                 name: vms-backend-env
           image: download.aipix.ai:8443/vms-backend/release:latest
           imagePullPolicy: Always
           volumeMounts:
-            - name: storage
-              mountPath: /var/www/api/storage
+            - mountPath: /var/www/api/storage/oauth-private.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-private.key
+            - mountPath: /var/www/api/storage/oauth-public.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-public.key
+            - mountPath: /var/www/api/storage/file.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: file.key
           resources:
             requests:
               cpu: 5m
@@ -484,9 +537,9 @@ spec:
       hostname: reports
       restartPolicy: Always
       volumes:
-        - name: storage
-          persistentVolumeClaim:
-            claimName: storage
+        - name: vms-backend-oauth
+          secret:
+            secretName: vms-backend-oauth
 
 ---
 apiVersion: apps/v1
@@ -547,8 +600,18 @@ spec:
           image: download.aipix.ai:8443/vms-backend/release:latest
           imagePullPolicy: Always
           volumeMounts:
-            - name: storage
-              mountPath: /var/www/api/storage
+            - mountPath: /var/www/api/storage/oauth-private.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-private.key
+            - mountPath: /var/www/api/storage/oauth-public.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-public.key
+            - mountPath: /var/www/api/storage/file.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: file.key
           resources:
             requests:
               cpu: 5m
@@ -558,8 +621,6 @@ spec:
       hostname: set-configs
       restartPolicy: Always
       volumes:
-        - name: storage
-          persistentVolumeClaim:
-            claimName: storage
-
-
+        - name: vms-backend-oauth
+          secret:
+            secretName: vms-backend-oauth

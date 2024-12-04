@@ -11,16 +11,16 @@ components:
 images:
 - name: download.aipix.ai:8443/analytics-worker/release
   newName: download.aipix.ai:8443/analytics-worker/release
-  newTag: 24.09.0.0
+  newTag: 24.09.1.0
 - name: download.aipix.ai:8443/analytics-ovms/release
   newName: download.aipix.ai:8443/analytics-ovms/release
-  newTag: 24.09.0.0
+  newTag: 24.09.1.0
 - name: download.aipix.ai:8443/analytics-orchestrator-server/release
   newName: download.aipix.ai:8443/analytics-orchestrator-server/release
-  newTag: 24.09.0.0
+  newTag: 24.09.1.0
 - name: download.aipix.ai:8443/analytics-tarantool/release
   newName: download.aipix.ai:8443/analytics-tarantool/release
-  newTag: 24.09.0.0
+  newTag: 24.09.1.0
 - name: download.aipix.ai:8443/analytics-face-vectorization-service/release
   newName: download.aipix.ai:8443/analytics-face-vectorization-service/release
   newTag: latest
@@ -33,31 +33,6 @@ images:
 ${CUSTOM_IMAGES}
 
 patches:
-#Replace persistent volumes with emptyDir
-- target:
-    group: ""
-    version: v1
-    kind: PersistentVolumeClaim
-    name: tarantool
-  patch: |
-    $patch: delete
-    apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      name: .*
-- target:
-    group: apps
-    version: v1
-    kind: Deployment
-    name: tarantool
-  patch: |-
-    - op: replace
-      path: /spec/template/spec/volumes/0
-      value:
-        emptyDir: {}
-        name: tarantool
-
-#Kustomizations with patch files
 - target:
     group: apps
     version: v1

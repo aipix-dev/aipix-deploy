@@ -17,7 +17,7 @@ update_orchestrator
 update_analytics-worker
 
 if [ ${MONITORING} == "yes" ]; then
-  update_metrics-pusher
+	update_metrics-pusher
 fi
 
 echo """

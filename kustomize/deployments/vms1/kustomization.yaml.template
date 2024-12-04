@@ -27,16 +27,16 @@ ${ADD_COMPONENT3}
 images:
 - name: download.aipix.ai:8443/vms-backend/release
   newName: download.aipix.ai:8443/vms-backend/release
-  newTag: 24.09.0.0
+  newTag: 24.09.1.0
 - name: download.aipix.ai:8443/vms-frontend-admin/release
   newName: download.aipix.ai:8443/vms-frontend-admin/release
-  newTag: 24.09.0.0
+  newTag: 24.09.1.0
 - name: download.aipix.ai:8443/vms-frontend-client/release
   newName: download.aipix.ai:8443/vms-frontend-client/release
-  newTag: 24.09.0.0
+  newTag: 24.09.1.0
 - name: download.aipix.ai:8443/controller/release
   newName: download.aipix.ai:8443/controller/release
-  newTag: 24.09.0.0
+  newTag: 24.09.1.0
 - name: download.aipix.ai:8443/vms-portal-backend/release
   newName: download.aipix.ai:8443/vms-portal-backend/release
   newTag: 24.09.0.0
@@ -52,13 +52,6 @@ images:
 ${CUSTOM_IMAGES}
 
 patches:
-${ADD_PATCH1}
-- target:
-    group: ""
-    version: v1
-    kind: PersistentVolumeClaim
-    name: (storage|controller-storage|portal-storage)
-  path: patch-storage-pvc.yaml
 - target:
     group: ""
     version: v1

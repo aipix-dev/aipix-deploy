@@ -16,14 +16,14 @@ helm repo add "${BRAND}" "${REPO}"  --username "${REPO_USER}" --password "${REPO
 helm repo update
 
 if [ -z "${VALUES}" ]; then
-  echo -e "\033[0;31mvgw values are not set!!!"
-  echo "Use deploy-vgw.sh <name_space> <values.yaml>"
-  exit 1
+	echo -e "\033[0;31mvgw values are not set!!!"
+	echo "Use deploy-vgw.sh <name_space> <values.yaml>"
+	exit 1
 fi
 
 if [ ! -e "$VALUES" ]; then
-  echo -e "\033[0;31m ${VALUES} doesn't exist !!!"
-  exit 1
+	echo -e "\033[0;31m ${VALUES} doesn't exist !!!"
+	exit 1
 fi
 echo "${VALUES}"
 helm -n "${NS_VMS}" upgrade -i -f "${VALUES}" vgw "${BRAND}/vgw"

@@ -1,6 +1,6 @@
-mediaagent:
+devices:
   enable: true
-  name: "Media Agent for tests"
+  name: "External devices"
   key: "devices"
   secret: "devices-secret-key"
   options: { cln  ment-messages: true, statistic: false }

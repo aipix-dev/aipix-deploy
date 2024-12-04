@@ -37,22 +37,22 @@ sed -i "s@PRIVATE_AWS_SECRET_ACCESS_KEY=.*@PRIVATE_AWS_SECRET_ACCESS_KEY=${MINIO
 sed -i "s@PRIVATE_AWS_ENDPOINT=.*@PRIVATE_AWS_ENDPOINT=http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../vms-backend/environments/.env
 sed -i "s@PRIVATE_AWS_URL=.*@PRIVATE_AWS_URL=https://${VMS_DOMAIN}/s3@g" ../vms-backend/environments/.env
 if [[ ${TYPE} == "single" ]] && [[ ${BACKEND_STORAGE_TYPE} == "disk" ]]; then
-        sed -E -i "s@^ *#? *FILESYSTEM_DISK_PUBLIC=.*@#FILESYSTEM_DISK_PUBLIC=s3-public@g" ../vms-backend/environments/.env
-        sed -E -i "s@^ *#? *FILESYSTEM_DISK_PRIVATE=.*@#FILESYSTEM_DISK_PRIVATE=s3-private@g" ../vms-backend/environments/.env
-        sed -E -i "s@^ *#? *S3_BACKUP_PATH=.*@#S3_BACKUP_PATH=database_backups@g" ../vms-backend/environments/.env
+    sed -E -i "s@^ *#? *FILESYSTEM_DISK_PUBLIC=.*@#FILESYSTEM_DISK_PUBLIC=s3-public@g" ../vms-backend/environments/.env
+    sed -E -i "s@^ *#? *FILESYSTEM_DISK_PRIVATE=.*@#FILESYSTEM_DISK_PRIVATE=s3-private@g" ../vms-backend/environments/.env
+    sed -E -i "s@^ *#? *S3_BACKUP_PATH=.*@#S3_BACKUP_PATH=database_backups@g" ../vms-backend/environments/.env
 elif [ -z "${BACKEND_STORAGE_TYPE}" ]; then
 	echo "Skipping FILESYSTEM_DISK config"
 else
 	sed -E -i "s@^ *#? *FILESYSTEM_DISK_PUBLIC=.*@FILESYSTEM_DISK_PUBLIC=s3-public@g" ../vms-backend/environments/.env
-        sed -E -i "s@^ *#? *FILESYSTEM_DISK_PRIVATE=.*@FILESYSTEM_DISK_PRIVATE=s3-private@g" ../vms-backend/environments/.env
-        sed -E -i "s@^ *#? *S3_BACKUP_PATH=.*@S3_BACKUP_PATH=database_backups@g" ../vms-backend/environments/.env
+    sed -E -i "s@^ *#? *FILESYSTEM_DISK_PRIVATE=.*@FILESYSTEM_DISK_PRIVATE=s3-private@g" ../vms-backend/environments/.env
+    sed -E -i "s@^ *#? *S3_BACKUP_PATH=.*@S3_BACKUP_PATH=database_backups@g" ../vms-backend/environments/.env
 fi
 
 cp -n ../controller/environments/env.sample ../controller/environments/.env
 sed -i "s@CONTROL_PLAIN_HLS_REDIRECT_ENDPOINT=.*@CONTROL_PLAIN_HLS_REDIRECT_ENDPOINT=${VMS_DOMAIN}/controller-hls@g" ../controller/environments/.env
 sed -i "s@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT=.*@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT=${VMS_DOMAIN}:5554@g" ../controller/environments/.env
 sed -i "s@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT_INTERNAL=.*@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT_INTERNAL=controller-control-plane-rtsp.${NS_VMS}.svc:5554@g" ../controller/environments/.env
-sed -i "s@ONVIF_EXTERNAL_HOST=.*@ONVIF_EXTERNAL_HOST=http://${CONTROLLER_ONVIF_EXTERNAL_HOST}@g" ../controller/environments/.env
+sed -i "s@ONVIF_EXTERNAL_HOST=.*@ONVIF_EXTERNAL_HOST=http://${CONTROLLER_ONVIF_EXTERNAL_HOST}:8888@g" ../controller/environments/.env
 cp -n ../nginx/nginx.conf.sample ../nginx/nginx.conf
 cp -n ../nginx/vms-backend-nginx-server.conf.sample ../nginx/vms-backend-nginx-server.conf
 cp -n ../nginx/vms-backend-nginx.conf.sample ../nginx/vms-backend-nginx.conf
@@ -66,7 +66,14 @@ if [ ${ANALYTICS} == "yes" ]; then
     sed -i "s@CLICKHOUSE_HOST=.*@CLICKHOUSE_HOST=clickhouse-server.${NS_A}.svc@g" ../vms-backend/environments/.env
     sed -i "s@ANALYTIC_CASE_CALLBACK_ENDPOINT=.*@ANALYTIC_CASE_CALLBACK_ENDPOINT=http://backend.${NS_VMS}.svc@g" ../vms-backend/environments/.env
 fi
+
+if [ ${MONITORING} == "yes" ]; then
+    sed -E -i "s@^ *#? *LOG_CHANNEL=.*@LOG_CHANNEL=syslogudp@g" ../vms-backend/environments/.env
+    sed -E -i "s@^ *#? *LOG_CHANNEL=.*@LOG_CHANNEL=syslogudp@g" ../controller/environments/.env
+fi
+
 cp -n ../vms-backend/license/license.json.sample ../vms-backend/license/license.json
+
 if [ ${PORTAL} == "yes" ]; then
     cp -n ../portal/environments/env.sample ../portal/environments/.env
     cp -n ../portal/environments-stub/env.sample ../portal/environments-stub/.env
@@ -84,6 +91,9 @@ if [ ${PORTAL} == "yes" ]; then
     sed -i "s@PRIVATE_AWS_SECRET_ACCESS_KEY=.*@PRIVATE_AWS_SECRET_ACCESS_KEY=${MINIO_PORTAL_SECRET_KEY_PRIV}@g" ../portal/environments/.env
     sed -i "s@PRIVATE_AWS_ENDPOINT=.*@PRIVATE_AWS_ENDPOINT=http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../portal/environments/.env
     sed -i "s@PRIVATE_AWS_URL=.*@PRIVATE_AWS_URL=https://${VMS_DOMAIN}/s3@g" ../portal/environments/.env
+    if [ ${MONITORING} == "yes" ]; then
+        sed -E -i "s@^ *#? *LOG_CHANNEL=.*@LOG_CHANNEL=syslogudp@g" ../portal/environments/.env
+    fi
     if [[ ${TYPE} == "single" ]] && [[ ${BACKEND_STORAGE_TYPE} == "disk" ]]; then
         sed -E -i "s@^ *#? *FILESYSTEM_DISK_PUBLIC=.*@#FILESYSTEM_DISK_PUBLIC=s3-public@g" ../portal/environments/.env
         sed -E -i "s@^ *#? *FILESYSTEM_DISK_PRIVATE=.*@#FILESYSTEM_DISK_PRIVATE=s3-private@g" ../portal/environments/.env
