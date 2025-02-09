@@ -61,6 +61,15 @@ spec:
               cpu: "200m"
               memory: 200Mi
         - name: celery
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           command: ["celery"]
           args:
             - -A
@@ -103,11 +112,13 @@ spec:
           - containerPort: 8081
             name: rest
           livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
             httpGet:
               path: /v2/health/live
               port: rest
           readinessProbe:
-            initialDelaySeconds: 5
+            initialDelaySeconds: 10
             periodSeconds: 5
             httpGet:
               path: /v2/health/ready

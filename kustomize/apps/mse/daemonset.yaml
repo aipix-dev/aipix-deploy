@@ -45,8 +45,6 @@ spec:
         - name: server-json
           mountPath: /opt/vsaas/services/server.json
           readOnly: true
-        # - name: streams-json
-        #   mountPath: /opt/vsaas/services/streams.json
         - name: cameras-json
           mountPath: /opt/vsaas/services/cameras.json
           readOnly: false
@@ -84,9 +82,6 @@ spec:
       - name: server-json
         hostPath:
           path: /opt/vsaas/mse/configs/server.json
-      # - name: streams-json
-      #   hostPath:
-      #     path: /opt/vsaas/mse/streams/streams.json
       - name: cameras-json
         hostPath:
           path: /opt/vsaas/mse/cameras/cameras.json

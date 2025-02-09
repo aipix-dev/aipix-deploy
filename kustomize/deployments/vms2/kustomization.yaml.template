@@ -26,118 +26,37 @@ ${ADD_COMPONENT3}
 images:
 - name: download.aipix.ai:8443/vms-backend/release
   newName: download.aipix.ai:8443/vms-backend/release
-  newTag: 24.09.1.0
+  newTag: 24.12.0.0
 - name: download.aipix.ai:8443/vms-frontend-admin/release
   newName: download.aipix.ai:8443/vms-frontend-admin/release
-  newTag: 24.09.1.0
+  newTag: 24.12.0.0
 - name: download.aipix.ai:8443/vms-frontend-client/release
   newName: download.aipix.ai:8443/vms-frontend-client/release
-  newTag: 24.09.1.0
+  newTag: 24.12.0.0
 - name: download.aipix.ai:8443/controller/release
   newName: download.aipix.ai:8443/controller/release
-  newTag: 24.09.1.0
+  newTag: 24.12.0.0
 - name: download.aipix.ai:8443/vms-portal-backend/release
   newName: download.aipix.ai:8443/vms-portal-backend/release
-  newTag: 24.09.0.0
+  newTag: 24.12.0.0
 - name: download.aipix.ai:8443/vms-portal-frontend-client/release
   newName: download.aipix.ai:8443/vms-portal-frontend-client/release
-  newTag: 24.09.0.0
+  newTag: 24.12.0.0
 - name: download.aipix.ai:8443/vms-portal-stub/release
   newName: download.aipix.ai:8443/vms-portal-stub/release
   newTag: latest
 - name: download.aipix.ai:8443/vms-portal-landing/release
   newName: download.aipix.ai:8443/vms-portal-landing/release
-  newTag: 24.09.0.0
+  newTag: 24.12.0.0
 ${CUSTOM_IMAGES}
 
 patches:
-#Delete persistent storages and kustomize initContainers
-- target:
-    group: ""
-    version: v1
-    kind: PersistentVolumeClaim
-    name: (storage|controller-storage|portal-storage)
-  patch: |
-    $patch: delete
-    apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      name: .*
-- target:
-    group: apps
-    version: v1
-    kind: Deployment
-    name: "(backend|set-configs|schedule|reports|queue-controller-webhooks|queue|cron|archive|analytic-events|analytic-statistics|\
-           controller.*|portal-backend|portal-schedule|portal-queue|portal-stub)"
-  patch: |-
-    - op: remove
-      path: /spec/template/spec/containers/0/volumeMounts/0
-    - op: remove
-      path: /spec/template/spec/volumes/0
-- target:
-    group: apps
-    version: v1
-    kind: Deployment
-    name: (backend|controller)
-  patch: |-
-    - op: remove
-      path: /spec/template/spec/containers/1/volumeMounts/0
-    - op: remove
-      path: /spec/template/spec/initContainers/0/volumeMounts/0
-    - op: replace
-      path: /spec/template/spec/initContainers/0/args
-      value:
-        - cp -Rp /var/www/api/public/* /mnt/public/
-- target:
-    group: apps
-    version: v1
-    kind: Deployment
-    name: (portal-backend|portal-stub)
-  patch: |-
-    - op: remove
-      path: /spec/template/spec/initContainers
-
-#Add mounts for oauth-private.key oauth-public.key and file.key to vms backend POD
-- target:
-    group: apps
-    version: v1
-    kind: Deployment
-    name: (backend|set-configs|schedule|reports|queue-controller-webhooks|queue|cron|archive|analytic-events|analytic-statistics)
-  patch: |-
-    - op: add
-      path: /spec/template/spec/volumes/-
-      value:
-        name: vms-backend-oauth
-        secret:
-          secretName: vms-backend-oauth
-    - op: add
-      path: /spec/template/spec/containers/0/volumeMounts/-
-      value:
-        mountPath: /var/www/api/storage/oauth-private.key
-        name: vms-backend-oauth
-        readOnly: true
-        subPath: oauth-private.key
-    - op: add
-      path: /spec/template/spec/containers/0/volumeMounts/-
-      value:
-        mountPath: /var/www/api/storage/oauth-public.key
-        name: vms-backend-oauth
-        readOnly: true
-        subPath: oauth-public.key
-    - op: add
-      path: /spec/template/spec/containers/0/volumeMounts/-
-      value:
-        mountPath: /var/www/api/storage/file.key
-        name: vms-backend-oauth
-        readOnly: true
-        subPath: file.key
-
 #Add php-fpm overrides configs
 - target:
     group: apps
     version: v1
     kind: Deployment
-    name: (backend|controller)
+    name: (backend|controller-api)
   patch: |-
     - op: add
       path: /spec/template/spec/volumes/-
@@ -165,20 +84,6 @@ patches:
         name: overrides-php-pool-www-conf
         readOnly: true
         subPath: z-overrides-www.conf
-
-#Change start-up args for vms queue POD
-- target:
-    group: apps
-    version: v1
-    kind: Deployment
-    name: queue
-  patch: |-
-    - op: replace
-      path: /spec/template/spec/containers/0/args
-      value:
-        - /bin/bash
-        - -c
-        - php artisan queue:work --queue=vms --sleep=3
 
 #Change replicas
 - target:

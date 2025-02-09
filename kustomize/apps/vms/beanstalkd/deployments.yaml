@@ -21,6 +21,9 @@ spec:
     type: Recreate
   template:
     metadata:
+      annotations:
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
       labels:
         app.kubernetes.io/name: beanstalkd
         app.kubernetes.io/component: message-broker
@@ -29,7 +32,9 @@ spec:
     spec:
       containers:
         - name: beanstalkd
-          image: schickling/beanstalkd:latest
+          # image: schickling/beanstalkd:latest
+          image: download.aipix.ai:8443/beanstalkd:1.13
+          imagePullPolicy: Always
           command:
             - /usr/bin/beanstalkd
             - -z
@@ -47,5 +52,17 @@ spec:
             requests:
               cpu: 10m
               memory: 25Mi
+        - name: beanstalkd-exporter
+          image: download.aipix.ai:8443/beanstalkd-exporter:2.0.0
+          imagePullPolicy: Always
+          args:
+            - --beanstalkd.systemMetrics=current_connections_count,current_jobs_buried_count,current_waiting_count
+            - --beanstalkd.allTubes
+          resources:
+            requests:
+              cpu: 10m
+              memory: 25Mi
       hostname: beanstalkd
       restartPolicy: Always
+      imagePullSecrets:
+        - name: download-aipix-ai

@@ -1,38 +1,38 @@
 {
   "proxy": {
     "listen": "*:8776:/",
-    "poll": 256,
+    "poll": 1024,
     "ip": 4,
     "ssl": true,
-    "workers": 2,
+    "workers": 4,
     "max-response-size": 65536,
     "max-request-size": 65536
   },
   "onvif": {
     "listen": "*:8887:/",
-    "workers": 2,
-    "poll": 256,
+    "workers": 4,
+    "poll": 1024,
     "ip": 4
   },
   "rtsp": {
     "listen": "*:8554:/",
     "sink": "*:8998:/",
-    "workers": 2,
-    "poll": 256,
+    "workers": 16,
+    "poll": 1024,
     "ip": 4
   },
   "cameras": "./cameras.json",
   "media": {
     "listen": "*:8443:/",
     "ip": 4,
-    "workers": 4,
-    "poll": 64,
+    "workers": 16,
+    "poll": 1024,
     "ssl": true
   },
   "api": {
     "listen": "*:8665:/api/",
-    "workers": 2,
-    "poll": 64,
+    "workers": 8,
+    "poll": 1024,
     "ssl": true,
     "ip": 4
   },

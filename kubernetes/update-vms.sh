@@ -60,9 +60,7 @@ kubectl create configmap vms-backend-nginx-server-conf --namespace=${NS_VMS} --f
 kubectl create configmap vms-backend-env --namespace=${NS_VMS} --from-env-file=../vms-backend/environments/.env
 kubectl create configmap vms-fcm-json  --namespace=${NS_VMS} --from-file=../vms-backend/certificates/fcm.json
 kubectl create configmap vms-voip-p8 --namespace=${NS_VMS} --from-file=../vms-backend/certificates/voip.p8
-kubectl create configmap vms-frontend-env --namespace=${NS_VMS} \
-                                          --from-env-file=../vms-frontend/admin.env \
-                                          --from-env-file=../vms-frontend/client.env
+kubectl create configmap vms-frontend-env --namespace=${NS_VMS} --from-env-file=../vms-frontend/admin.env
 kubectl create configmap push1st-server --namespace=${NS_VMS} --from-file=server.yml=../push1st/server.yml
 kubectl create configmap push1st-app --namespace=${NS_VMS} --from-file=../push1st/app.yml
 kubectl create configmap push1st-devices --namespace=${NS_VMS} --from-file=../push1st/devices.yml
@@ -139,18 +137,22 @@ echo "Manifests were successfully aplied"
 for i in $(kubectl get deployments -n ${NS_VMS} | awk 'NR>1 { print $1 }'); do kubectl rollout restart deployment.apps/$i  -n ${NS_VMS}; done
 kubectl -n ${NS_VMS} rollout status deployment backend >/dev/null
 kubectl -n ${NS_VMS} rollout status deployment controller-api >/dev/null
-echo "Deployments were successfully restarted"
-sleep 10
+if [ ${TYPE} != "prod" ]; then
+    kubectl -n ${NS_VMS} rollout status deployment mysql-server >/dev/null
+fi
 
+echo "Deployments were successfully restarted"
+sleep 15
 
 kubectl -n ${NS_VMS} exec deployment.apps/backend -- ./scripts/update.sh
 kubectl -n ${NS_VMS} exec deployment.apps/backend -- chown www-data:www-data -R storage/logs
 kubectl -n ${NS_VMS} exec deployment.apps/controller-api -- ./scripts/update.sh
 
 if [ ${PORTAL} == "yes" ]; then
+	kubectl -n ${NS_VMS} rollout status deployment portal-backend >/dev/null
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-backend -- ./scripts/update.sh
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/update.sh
-	kubectl -n ${NS_VMS} rollout status deployment portal-backend >/dev/null
+	
 fi
 
 if [[ ${TYPE} == "single" ]] && [[ ${BACKEND_STORAGE_TYPE} == "s3_and_disk" ]]; then
@@ -159,7 +161,7 @@ if [[ ${TYPE} == "single" ]] && [[ ${BACKEND_STORAGE_TYPE} == "s3_and_disk" ]]; 
 	kubectl --namespace=${NS_VMS} exec deployments/backend -- cat storage/oauth-private.key > ../vms-backend/certificates/oauth-private.key
 fi
 
-VMS_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+# VMS_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
 echo "
 Your containers are updated successfully!

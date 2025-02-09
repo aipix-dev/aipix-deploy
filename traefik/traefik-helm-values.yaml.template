@@ -18,7 +18,7 @@ additionalArguments:
   - --serversTransport.insecureSkipVerify=true
   - --entrypoints.controller-rtsp.address=:5554/tcp
   - --entrypoints.contr-onvif.address=:8888/tcp
-  - --entryPoints.web.http.redirections.entryPoint.to=websecure
+  - --entryPoints.web.http.redirections.entryPoint.to=:443
   - --entrypoints.web.http.redirections.entrypoint.scheme=https
   - --entrypoints.web.http.redirections.entrypoint.priority=100
 

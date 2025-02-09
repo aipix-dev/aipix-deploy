@@ -114,6 +114,7 @@ spec:
             - artisan 
             - queue:work
             - --queue=portal
+            - --timeout=600
           envFrom:
             - configMapRef:
                 name: vms-portal-backend-env

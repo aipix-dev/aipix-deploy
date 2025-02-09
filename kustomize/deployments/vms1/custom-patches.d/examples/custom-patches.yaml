@@ -14,5 +14,5 @@
     group: apps
     version: v1
     kind: Deployment
-    name: (backend|controller)
+    name: (backend|controller-api)
   path: ./custom-patches.d/patch-image-pull-policy-init.yaml

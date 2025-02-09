@@ -33,3 +33,12 @@ MEDIA_SERVER_TOKEN:
 TEST_BRANCH_NAME: test1
 TEST_CAMERA_NAME: cam1
 TEST_ARCHIVE_DAYS: 3
+
+HD_RTSP_LINK: rtsp://rtsp-server.testing.svc:8080/stream_1
+SD_RTSP_LINK: rtsp://rtsp-server.testing.svc:8080/stream_2
+CURSOR_LIVE_COLOR_RGB: ['64', '207', '52']
+CURSOR_ARCHIVE_COLOR_RGB: ['231', '196', '16']
+
+#ONVIF_ADMIN: 
+#ONVIF_PASSWORD: 
+#ONVIF_IP: 

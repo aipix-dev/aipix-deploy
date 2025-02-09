@@ -36,6 +36,14 @@ spec:
           env:
             - name: TARANTOOL_PORT
               value: "3301"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           ports:
             - containerPort: 80
               name: http
@@ -53,6 +61,14 @@ spec:
           env:
             - name: TARANTOOL_PORT
               value: "3301"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           volumeMounts:
             - name: analytics-env
               mountPath: /opt/analytics-orchestrator-server/.env
@@ -66,6 +82,14 @@ spec:
           env:
             - name: TARANTOOL_PORT
               value: "3301"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           volumeMounts:
             - name: analytics-env
               mountPath: /opt/analytics-orchestrator-server/.env
@@ -79,6 +103,14 @@ spec:
           env:
             - name: TARANTOOL_PORT
               value: "3301"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           volumeMounts:
             - name: analytics-env
               mountPath: /opt/analytics-orchestrator-server/.env
@@ -92,6 +124,14 @@ spec:
           env:
             - name: TARANTOOL_PORT
               value: "3301"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           volumeMounts:
             - name: analytics-env
               mountPath: /opt/analytics-orchestrator-server/.env
@@ -107,6 +147,14 @@ spec:
           env:
             - name: TARANTOOL_PORT
               value: "3301"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           volumeMounts:
             - name: a-licensing-yaml
               mountPath: /opt/analytics-licensing/config.yaml

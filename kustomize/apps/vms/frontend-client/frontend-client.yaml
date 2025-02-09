@@ -40,9 +40,6 @@ spec:
               topologyKey: kubernetes.io/hostname
       containers:
         - name: frontend-client
-          envFrom:
-            - configMapRef:
-                name: vms-frontend-env
           image: download.aipix.ai:8443/vms-frontend-client/release:latest
           imagePullPolicy: Always
           ports:

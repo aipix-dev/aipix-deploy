@@ -62,6 +62,7 @@ print_new_config_lines () {
 	fi
 	for key in "${!new_elements[@]}"; do cat $sample_file | grep -w $key >> $current_file; done
 	#for key in "${!new_elements[@]}"; do cat $sample_file | grep $key ; done
+	echo "Variables for env file $current_file successfully synced"
 }
 
 

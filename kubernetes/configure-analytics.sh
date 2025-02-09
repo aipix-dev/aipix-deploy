@@ -45,6 +45,7 @@ if [ ${MONITORING} == "yes" ]; then
     sed -i 's@^#MONITORING_@MONITORING_@g' ../analytics/.env
     sed -i "s@.DEPLOYMENT_NAME.*@DEPLOYMENT_NAME = ${NS_A}@g" ../analytics/.env
     sed -i "s@^#PUSH_ERRORS_@PUSH_ERRORS_@g" ../analytics/analytics-worker.conf
+    # sed -i "s@^#SYS_LOG_@SYS_LOG_@g" ../analytics/analytics-worker.conf
     envsubst < ../analytics/metrics-pusher.env.sample > ../analytics/metrics-pusher.env
     envsubst < ../analytics/telegraf.conf.sample > ../analytics/telegraf.conf
 fi

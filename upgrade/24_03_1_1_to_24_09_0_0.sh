@@ -119,7 +119,7 @@ fi
 ../kubernetes/deploy-traefik.sh
 
 ### Deploy Minio s3
-../kubernetes/generate-sources.sh force
+# ../kubernetes/generate-sources.sh force
 source ../kubernetes/sources.sh
 # Restore Minio s3
 ../kubernetes/deploy-minio-single.sh

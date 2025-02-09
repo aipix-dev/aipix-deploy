@@ -12,6 +12,8 @@ REDIS_PORT=6379
 OVMS_ADDRESS=localhost:8080
 
 LOGS_DIR=/var/log/ovms-client
+#SYS_LOG_HOST=syslog.monitoring.svc
+#SYS_LOG_PORT=5140
 
 #Monitoring
 #PUSH_ERRORS_MONITORING_ENDPOINT=http://metrics-pusher:8080/telegraf
