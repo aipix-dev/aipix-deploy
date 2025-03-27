@@ -25,13 +25,25 @@ patches:
     group: apps
     version: v1
     kind: Deployment
-    name: (prometheus-deployment|kube-state-metrics|grafana|.*influxdb2)
+    name: (prometheus-deployment|kube-state-metrics|grafana)
   path: patch-affinity.yaml
 - target:
     group: apps
     version: v1
     kind: Deployment
-    name: (prometheus-deployment|kube-state-metrics|grafana|.*influxdb2)
+    name: (prometheus-deployment|kube-state-metrics|grafana)
+  path: patch-monitoring-tolerations.yaml
+- target:
+    group: apps
+    version: v1
+    kind: StatefulSet
+    name: (.*influxdb2)
+  path: patch-affinity.yaml
+- target:
+    group: apps
+    version: v1
+    kind: StatefulSet
+    name: (.*influxdb2)
   path: patch-monitoring-tolerations.yaml
 
 # Prometheus

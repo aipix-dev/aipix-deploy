@@ -75,7 +75,7 @@ spec:
   - contr-onvif
   routes:
   - kind: Rule
-    match: Host (`*`)
+    match: HostRegexp(`^.+$`)
     middlewares:
     - name: gzip-middleware
     - name: max-body-size

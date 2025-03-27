@@ -22,7 +22,7 @@ yq -i '.additionalArguments += "--entrypoints.logger.address=:8109/udp"' ../trae
 ### Update VMS
 
 # Update VGW
-if [[ $(kubectl -n vsaas-vms get deployments.apps vgw) ]]; then
+if [[ $(kubectl -n vsaas-vms get statefulsets.apps vgw) ]]; then
     ../kubernetes/update-vgw.sh
 else
     echo "VGW is not installed, continue update"
