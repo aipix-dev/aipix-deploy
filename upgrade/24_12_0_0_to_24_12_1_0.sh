@@ -13,6 +13,8 @@ kubectl exec --namespace=${NS_VMS} deployment.apps/cron -- ./db_dump.sh
 
 
 ### Update Traefik
+sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+sudo chmod a+x /usr/local/bin/yq
 yq -i '.ports.logger={"port": 8109, "protocol": "UDP", "expose": {"default": true},"exposedPort": 8109}' ../traefik/traefik-helm-values.yaml
 yq -i '.additionalArguments += "--entrypoints.logger.address=:8109/udp"' ../traefik/traefik-helm-values.yaml
 ../kubernetes/update-traefik-certs.sh
@@ -22,6 +24,8 @@ yq -i '.additionalArguments += "--entrypoints.logger.address=:8109/udp"' ../trae
 # Update VGW
 if [[ $(kubectl -n vsaas-vms get deployments.apps vgw) ]]; then
     ../kubernetes/update-vgw.sh
+else
+    echo "VGW is not installed, continue update"
 fi
 
 # Update VMS
@@ -32,12 +36,16 @@ kubectl --namespace=${NS_VMS} delete deployment.apps/nginx
 # Update MSE
 if [[ $(kubectl get ns | grep ${NS_MS}) ]]; then
     ../kubernetes/update-mse.sh
+else
+    echo "MSE is not installed in k8s, continue update"
 fi
 
 # Update Analytics
 if [ ${ANALYTICS} == "yes" ]; then
     ../kubernetes/configure-analytics.sh
     ../kubernetes/update-analytics.sh
+else
+    echo "Analytics is not installed, continue update"
 fi
 
 # Update monitoring
@@ -75,7 +83,7 @@ EOF
     envsubst \
             < ../monitoring/loki-values.yaml.sample \
             > ../monitoring/loki-values.yaml
-
+    helm repo update
     helm -n monitoring template --debug fluent-bit fluent/fluent-bit --set testFramework.enabled=false -f ../monitoring/fluentbit-values.yaml --version 0.48.9 > ../kustomize/deployments/monitoring1/fluent-bit.yaml
     helm -n monitoring template --debug loki grafana/loki -f ../monitoring/loki-values.yaml --version 6.28.0 > ../kustomize/deployments/monitoring1/loki.yaml
     ../kustomize/deployments/monitoring1/update-kustomization.sh
@@ -89,6 +97,8 @@ EOF
     ../kubernetes/configure-monitoring.sh
     ../kubernetes/deploy-monitoring.sh
     # helm -n monitoring upgrade -i vsaas-media-logger --set imagePullSecrets[0].name=download-aipix-ai aipix/vsaas-media-logger
+else
+    echo "Monitoring is not installed, continue update"
 fi
 
 echo """

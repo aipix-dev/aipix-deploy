@@ -1,7 +1,7 @@
 #!/bin/bash
 #Install Calico
 
-CALICO_VER="3.29.2"
+CALICO_VER="3.29.3"
 
 # script_path=$(pwd)
 

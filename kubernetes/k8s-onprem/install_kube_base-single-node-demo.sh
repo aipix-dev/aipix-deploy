@@ -4,9 +4,9 @@
 # Install additional  Kubernetes Components for single node nstallation#
 #########################
 K8S_VER="1.32"
-K8S_VER_PATCH="2"
+K8S_VER_PATCH="3"
 MetalLB_VER="0.14.9"
-CALICO_VER="3.29.2"
+CALICO_VER="3.29.3"
 
 # script_path=$(pwd)
 

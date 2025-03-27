@@ -4,12 +4,12 @@
 # Install Kubernetes Base Components #
 ######################################
 K8S_VER="1.32"
-K8S_VER_PATCH="2"
+K8S_VER_PATCH="3"
 K8S_VER_BUILD="1.1"
-CONTAINERD_VER="2.0.2"
-RUNC_VER="1.2.5"
+CONTAINERD_VER="2.0.4"
+RUNC_VER="1.2.6"
 NET_PLUGINS_VER="1.6.2"
-CALICO_VER="3.29.2"
+CALICO_VER="3.29.3"
 
 # script_path=$(pwd)
 
@@ -46,6 +46,7 @@ net.bridge.bridge-nf-call-iptables  = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 net.ipv4.ip_forward                 = 1
 EOF
+echo "fs.inotify.max_user_instances = 8192" > /etc/sysctl.d/99-inotify.conf
 
 # Apply sysctl params without reboot
 sudo sysctl --system

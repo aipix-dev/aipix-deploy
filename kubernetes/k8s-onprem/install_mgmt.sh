@@ -1,9 +1,9 @@
 #!/bin/bash
 
 K8S_VER="1.32"
-K8S_VER_PATCH="2"
+K8S_VER_PATCH="3"
 K8S_VER_BUILD="1.1"
-CALICO_VER="3.29.2"
+CALICO_VER="3.29.3"
 
 sudo swapoff -a
 sudo sed -i '/^\/swap/s/^/#/' /etc/fstab
