@@ -382,15 +382,11 @@ config:
         Name tail
         Path /var/log/containers/*.log
         multiline.parser docker, cri
+        Exclude_Path /*/*/*/calico*.log,/*/*/*/fluent-bit*.log,/*/*/*/coredns*.log,/*/*/*/etcd*.log,/*/*/*/kube*.log,/*/*/*/csi*.log,/*/*/*/speaker*.log
         Tag kube.*
         Mem_Buf_Limit 5MB
         Skip_Long_Lines On
-
-    # [INPUT]
-        # Name systemd
-        # Tag host.*
-        # Systemd_Filter _SYSTEMD_UNIT=kubelet.service
-        # Read_From_Tail On
+        Inotify_Watcher true
 
     [INPUT]
         Name    syslog
@@ -410,19 +406,6 @@ config:
         K8S-Logging.Parser Off
         K8S-Logging.Exclude Off
     [FILTER]
-        Name grep
-        Match kube.*
-        Exclude $kubernetes['container_name'] fluent-bit
-        Exclude $kubernetes['container_name'] loki
-        Exclude $kubernetes['container_name'] grafana
-        Exclude $kubernetes['container_name'] speaker
-        Exclude $kubernetes['container_name'] calico
-    [FILTER]
-        name lua
-        Match   syslog*
-        script  /fluent-bit/etc/conf/pritolevel.lua
-        call    pritolevel
-    [FILTER]
         Name    multiline
         match   syslog-std
         multiline.key_content log
@@ -435,7 +418,7 @@ config:
         Match syslog*
         Host loki.monitoring.svc.cluster.local
         labels job=syslog
-        label_keys $host,$app_name,$facility,$level
+        label_keys $host,$app_name,$pri
         Port 3100
     [OUTPUT]
         Name loki

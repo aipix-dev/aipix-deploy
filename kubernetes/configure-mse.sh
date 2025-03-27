@@ -39,7 +39,7 @@ if [[ ${CONFIGURE} == "configure" ]]; then
 	rsync -e "ssh -p ${PORT} ${SSH_OPTIONS}" --rsync-path="sudo rsync" ../mse/public.key ${USERNAME}@${MS_IP}:/opt/${MS_TYPE}/mse/licenses/public.key || true
 	echo """
 
-	Configuration script is finished successfuly!
+	MSE configuration script completed successfuly!
 
 	"""
 fi

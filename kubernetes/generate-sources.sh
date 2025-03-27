@@ -53,9 +53,9 @@ Passwords in sources.sh are updated.
     UPDATED="yes"
 fi 
 
-echo "
-Script is finished successfully!
-"
+echo """
+Generate sources script completed successfuly!
+"""
 
 if [[ ${UPDATED} != "yes" ]]; then
     echo "

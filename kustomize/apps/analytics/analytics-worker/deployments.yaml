@@ -112,13 +112,11 @@ spec:
           - containerPort: 8081
             name: rest
           livenessProbe:
-            initialDelaySeconds: 10
-            periodSeconds: 5
             httpGet:
               path: /v2/health/live
               port: rest
           readinessProbe:
-            initialDelaySeconds: 10
+            initialDelaySeconds: 5
             periodSeconds: 5
             httpGet:
               path: /v2/health/ready

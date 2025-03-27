@@ -147,14 +147,6 @@ spec:
           env:
             - name: TARANTOOL_PORT
               value: "3301"
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
           volumeMounts:
             - name: a-licensing-yaml
               mountPath: /opt/analytics-licensing/config.yaml

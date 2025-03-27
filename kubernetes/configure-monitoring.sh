@@ -5,6 +5,13 @@ cd "$scriptdir"
 
 source ./sources.sh
 
+BRAND=aipix
+HELM_REPO="https://download.aipix.ai/repository/charts/"
+
+helm repo rm "${BRAND}" || true
+helm repo add "${BRAND}" "${HELM_REPO}" --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}"
+helm repo update
+
 git -C ../kustomize/apps/monitoring clone https://github.com/techiescamp/kubernetes-prometheus.git || true
 git -C ../kustomize/apps/monitoring clone https://github.com/devopscube/kube-state-metrics-configs.git || true
 git -C ../kustomize/apps/monitoring clone https://github.com/bibinwilson/kubernetes-node-exporter.git || true
@@ -60,15 +67,23 @@ cp -n ../monitoring/grafana-dashboards-config.yaml.sample ../monitoring/grafana-
 # Configure logging
 ## Configure fluent-bit
 cp -n ../monitoring/fluentbit-values.yaml.sample ../monitoring/fluentbit-values.yaml
-helm -n monitoring template --debug fluent-bit fluent/fluent-bit --set testFramework.enabled=false -f ../monitoring/fluentbit-values.yaml > ../kustomize/deployments/monitoring1/fluent-bit.yaml
+helm -n monitoring template --debug fluent-bit fluent/fluent-bit --set testFramework.enabled=false -f ../monitoring/fluentbit-values.yaml --version 0.48.9 > ../kustomize/deployments/monitoring1/fluent-bit.yaml
 cp  ../monitoring/syslog-service.yaml ../kustomize/deployments/monitoring1/
 
 ## Configure loki
-cp -n ../monitoring/loki-values.yaml.sample ../monitoring/loki-values.yaml
-helm -n monitoring template --debug loki grafana/loki -f ../monitoring/loki-values.yaml --version 5.47.2 > ../kustomize/deployments/monitoring1/loki.yaml
+if [ ${TYPE} == "prod" ]; then
+	export S3_PORT_INTERNAL=""
+else
+	export S3_PORT_INTERNAL="9000"
+fi
+envsubst \
+	    < ../monitoring/loki-values.yaml.sample \
+	    > ../monitoring/loki-values.yaml
+
+helm -n monitoring template --debug loki grafana/loki -f ../monitoring/loki-values.yaml --version 6.28.0 > ../kustomize/deployments/monitoring1/loki.yaml
 
 echo """
 
-Configurations script is finished successfuly!
+Monitoring configuration script completed successfuly!
 
 """

@@ -6,29 +6,29 @@ cd "$scriptdir"
 
 # Reads the file and gather all enviroments variables
 get_env_dict_from_file () {
-	file=$1
-	declare -A dict
-	dict=()
-	for line in $(cat ${file} | sed -e 's/ *= */=/g'); do
-		set "${line}"
- 		for word in "$@"; do
-			if [[ $(echo $word | grep "=") ]]; then
-				IFS='=' read -r key val <<< "$word"
-				if [[ -n "${val}" ]]; then
-					key=$(echo $key | sed -e 's/#//g')
-					dict["${key}"]="${val}"
-				else
-					key=$(echo $key | sed -e 's/#//g')
-					dict["${key}"]=""
-				fi
-			fi
-		done
-	done
-	echo '('
-	for key in "${!dict[@]}"; do echo "['$key']='${dict[$key]}'"; done
-	echo ')'
+        file=$1
+        declare -A dict
+        dict=()
+        IFS=$'\n'
+        for line in $(cat ${file} | sed -e 's/ *= */=/g'); do
+                set "${line}"
+                for word in "$@"; do
+                        if [[ $(echo $word | grep "=") ]]; then
+                                IFS='=' read -r key val <<< "$word"
+                                if [[ -n "${val}" ]]; then
+                                        key=$(echo $key | sed -e 's/#//g')
+                                        dict["${key}"]="${val}"
+                                else
+                                        key=$(echo $key | sed -e 's/#//g')
+                                        dict["${key}"]=""
+                                fi
+                        fi
+                done
+        done
+        echo '('
+        for key in "${!dict[@]}"; do echo "['$key']=\"${dict[$key]//[\"\']}\""; done
+        echo ')'
 }
-
 
 # Checks if element "$1" is in array "$2"
 # @NOTE:
@@ -80,6 +80,6 @@ if [ -f ../analytics/metrics-pusher.env ]; then print_new_config_lines ../analyt
 
 echo """
 
-Configurations script is finished successfuly!
+Update configs script completed successfuly!
 
 """

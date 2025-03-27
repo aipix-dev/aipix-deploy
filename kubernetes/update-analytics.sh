@@ -21,7 +21,7 @@ if [ ${MONITORING} == "yes" ]; then
 fi
 
 echo """
-Update script completed successfuly!
+Analytics update script completed successfuly!
 
 Access your ORCHESTRATOR with the following URL:
 https://${ANALYTICS_DOMAIN}/orch-admin/ (${ANALYTICS_DOMAIN} should be resolved on DNS-server)

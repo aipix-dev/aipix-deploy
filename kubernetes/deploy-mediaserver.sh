@@ -22,5 +22,5 @@ kubectl apply -k ../kustomize/deployments/${MS_TEMPLATE}
 
 
 echo """
-Deployment script completed successfuly!
+Mediaserver deployment script completed successfuly!
 """

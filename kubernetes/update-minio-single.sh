@@ -28,10 +28,10 @@ until [[ $(kubectl get deployments.apps minio -n ${NS_MINIO} -o jsonpath='{.stat
   	fi
 done
 
-echo "
-Update script completed successfuly!
+echo """
+Minio-single update script completed successfuly!
 
 Minio console can be reached with the following URL:
 http://${K8S_API_ENDPOINT}:30090
 https://${MINIO_CONSOLE_DOMAIN} (${MINIO_CONSOLE_DOMAIN} should be resolved on DNS-server)
-"
+"""

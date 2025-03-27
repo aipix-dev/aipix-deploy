@@ -7,7 +7,7 @@ database:
 pushServerApiUrl: http://push1st:6002/apps/orchestrator/events
 
 # for ONLINE licensing
-# licenseURL:
+#licenseURL:
 
 # for OFFLINE licensing (default)
 #publicKey:

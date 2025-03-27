@@ -4,6 +4,6 @@ patches:
 - target:
     group: apps
     version: v1
-    kind: (StatefulSet|Deployment)
+    kind: Deployment
     name: push1st
   path: push1st-orch-app.yaml

@@ -41,3 +41,8 @@ do
     echo "Waiting for starting containers ..."
 done
 sleep 5
+
+echo """
+Tests are started
+
+"""

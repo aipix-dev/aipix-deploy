@@ -1,6 +1,6 @@
 namespace: ${NS_VMS}
 resources:
-- ../../apps/vms/nginx
+#- ../../apps/vms/nginx
 - ../../apps/vms/backend
 - ../../apps/vms/beanstalkd
 - ../../apps/vms/redis
@@ -26,72 +26,44 @@ ${ADD_COMPONENT3}
 images:
 - name: download.aipix.ai:8443/vms-backend/release
   newName: download.aipix.ai:8443/vms-backend/release
-  newTag: 24.12.0.0
+  newTag: 24.12.1.0
 - name: download.aipix.ai:8443/vms-frontend-admin/release
   newName: download.aipix.ai:8443/vms-frontend-admin/release
-  newTag: 24.12.0.0
+  newTag: 24.12.1.0
 - name: download.aipix.ai:8443/vms-frontend-client/release
   newName: download.aipix.ai:8443/vms-frontend-client/release
-  newTag: 24.12.0.0
+  newTag: 24.12.1.0
 - name: download.aipix.ai:8443/controller/release
   newName: download.aipix.ai:8443/controller/release
-  newTag: 24.12.0.0
+  newTag: 24.12.1.0
 - name: download.aipix.ai:8443/vms-portal-backend/release
   newName: download.aipix.ai:8443/vms-portal-backend/release
-  newTag: 24.12.0.0
+  newTag: 24.12.1.0
 - name: download.aipix.ai:8443/vms-portal-frontend-client/release
   newName: download.aipix.ai:8443/vms-portal-frontend-client/release
-  newTag: 24.12.0.0
+  newTag: 24.12.1.0
 - name: download.aipix.ai:8443/vms-portal-stub/release
   newName: download.aipix.ai:8443/vms-portal-stub/release
   newTag: latest
 - name: download.aipix.ai:8443/vms-portal-landing/release
   newName: download.aipix.ai:8443/vms-portal-landing/release
-  newTag: 24.12.0.0
+  newTag: 24.12.1.0
+- name: download.aipix.ai:8443/beanstalkd
+  newName: download.aipix.ai:8443/beanstalkd
+  newTag: "1.13"
+- name: download.aipix.ai:8443/beanstalkd-exporter
+  newName: download.aipix.ai:8443/beanstalkd-exporter
+  newTag: 2.0.0
 ${CUSTOM_IMAGES}
 
 patches:
-#Add php-fpm overrides configs
-- target:
-    group: apps
-    version: v1
-    kind: Deployment
-    name: (backend|controller-api)
-  patch: |-
-    - op: add
-      path: /spec/template/spec/volumes/-
-      value:
-        name: overrides-php-ini
-        configMap:
-          name: overrides-php-ini
-    - op: add
-      path: /spec/template/spec/volumes/-
-      value:
-        name: overrides-php-pool-www-conf
-        configMap:
-          name: overrides-php-pool-www-conf
-    - op: add
-      path: /spec/template/spec/containers/0/volumeMounts/-
-      value:
-        mountPath: /etc/php/8.1/fpm/conf.d/99-overrides-php.ini
-        name: overrides-php-ini
-        readOnly: true
-        subPath: 99-overrides-php.ini
-    - op: add
-      path: /spec/template/spec/containers/0/volumeMounts/-
-      value:
-        mountPath: /etc/php/8.1/fpm/pool.d/z-overrides-www.conf
-        name: overrides-php-pool-www-conf
-        readOnly: true
-        subPath: z-overrides-www.conf
-
 #Change replicas
 - target:
     group: apps
     version: v1
     kind: Deployment
     name: "(frontend-admin|frontend-client|backend|archive|queue|reports|set-configs|queue-controller-webhooks|\
-         controller|controller-control-plane-hls|controller-control-plane-rtsp|controller-media-servers-callback-queue|\
+         controller-api|controller-control-plane-hls|controller-control-plane-rtsp|controller-media-servers-callback-queue|\
          controller-queue|portal-frontend-client|portal-backend|portal-landing|portal-queue|portal-stub)"
   patch: |-
     - op: replace
@@ -130,12 +102,6 @@ patches:
     kind: IngressRoute
     name: frontend-admin
   path: patch-ingressroute-frontend-admin.yaml
-- target:
-    group: traefik.io
-    version: v1alpha1
-    kind: IngressRoute
-    name: frontend-client
-  path: patch-ingressroute-frontend-client.yaml
 - target:
     group: traefik.io
     version: v1alpha1

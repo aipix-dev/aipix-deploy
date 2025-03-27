@@ -9,12 +9,12 @@ source ./sources.sh
 kubectl delete secret download-aipix-ai --namespace=${NS_VMS} || true
 
 # Delete VMS configs
-kubectl delete secret vms-nginx-cert --namespace=${NS_VMS} || true
+kubectl delete secret vms-nginx-cert --namespace=${NS_VMS} || true   #delete in 25.03
 kubectl delete secret vms-backend-oauth --namespace=${NS_VMS} || true
-kubectl delete configmap vms-nginx-conf --namespace=${NS_VMS} || true
-kubectl delete configmap vms-nginx-base-conf --namespace=${NS_VMS} || true
-kubectl delete configmap vms-backend-nginx-conf --namespace=${NS_VMS} || true
-kubectl delete configmap vms-backend-nginx-server-conf --namespace=${NS_VMS} || true
+kubectl delete configmap vms-nginx-conf --namespace=${NS_VMS} || true  #delete in 25.03
+kubectl delete configmap vms-nginx-base-conf --namespace=${NS_VMS} || true   #delete in 25.03
+kubectl delete configmap vms-backend-nginx-conf --namespace=${NS_VMS} || true  #delete in 25.03
+kubectl delete configmap vms-backend-nginx-server-conf --namespace=${NS_VMS} || true  #delete in 25.03
 kubectl delete configmap vms-backend-env --namespace=${NS_VMS} || true
 kubectl delete configmap vms-fcm-json  --namespace=${NS_VMS} || true
 kubectl delete configmap vms-voip-p8 --namespace=${NS_VMS} || true
@@ -33,8 +33,8 @@ fi
 
 # Delete CONTROLLER configmsps
 kubectl delete configmap controller-env --namespace=${NS_VMS} || true
-kubectl delete configmap controller-nginx-conf --namespace=${NS_VMS} || true
-kubectl delete configmap controller-nginx-server-conf --namespace=${NS_VMS} || true
+kubectl delete configmap controller-nginx-conf --namespace=${NS_VMS} || true   #delete in 25.03
+kubectl delete configmap controller-nginx-server-conf --namespace=${NS_VMS} || true   #delete in 25.03
 
 # Delete PORTAL configmsps
 if [ ${PORTAL} == "yes" ]; then
@@ -49,14 +49,14 @@ kubectl create secret docker-registry download-aipix-ai --namespace=${NS_VMS} \
                                                         --docker-password=${DOCKER_PASSWORD}
 
 # Create VMS configmsps
-kubectl create secret tls vms-nginx-cert --namespace=${NS_VMS} \
-  --cert=../nginx/ssl/tls.crt \
-  --key=../nginx/ssl/tls.key
+# kubectl create secret tls vms-nginx-cert --namespace=${NS_VMS} \
+#   --cert=../nginx/ssl/tls.crt \
+#   --key=../nginx/ssl/tls.key
 
-kubectl create configmap vms-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/nginx.conf
-kubectl create configmap vms-nginx-base-conf --namespace=${NS_VMS} --from-file=../nginx/nginx-base.conf
-kubectl create configmap vms-backend-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/vms-backend-nginx.conf
-kubectl create configmap vms-backend-nginx-server-conf --namespace=${NS_VMS} --from-file=../nginx/vms-backend-nginx-server.conf
+# kubectl create configmap vms-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/nginx.conf
+# kubectl create configmap vms-nginx-base-conf --namespace=${NS_VMS} --from-file=../nginx/nginx-base.conf
+# kubectl create configmap vms-backend-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/vms-backend-nginx.conf
+# kubectl create configmap vms-backend-nginx-server-conf --namespace=${NS_VMS} --from-file=../nginx/vms-backend-nginx-server.conf
 kubectl create configmap vms-backend-env --namespace=${NS_VMS} --from-env-file=../vms-backend/environments/.env
 kubectl create configmap vms-fcm-json  --namespace=${NS_VMS} --from-file=../vms-backend/certificates/fcm.json
 kubectl create configmap vms-voip-p8 --namespace=${NS_VMS} --from-file=../vms-backend/certificates/voip.p8
@@ -95,8 +95,8 @@ fi
 
 # Create CONTROLLER configmsps
 kubectl create configmap controller-env --namespace=${NS_VMS} --from-env-file=../controller/environments/.env
-kubectl create configmap controller-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/controller-nginx.conf
-kubectl create configmap controller-nginx-server-conf --namespace=${NS_VMS} --from-file=../nginx/controller-nginx-server.conf
+# kubectl create configmap controller-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/controller-nginx.conf
+# kubectl create configmap controller-nginx-server-conf --namespace=${NS_VMS} --from-file=../nginx/controller-nginx-server.conf
 
 # Create PORTAL configmsps
 if [ ${PORTAL} == "yes" ]; then
@@ -120,14 +120,12 @@ do
     	break
   	fi
   	replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.replicas}')
-  	# ready_replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}')
   	ready_replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.availableReplicas}')
   	while [[ ${replicas} != ${ready_replicas} ]]
   	do
     	echo "Waiting for updating containers ..."
     	sleep 5
     	replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.replicas}')
-    	# ready_replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}')
     	ready_replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.availableReplicas}')
   	done
 done
@@ -150,9 +148,9 @@ kubectl -n ${NS_VMS} exec deployment.apps/controller-api -- ./scripts/update.sh
 
 if [ ${PORTAL} == "yes" ]; then
 	kubectl -n ${NS_VMS} rollout status deployment portal-backend >/dev/null
+	kubectl -n ${NS_VMS} rollout status deployment portal-stub >/dev/null
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-backend -- ./scripts/update.sh
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/update.sh
-	
 fi
 
 if [[ ${TYPE} == "single" ]] && [[ ${BACKEND_STORAGE_TYPE} == "s3_and_disk" ]]; then
@@ -163,10 +161,10 @@ fi
 
 # VMS_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
-echo "
-Your containers are updated successfully!
+echo """
+VMS update script completed successfuly!
 
 Update script completed successfuly!
 Access your VMS with the following URL:
 https://${VMS_DOMAIN}/admin
-"
+"""

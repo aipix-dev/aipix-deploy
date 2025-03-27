@@ -1,10 +1,17 @@
 #!/bin/bash
 
-#########################
+######################################
 # Install Kubernetes Base Components #
-#########################
+######################################
+K8S_VER="1.32"
+K8S_VER_PATCH="2"
+K8S_VER_BUILD="1.1"
+CONTAINERD_VER="2.0.2"
+RUNC_VER="1.2.5"
+NET_PLUGINS_VER="1.6.2"
+CALICO_VER="3.29.2"
 
-script_path=$(pwd)
+# script_path=$(pwd)
 
 scriptdir="$(dirname "$0")"
 cd "$scriptdir"
@@ -12,16 +19,17 @@ cd "$scriptdir"
 sudo swapoff -a
 sudo sed -i '/^\/swap/s/^/#/' /etc/fstab
 
-sudo apt-get update
-sudo apt-get install -y apt-transport-https ca-certificates curl
-sudo apt install -y ntp net-tools lvm2 ioping
+sudo apt update -y && sudo apt install -y apt-transport-https ca-certificates curl ntp net-tools lvm2 ioping
+sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+sudo chmod a+x /usr/local/bin/yq
 
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v${K8S_VER}/deb/Release.key | sudo gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${K8S_VER}/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
-
-sudo apt-get update
-sudo apt-get install -y kubelet=1.28.10-1.1  kubeadm=1.28.10-1.1  kubectl=1.28.10-1.1
+sudo apt update -y
+sudo apt install -y kubelet=${K8S_VER}.${K8S_VER_PATCH}-${K8S_VER_BUILD} \
+                    kubeadm=${K8S_VER}.${K8S_VER_PATCH}-${K8S_VER_BUILD} \
+		            kubectl=${K8S_VER}.${K8S_VER_PATCH}-${K8S_VER_BUILD}
 sudo apt-mark hold kubelet kubeadm kubectl
 
 cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
@@ -43,16 +51,16 @@ EOF
 sudo sysctl --system
 
 #containerd --version
-sudo curl -L https://github.com/containerd/containerd/releases/download/v1.7.17/containerd-1.7.17-linux-amd64.tar.gz -o containerd-1.7.17-linux-amd64.tar.gz
+sudo curl -L https://github.com/containerd/containerd/releases/download/v${CONTAINERD_VER}/containerd-${CONTAINERD_VER}-linux-amd64.tar.gz -o containerd-${CONTAINERD_VER}-linux-amd64.tar.gz
 
-sudo tar Cxzvf /usr/local containerd-1.7.17-linux-amd64.tar.gz
-sudo rm containerd-1.7.17-linux-amd64.tar.gz
+sudo tar Cxzvf /usr/local containerd-${CONTAINERD_VER}-linux-amd64.tar.gz
+sudo rm containerd-${CONTAINERD_VER}-linux-amd64.tar.gz
 
 sudo mkdir /etc/containerd
 sudo sh -c "containerd config default > /etc/containerd/config.toml"
 
 sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
-sudo sed -i 's@sandbox_image =.*@sandbox_image = "registry.k8s.io/pause:3.9"@' /etc/containerd/config.toml
+sudo sed -i 's@sandbox_image =.*@sandbox_image = "registry.k8s.io/pause:3.10"@' /etc/containerd/config.toml
 
 sudo curl -L https://raw.githubusercontent.com/containerd/containerd/main/containerd.service -o /usr/lib/systemd/system/containerd.service
 
@@ -60,20 +68,20 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now containerd
 
 #runc --version
-sudo curl -L https://github.com/opencontainers/runc/releases/download/v1.1.12/runc.amd64 -o runc.amd64
+sudo curl -L https://github.com/opencontainers/runc/releases/download/v${RUNC_VER}/runc.amd64 -o runc.amd64
 
 sudo install -m 755 runc.amd64 /usr/local/sbin/runc
 sudo rm runc.amd64
 
 #Install network plugins
-sudo curl -L https://github.com/containernetworking/plugins/releases/download/v1.5.0/cni-plugins-linux-amd64-v1.5.0.tgz -o cni-plugins-linux-amd64-v1.5.0.tgz
+sudo curl -L https://github.com/containernetworking/plugins/releases/download/v${NET_PLUGINS_VER}/cni-plugins-linux-amd64-v${NET_PLUGINS_VER}.tgz -o cni-plugins-linux-amd64-v${NET_PLUGINS_VER}.tgz
 sudo mkdir -p /opt/cni/bin
-sudo tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v1.5.0.tgz
-sudo rm cni-plugins-linux-amd64-v1.5.0.tgz
+sudo tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v${NET_PLUGINS_VER}.tgz
+sudo rm cni-plugins-linux-amd64-v${NET_PLUGINS_VER}.tgz
 
 #Install Calico control client for network plugin
 cd /usr/local/bin/
-sudo curl -L https://github.com/projectcalico/calico/releases/download/v3.29.1/calicoctl-linux-amd64 -o calicoctl
+sudo curl -L https://github.com/projectcalico/calico/releases/download/v${CALICO_VER}/calicoctl-linux-amd64 -o calicoctl
 
 sudo chmod +x calicoctl
 

@@ -12,13 +12,13 @@ kubectl create secret docker-registry download-aipix-ai --namespace=${NS_VMS} \
                                                         --docker-server=https://download.aipix.ai:8443 \
                                                         --docker-username=${DOCKER_USERNAME} \
                                                         --docker-password=${DOCKER_PASSWORD}
-kubectl create secret tls vms-nginx-cert --namespace=${NS_VMS} \
-                                        --cert=../nginx/ssl/tls.crt \
-                                        --key=../nginx/ssl/tls.key
-kubectl create configmap vms-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/nginx.conf
-kubectl create configmap vms-nginx-base-conf --namespace=${NS_VMS} --from-file=../nginx/nginx-base.conf
-kubectl create configmap vms-backend-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/vms-backend-nginx.conf
-kubectl create configmap vms-backend-nginx-server-conf --namespace=${NS_VMS} --from-file=../nginx/vms-backend-nginx-server.conf
+# kubectl create secret tls vms-nginx-cert --namespace=${NS_VMS} \
+#                                         --cert=../nginx/ssl/tls.crt \
+#                                         --key=../nginx/ssl/tls.key
+# kubectl create configmap vms-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/nginx.conf
+# kubectl create configmap vms-nginx-base-conf --namespace=${NS_VMS} --from-file=../nginx/nginx-base.conf
+# kubectl create configmap vms-backend-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/vms-backend-nginx.conf
+# kubectl create configmap vms-backend-nginx-server-conf --namespace=${NS_VMS} --from-file=../nginx/vms-backend-nginx-server.conf
 kubectl create configmap vms-backend-env --namespace=${NS_VMS} --from-env-file=../vms-backend/environments/.env
 kubectl create configmap vms-fcm-json  --namespace=${NS_VMS} --from-file=../vms-backend/certificates/fcm.json
 kubectl create configmap vms-voip-p8 --namespace=${NS_VMS} --from-file=../vms-backend/certificates/voip.p8
@@ -61,8 +61,8 @@ fi
 
 # Create CONTROLLER configmsps
 kubectl create configmap controller-env --namespace=${NS_VMS} --from-env-file=../controller/environments/.env
-kubectl create configmap controller-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/controller-nginx.conf
-kubectl create configmap controller-nginx-server-conf --namespace=${NS_VMS} --from-file=../nginx/controller-nginx-server.conf
+# kubectl create configmap controller-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/controller-nginx.conf
+# kubectl create configmap controller-nginx-server-conf --namespace=${NS_VMS} --from-file=../nginx/controller-nginx-server.conf
 
 
 #Create PORTAL configmaps
@@ -82,13 +82,25 @@ while true
 do
 	if ([[ ${TYPE} == "prod" ]] || [[ $(kubectl get deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]) && \
         [[ $(kubectl get deployment controller-api -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] && \
-        [[ $(kubectl get deployment cron -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] && \
         [[ $(kubectl get deployment backend -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]        
     then break
     fi
     sleep 5
-    echo "Waiting for starting containers ..."
+    echo "Waiting for starting backend and controller containers ..."
 done
+
+if [ ${PORTAL} == "yes" ]; then
+    while true
+    do
+        if [[ $(kubectl get deployment portal-backend -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] && \
+            [[ $(kubectl get deployment portal-stub -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]
+        then break
+        fi
+        sleep 5
+        echo "Waiting for starting portal-backend and portal-stub containers ..."
+    done
+fi
+
 sleep 10
 
 kubectl exec -n ${NS_VMS} deployment.apps/backend -- ./scripts/create_db.sh
@@ -105,10 +117,11 @@ if [ ${PORTAL} == "yes" ]; then
     kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/start.sh
 fi
 
-# VMS_IP=$(kubectl get service/nginx -n ${NS_VMS} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 VMS_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
 echo """
-Deployment script completed successfuly!
+
+VMS deployment script completed successfuly!
 
 Access your VMS with the following URL:
 http://${VMS_IP}/admin

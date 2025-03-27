@@ -22,5 +22,5 @@ kubectl apply -k ../kustomize/deployments/${MSE_TEMPLATE}
 
 
 echo """
-Deployment script completed successfuly!
+MSE deployment script completed successfuly!
 """

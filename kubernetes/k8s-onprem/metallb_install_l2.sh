@@ -1,29 +1,62 @@
 #!/bin/bash
 
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.5/config/manifests/metallb-native.yaml
-echo "Waiting for 30 sec to start MeetalLB containers"
-sleep 30
+MetalLB_VER="0.14.9"
+
+# script_path=$(pwd)
+
+scriptdir="$(dirname "$0")"
+cd "$scriptdir"
+
+source ./sources.sh
+
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v${MetalLB_VER}/config/manifests/metallb-native.yaml
+
+# Waiting for starting MetalLB
+wait_period=0
+while true
+do
+    wait_period=$(($wait_period+10))
+    if [ $wait_period -gt 600 ]; then
+        echo "The script ran for 10 minutes to start containers, exiting now.."
+        exit 1
+    else
+        if [[ $(kubectl get  daemonset speaker -n metallb-system -o jsonpath='{.status.numberReady}') -ge 1 ]]; then
+            break
+        fi
+        echo "Waiting for starting MetalLB (max 10 min) ..."
+        sleep 10
+    fi
+done
+sleep 10
 
 kubectl create -f - <<EOF
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
-  name: first-pool
+  name: traefik-pool
   namespace: metallb-system
 spec:
   addresses:
-  - 192.168.205.24-192.168.205.31
+  - ${TRAEFIK_ADVERTISEMENT_RANGE}
+  serviceAllocation:
+    priority: 50
+    serviceSelectors:
+    - matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+        - traefik
 EOF
 
 kubectl create -f - <<EOF
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
-  name: advertisement-1
+  name: traefik-advertisement
   namespace: metallb-system
 spec:
   ipAddressPools:
-  - first-pool
+  - traefik-pool
 #  nodeSelectors:
 #  - matchLabels:
 #      kubernetes.io/hostname: k8s-worker-01
@@ -33,4 +66,33 @@ spec:
 #      kubernetes.io/hostname: k8s-worker-03
 EOF
 
+if [[ -n ${L2_ADVERTISEMENT_RANGE} ]]; then
+    kubectl create -f - <<EOF
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: service-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - ${L2_ADVERTISEMENT_RANGE}
+EOF
 
+    kubectl create -f - <<EOF
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: service-advertisement
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - service-pool
+#  nodeSelectors:
+#  - matchLabels:
+#      kubernetes.io/hostname: k8s-worker-01
+#  - matchLabels:
+#      kubernetes.io/hostname: k8s-worker-02
+#  - matchLabels:
+#      kubernetes.io/hostname: k8s-worker-03
+EOF
+fi

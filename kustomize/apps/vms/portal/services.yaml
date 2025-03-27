@@ -14,7 +14,7 @@ spec:
     - name: "http"
       port: 80
       protocol: TCP
-      targetPort: 80
+      targetPort: 8080
   selector:
     app.kubernetes.io/name: portal-backend
     app.kubernetes.io/component: backend
@@ -60,7 +60,7 @@ spec:
     - name: "http"
       port: 80
       protocol: TCP
-      targetPort: 80
+      targetPort: 8080
   selector:
     app.kubernetes.io/name: portal-stub
     app.kubernetes.io/component: backend

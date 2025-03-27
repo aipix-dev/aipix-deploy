@@ -52,6 +52,6 @@ rm -rf ../traefik/traefik-helm-values.yaml.tmp
 
 echo """
 
-Configuration script is finished successfuly!
+Traefik configuration script completed successfuly!
 
 """

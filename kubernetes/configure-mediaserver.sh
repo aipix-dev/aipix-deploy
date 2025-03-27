@@ -43,7 +43,7 @@ if [[ ${CONFIGURE} == "configure" ]]; then
 
 	echo """
 
-	Configuration script is finished successfuly!
+	Mediaserver configuration script completed successfuly!
 
 	"""
 fi

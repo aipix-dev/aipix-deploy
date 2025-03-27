@@ -7,12 +7,10 @@ source ./sources.sh
 
 VALUES="../vgw/values.yaml"
 BRAND=aipix
-REPO="https://download.aipix.ai/repository/charts/"
-REPO_USER=aipix
-REPO_PASSWORD=aipix
+HELM_REPO="https://download.aipix.ai/repository/charts/"
 
 helm repo rm "${BRAND}" || true
-helm repo add "${BRAND}" "${REPO}"  --username "${REPO_USER}" --password "${REPO_PASSWORD}"
+helm repo add "${BRAND}" "${HELM_REPO}" --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}"
 helm repo update
 
 if [ -z "${VALUES}" ]; then
@@ -22,9 +20,17 @@ if [ -z "${VALUES}" ]; then
 fi
 
 if [ ! -e "$VALUES" ]; then
-	echo -e "\033[0;31m ${VALUES} doesn't exist !!!"
+	echo -e "\033[0;31m ${VALUES} doesn't exist !!!\033[0m"
 	exit 1
 fi
-echo "${VALUES}"
-helm -n "${NS_VMS}" upgrade -i -f "${VALUES}" vgw "${BRAND}/vgw"
-helm -n "${NS_VMS}" list -f vgw
+
+kubectl delete secret vgw-certificate -n ${NS_VMS} || true
+kubectl create secret tls vgw-certificate -n ${NS_VMS} --cert=../vgw/tls.crt --key=../vgw/tls.key
+
+helm -n ${NS_VMS} upgrade -i -f "${VALUES}" vgw "${BRAND}/vgw"
+helm -n ${NS_VMS} list -f vgw
+
+echo """
+
+VGW update script completed successfuly!
+"""

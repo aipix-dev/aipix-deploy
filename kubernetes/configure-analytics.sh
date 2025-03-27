@@ -25,7 +25,6 @@ sed -i "s@mysql-server-analytics@mysql-server.${NS_VMS}.svc@g" ../analytics/.env
 sed -i "s@redis-server-analytics@redis-server.${NS_VMS}.svc@g" ../analytics/.env
 sed -i 's@//vectorizator:.*/process/@//vectorizator/process/@g' ../analytics/.env
 sed -i 's@//analytics-licensing:8888@//127.0.0.1:8888@g' ../analytics/.env
-sed -i 's@REDIS_STATS_DB =.*@REDIS_STATS_DB = 7@g' ../analytics/.env
 sed -i 's@^MONITORING_@#MONITORING_@g' ../analytics/.env
 sed -i 's@^DEPLOYMENT_NAME@#DEPLOYMENT_NAME@g' ../analytics/.env
 
@@ -52,6 +51,6 @@ fi
 
 echo """
 
-Configurations script is finished successfuly!
+Analytics configuration script completed successfuly!
 
 """

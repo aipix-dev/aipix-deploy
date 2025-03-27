@@ -12,5 +12,5 @@ sed -i "s@example.com@${VMS_DOMAIN}@g" ../tests/variables.yaml
 
 echo """
 
-Configurations script is finished successfuly!
+Tests configuration script completed successfuly!
 """

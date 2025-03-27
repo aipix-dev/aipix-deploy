@@ -8,6 +8,8 @@ source ./k8s-onprem/sources.sh
 
 kubectl create ns monitoring || true
 
+kubectl delete secret download-aipix-ai --namespace=monitoring || true
+
 if [ ${PROVISION_DASHBOARDS} == "yes" ]; then
     kubectl -n monitoring delete cm grafana-dashboards > /dev/null 2>&1 || true 
     kubectl -n monitoring delete cm grafana-dashboards-config > /dev/null 2>&1 || true
@@ -30,8 +32,16 @@ PROMETHEUS_PORT=$(kubectl get service/prometheus-service -n monitoring -o jsonpa
 GRAFANA_PORT=$(kubectl get service/grafana -n monitoring -o jsonpath='{.spec.ports[0].nodePort}')
 INFLUX_PORT=$(kubectl get service/vsaas-influxdb2 -n monitoring -o jsonpath='{.spec.ports[0].nodePort}')
 
-echo "
-Installations of monitoring components is finished !
+# deploy vsaas-logger
+kubectl create secret docker-registry download-aipix-ai --namespace=monitoring \
+                                                        --docker-server=https://download.aipix.ai:8443 \
+                                                        --docker-username=${DOCKER_USERNAME} \
+                                                        --docker-password=${DOCKER_PASSWORD}
+
+helm -n monitoring upgrade -i vsaas-media-logger --set imagePullSecrets[0].name=download-aipix-ai aipix/vsaas-media-logger
+
+echo """
+Monitoring deployment script completed successfuly!
 
 URL to access Prometheus is
 http://${K8S_API_ENDPOINT}:${PROMETHEUS_PORT}
@@ -48,4 +58,4 @@ http://${K8S_API_ENDPOINT}:${GRAFANA_PORT}
 https://${VMS_DOMAIN}/monitoring
 Default credentials are admin/admin.
 Replace them during first login.
-"
+"""

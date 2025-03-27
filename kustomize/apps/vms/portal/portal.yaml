@@ -45,9 +45,10 @@ spec:
             - php 
             - artisan
             - octane:start
-            - --server=swoole
-            - --host=portal-backend
-            - --port=80
+            - --port=8080
+            - --host=0.0.0.0
+            - --task-workers=2
+            - --max-requests=1000
           envFrom:
             - configMapRef:
                 name: vms-portal-backend-env
@@ -114,7 +115,6 @@ spec:
             - artisan 
             - queue:work
             - --queue=portal
-            - --timeout=600
           envFrom:
             - configMapRef:
                 name: vms-portal-backend-env

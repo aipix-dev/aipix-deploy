@@ -33,8 +33,8 @@ export MINIO_IP1=$(kubectl -n ${NS_MINIO} get service/minio-1 -o=jsonpath='{.sta
 export MINIO_IP2=$(kubectl -n ${NS_MINIO} get service/minio-2 -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
 
-echo "
-Update script completed successfuly!
+echo """
+Minio-HA update script completed successfuly!
 
 Minio console can be reached with the following URL:
 http://${MINIO_IP1}:9090
@@ -42,4 +42,4 @@ http://${MINIO_IP2}:9090
 https://${MINIO_CONSOLE_DOMAIN_1}
 https://${MINIO_CONSOLE_DOMAIN_2}
 ${MINIO_CONSOLE_DOMAIN_1} and ${MINIO_CONSOLE_DOMAIN_2} should be resolved with DNS-server
-"
+"""

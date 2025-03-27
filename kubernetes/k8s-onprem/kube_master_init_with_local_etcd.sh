@@ -1,30 +1,49 @@
 #!/bin/bash
 
+K8S_VER="1.32"
+K8S_VER_PATCH="2"
+
+# script_path=$(pwd)
+
+scriptdir="$(dirname "$0")"
+cd "$scriptdir"
+
+source ./sources.sh
+
 cat << EOF > kubeadm_init.yaml
 ---
 apiServer:
   extraArgs:
-    authorization-mode: Node,RBAC
-  timeoutForControlPlane: 4m0s
-apiVersion: kubeadm.k8s.io/v1beta3
+  - name: authorization-mode
+    value: Node,RBAC
+apiVersion: kubeadm.k8s.io/v1beta4
+caCertificateValidityPeriod: 262800h0m0s
+certificateValidityPeriod: 43800h0m0s
 certificatesDir: /etc/kubernetes/pki
 clusterName: kubernetes
-controlPlaneEndpoint: 192.168.205.12:6443 # change to LB IP or DNS name
+controlPlaneEndpoint: ${K8S_API_ENDPOINT}:6443
 controllerManager:
   extraArgs:
-    allocate-node-cidrs: 'false'
+  - name: allocate-node-cidrs
+    value: "false"
 dns: {}
+encryptionAlgorithm: RSA-2048
 etcd:
   local:
     dataDir: /var/lib/etcd
 imageRepository: registry.k8s.io
 kind: ClusterConfiguration
-kubernetesVersion: v1.28.10
+kubernetesVersion: v${K8S_VER}.${K8S_VER_PATCH}
 networking:
   dnsDomain: cluster.local
-  podSubnet: 10.244.0.0/16
-  serviceSubnet: 10.245.0.0/16
+  podSubnet: ${POD_SUBNET}
+  serviceSubnet: ${SERVICE_SUBNET}
+proxy: {}
 scheduler: {}
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+mode: nftables
 EOF
 
 sudo kubeadm init --config kubeadm_init.yaml  --upload-certs
@@ -38,5 +57,5 @@ echo 'source <(kubectl completion bash)' >> $HOME/.bashrc
 echo "
 Kubernates instalation is finished succesfuly
 Clusetr inited with  kubeadm init --config kubeadm_init.yaml
-Save the output. It will be used on the next steps.
+Save the output above. It will be used on the next steps.
 "

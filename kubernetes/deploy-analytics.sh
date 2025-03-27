@@ -74,7 +74,7 @@ kubectl -n ${NS_A} annotate service analytics-worker prometheus.io/port="8081"
 kubectl -n ${NS_A} annotate service analytics-worker prometheus.io/scrape="true"
 
 echo """
-Deployment script completed successfuly!
+Analytics deployment script completed successfuly!
 
 Access your ORCHESTRATOR with the following URL:
 https://${ANALYTICS_DOMAIN}/orch-admin/ (${ANALYTICS_DOMAIN} should be resolved on DNS-server)

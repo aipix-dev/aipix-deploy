@@ -14,5 +14,7 @@ kubectl -n ${TRAEFIK_NAMESPACE} delete ingressroutes.traefik.io traefik-dashboar
 helm upgrade -n ${TRAEFIK_NAMESPACE} traefik traefik/traefik -f ../traefik/traefik-helm-values.yaml >/dev/null
 
 echo """
-Certificates were successfully updated
+
+Traefik and certificates update script completed successfuly!
+
 """

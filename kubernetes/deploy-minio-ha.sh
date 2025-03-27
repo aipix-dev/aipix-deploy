@@ -246,8 +246,8 @@ mc replicate add minio-2/${MINIO_ANALYTICS_BUCKET_NAME} \
    --replicate "delete,delete-marker,existing-objects,metadata-sync"
 
 
-echo "
-Deployment script completed successfuly!
+echo """
+Minio-HA deployment script completed successfuly!
 
 Minio console can be reached with the following URL:
 http://${MINIO_IP1}:9090
@@ -255,4 +255,4 @@ http://${MINIO_IP2}:9090
 https://${MINIO_CONSOLE_DOMAIN_1}
 https://${MINIO_CONSOLE_DOMAIN_2}
 ${MINIO_CONSOLE_DOMAIN_1} and ${MINIO_CONSOLE_DOMAIN_2} should be resolved with DNS-server
-"
+"""

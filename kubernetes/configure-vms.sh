@@ -59,11 +59,11 @@ sed -i "s@CONTROL_PLAIN_HLS_REDIRECT_ENDPOINT=.*@CONTROL_PLAIN_HLS_REDIRECT_ENDP
 sed -i "s@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT=.*@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT=${VMS_DOMAIN}:5554@g" ../controller/environments/.env
 sed -i "s@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT_INTERNAL=.*@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT_INTERNAL=controller-control-plane-rtsp.${NS_VMS}.svc:5554@g" ../controller/environments/.env
 sed -i "s@ONVIF_EXTERNAL_HOST=.*@ONVIF_EXTERNAL_HOST=http://${CONTROLLER_ONVIF_EXTERNAL_HOST}:8888@g" ../controller/environments/.env
-cp -n ../nginx/nginx.conf.sample ../nginx/nginx.conf
-cp -n ../nginx/vms-backend-nginx-server.conf.sample ../nginx/vms-backend-nginx-server.conf
-cp -n ../nginx/vms-backend-nginx.conf.sample ../nginx/vms-backend-nginx.conf
-cp -n ../nginx/controller-nginx-server.conf.sample ../nginx/controller-nginx-server.conf
-cp -n ../nginx/controller-nginx.conf.sample ../nginx/controller-nginx.conf
+# cp -n ../nginx/nginx.conf.sample ../nginx/nginx.conf
+# cp -n ../nginx/vms-backend-nginx-server.conf.sample ../nginx/vms-backend-nginx-server.conf
+# cp -n ../nginx/vms-backend-nginx.conf.sample ../nginx/vms-backend-nginx.conf
+# cp -n ../nginx/controller-nginx-server.conf.sample ../nginx/controller-nginx-server.conf
+# cp -n ../nginx/controller-nginx.conf.sample ../nginx/controller-nginx.conf
 cp -n ../vms-frontend/admin.env.sample ../vms-frontend/admin.env
 
 if [ ${ANALYTICS} == "yes" ]; then
@@ -100,11 +100,7 @@ if [ ${PORTAL} == "yes" ]; then
     sed -i "s@PRIVATE_AWS_SECRET_ACCESS_KEY=.*@PRIVATE_AWS_SECRET_ACCESS_KEY=${MINIO_PORTAL_SECRET_KEY_PRIV}@g" ../portal/environments/.env
     sed -i "s@PRIVATE_AWS_ENDPOINT=.*@PRIVATE_AWS_ENDPOINT=http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../portal/environments/.env
     sed -i "s@PRIVATE_AWS_URL=.*@PRIVATE_AWS_URL=https://${VMS_DOMAIN}/s3@g" ../portal/environments/.env
-    # if [ ${MONITORING} == "yes" ]; then
-    #     sed -E -i "s@^ *#? *LOG_CHANNEL=.*@LOG_CHANNEL=syslogudp@g" ../portal/environments/.env
-    #     sed -E -i "s@^ *#? *SYSLOG_UDP_HOST=.*@SYSLOG_UDP_HOST=syslog.monitoring.svc@g" ../portal/environments/.env
-    #     sed -E -i "s@^ *#? *SYSLOG_UDP_PORT=.*@SYSLOG_UDP_PORT=5140@g" ../portal/environments/.env
-    # fi
+
     if [[ ${TYPE} == "single" ]] && [[ ${BACKEND_STORAGE_TYPE} == "disk" ]]; then
         sed -E -i "s@^ *#? *FILESYSTEM_DISK_PUBLIC=.*@#FILESYSTEM_DISK_PUBLIC=s3-public@g" ../portal/environments/.env
         sed -E -i "s@^ *#? *FILESYSTEM_DISK_PRIVATE=.*@#FILESYSTEM_DISK_PRIVATE=s3-private@g" ../portal/environments/.env
@@ -118,6 +114,6 @@ fi
 
 echo """
 
-Configuration script is finished successfuly!
+VMS configuration script completed successfuly!
 
 """

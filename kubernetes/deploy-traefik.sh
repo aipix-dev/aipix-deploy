@@ -30,7 +30,7 @@ sleep 5
 TRAEFIK_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
 echo """
-Deployment script completed successfuly!
+Traefik deployment script completed successfuly!
 
 Access your Traefik dashboard with the following URL:
 http://${TRAEFIK_IP}/dashboard/

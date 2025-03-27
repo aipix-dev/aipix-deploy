@@ -25,5 +25,5 @@ kubectl apply -k ../kustomize/deployments/${MSE_TEMPLATE}
 kubectl --namespace=${NS_MS} rollout restart daemonset mse 
 
 echo """
-Deployment script completed successfuly!
+MSE update script completed successfuly!
 """

@@ -38,3 +38,6 @@ else
       echo /var/opt/vol${i} /mnt/disks/disk_vol${i} none bind 0 0 | sudo tee -a /etc/fstab
     done
 fi
+
+#for ubuntu 24.04 you need to apply fstab changes
+sudo systemctl daemon-reload

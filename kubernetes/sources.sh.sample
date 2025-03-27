@@ -25,7 +25,7 @@ export TYPE=single                                              ##Installations 
 
 export VMS_LIC_OFFLINE=no 			                #If vms offline license will be used ("yes" or "no")
 export MS_LIC_OFFLINE=no 			                #If mediaserver offline license will be used ("yes" or "no")
-export A_LIC_OFFLINE=yes 			                #If analytics offline license will be used ("yes" or "no")
+export A_LIC_OFFLINE=no 			                #If analytics offline license will be used ("yes" or "no")
 
 #S3 minio basic deployment parameters:
 export BACKEND_STORAGE_TYPE=s3        				#backend storage type for demo installation: s3, disk or s3_and_disk (for migration to s3)
@@ -49,6 +49,9 @@ export MINIO_PORTAL_SECRET_KEY_PRIV=pA6d6RsmTVfvJ066q4U1VeJOGnEdyf4YHPKD0gsT    
 export MINIO_ANALYTICS_BUCKET_NAME=analytics-store                                   #minio bucket name for analytics
 export MINIO_ANALYTICS_ACCESS_KEY=Y4RJU1RNFGK48LGO9I2S                               #define minio access key for analytics bucket (use letters and numbers only)
 export MINIO_ANALYTICS_SECRET_KEY=qV6drWCmTV0vJ0Q2q921VeJOGnEcyfYYHPKD0k7R           #define minio secret key for analytics bucket (use letters and numbers only)
+export MINIO_LOGS_BUCKET_NAME=logs                                                          # define backet name for logs
+export MINIO_LOGS_ACCESS_KEY=TW2N577S01BDXSSRCJB2                                           # define minio access key for logs bucket
+export MINIO_LOGS_SECRET_KEY=uTgCH2La9fH749uE5v2RqpaCOsxfRUmGLktyN2dn                       # define minio secret key for logs bucket
 
 #Monitoring parameters
 export MONITORING=no  			                          	#If monitoring will be deployed ("yes" or "no")
@@ -59,7 +62,7 @@ export INFLUX_TOKEN=2pORp9tDo40Lm32oGUKFLL8r1UuNbgUT			#define influxdb API toke
 
 #Portal parameters
 export PORTAL=no                            				#If portal will be deployed ("yes" or "no")
-export PORTAL_STUB_DOMAIN=portal.example.com                          	#define portal-stub domain name
+export PORTAL_STUB_DOMAIN=portal-stub.example.com                          	#define portal-stub domain name
 
 ###END of the VSaaS base config ###
 
