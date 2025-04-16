@@ -26,9 +26,10 @@ kubectl create configmap vms-frontend-env --namespace=${NS_VMS} --from-env-file=
 kubectl create configmap push1st-server --namespace=${NS_VMS} --from-file=server.yml=../push1st/server.yml
 kubectl create configmap push1st-app --namespace=${NS_VMS} --from-file=../push1st/app.yml
 kubectl create configmap push1st-devices --namespace=${NS_VMS} --from-file=../push1st/devices.yml
+
 # Generate oauth-private.key, oauth-public.key, file.key and create configmap
-openssl genpkey -algorithm RSA -out ../vms-backend/certificates/private_key.pem -pkeyopt rsa_keygen_bits:4096 > /dev/null 2>&1 
-openssl rsa -in ../vms-backend/certificates/private_key.pem  -pubout -out ../vms-backend/certificates/public_key.pem > /dev/null 2>&1 
+openssl genpkey -algorithm RSA -out ../vms-backend/certificates/private_key.pem -pkeyopt rsa_keygen_bits:4096 > /dev/null 2>&1
+openssl rsa -in ../vms-backend/certificates/private_key.pem  -pubout -out ../vms-backend/certificates/public_key.pem > /dev/null 2>&1
 cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 300 | head -n 1 | xargs echo -n > ../vms-backend/certificates/file.key.tmp
 cp -n ../vms-backend/certificates/private_key.pem ../vms-backend/certificates/oauth-private.key
 cp -n ../vms-backend/certificates/public_key.pem ../vms-backend/certificates/oauth-public.key
@@ -82,7 +83,7 @@ while true
 do
 	if ([[ ${TYPE} == "prod" ]] || [[ $(kubectl get deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]) && \
         [[ $(kubectl get deployment controller-api -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] && \
-        [[ $(kubectl get deployment backend -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]        
+        [[ $(kubectl get deployment backend -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]
     then break
     fi
     sleep 5

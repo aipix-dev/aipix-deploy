@@ -20,6 +20,7 @@ components:
 - ../../components/middlewares/strip-prefixes-frontend-admin
 - ../../components/middlewares/upgrade-insecure-requests
 - ../../components/middlewares/max-body-size
+- ../../components/vms/push1st-devices-app
 ${ADD_COMPONENT1}
 ${ADD_COMPONENT2}
 ${ADD_COMPONENT3}

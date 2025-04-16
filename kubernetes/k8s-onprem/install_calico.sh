@@ -1,14 +1,21 @@
 #!/bin/bash
 #Install Calico
 
-CALICO_VER="3.29.3"
-
 # script_path=$(pwd)
-
 scriptdir="$(dirname "$0")"
 cd "$scriptdir"
 
+if [ ! -f "./sources.sh" ]; then
+    echo >&2 "ERROR: File sources.sh does not exist. Please make a copy from sources.sh.sample and edit as required"
+    exit 2
+fi
 source ./sources.sh
+if [ -z "${SRC_CALICO_VER}" ]; then
+    echo >&2  "ERROR: File sources.sh does not contain K8S version variables. Copy system variables fom sources.sh.sample file."
+    exit 2
+fi
+
+CALICO_VER=${SRC_CALICO_VER}
 
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VER}/manifests/tigera-operator.yaml
 

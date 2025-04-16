@@ -1,14 +1,23 @@
 #!/bin/bash
 
-K8S_VER="1.32"
-K8S_VER_PATCH="3"
-
 # script_path=$(pwd)
-
 scriptdir="$(dirname "$0")"
 cd "$scriptdir"
 
+if [ ! -f "./sources.sh" ]; then
+    echo >&2 "ERROR: File sources.sh does not exist. Please make a copy from sources.sh.sample and edit as required"
+    exit 2
+fi
 source ./sources.sh
+if [ -z "${SRC_K8S_VER}" ]; then
+    echo >&2  "ERROR: File sources.sh does not contain K8S version variables. Copy system variables fom sources.sh.sample file."
+    exit 2
+fi
+
+
+K8S_VER=${SRC_K8S_VER}
+K8S_VER_PATCH=${SRC_K8S_VER_PATCH}
+
 
 cat << EOF > kubeadm_init.yaml
 ---

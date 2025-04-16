@@ -66,7 +66,7 @@ patches:
     version: v1
     kind: PersistentVolumeClaim
     name: (.*influxdb2)
-  path: patch-influx-sc.yaml
+  path: patch-influx-pvc.yaml
 - target:
     group: ""
     version: v1
@@ -95,6 +95,12 @@ patches:
     kind: Deployment
     name: grafana
   path: patch-grafana-volume.yaml
+- target:
+    group: ""
+    version: v1
+    kind: PersistentVolumeClaim
+    name: grafana-storage
+  path: patch-grafana-pvc.yaml
 - target:
     group: traefik.io
     version: v1alpha1

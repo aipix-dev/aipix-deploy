@@ -3,18 +3,31 @@
 ######################################
 # Install Kubernetes Base Components #
 ######################################
-K8S_VER="1.32"
-K8S_VER_PATCH="3"
-K8S_VER_BUILD="1.1"
-CONTAINERD_VER="2.0.4"
-RUNC_VER="1.2.6"
-NET_PLUGINS_VER="1.6.2"
-CALICO_VER="3.29.3"
 
 # script_path=$(pwd)
-
 scriptdir="$(dirname "$0")"
 cd "$scriptdir"
+
+if [ ! -f "./sources.sh" ]; then
+    echo "Using ENV from sources.sh.sample"
+    source ./sources.sh.sample
+else
+    echo "Using ENV from sources.sh"
+    source ./sources.sh
+    if [ -z "${SRC_K8S_VER}" ]; then
+        echo >&2  "ERROR: File sources.sh does not contain K8S version variables. Copy system variables fom sources.sh.sample file."
+        exit 2
+    fi
+fi
+
+
+K8S_VER=${SRC_K8S_VER}
+K8S_VER_PATCH=${SRC_K8S_VER_PATCH}
+K8S_VER_BUILD=${SRC_K8S_VER_BUILD}
+CONTAINERD_VER=${SRC_CONTAINERD_VER}
+RUNC_VER=${SRC_RUNC_VER}
+NET_PLUGINS_VER=${SRC_NET_PLUGINS_VER}
+CALICO_VER=${SRC_CALICO_VER}
 
 sudo swapoff -a
 sudo sed -i '/^\/swap/s/^/#/' /etc/fstab

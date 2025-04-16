@@ -18,12 +18,12 @@ update_analytics-worker () {
     set -e
     kubectl delete configmap analytics-worker-cm  --namespace=${NS_A} || true
     kubectl create configmap analytics-worker-cm  --namespace=${NS_A} --from-file=.env=../analytics/analytics-worker.conf
-    TargetReplicas=$(kubectl get  deployment analytics-worker --namespace=${NS_A} -o jsonpath='{.status.replicas}')
+    TargetReplicas=$(kubectl get deployment analytics-worker --namespace=${NS_A} -o jsonpath='{.status.replicas}')
     kubectl -n ${NS_A} rollout restart deployment analytics-worker
     # Waiting for starting containers
     while true
     do
-        if [[ $(kubectl get  deployment analytics-worker -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge ${TargetReplicas} ]]
+        if [[ $(kubectl get deployment analytics-worker -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge ${TargetReplicas} ]]
         then break
         fi
         sleep 10
@@ -46,15 +46,13 @@ update_orchestrator () {
     while true
     do
         if ([[ ${TYPE} == "prod" ]] || [[ $(kubectl get  deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]) && \
-            [[ $(kubectl get  deployment orchestrator -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]
+            [[ $(kubectl get deployment orchestrator -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]
         then break
         fi
         echo "Waiting for starting orchestrator and mysql container if presents (max 5 minutes) ..."
         sleep 10
-        
     done
     sleep 10
-    # kubectl exec -n ${NS_A} deployment.apps/orchestrator -c django --  python manage.py migrate
     kubectl exec -n ${NS_A} deployment.apps/orchestrator -c django --  python manage.py seed
 }
 

@@ -12,7 +12,8 @@ else
     S3_PORT_INTERNAL=":9000"
 fi
 
-export CONTROLLER_ONVIF_EXTERNAL_HOST=$(echo $TRAEFIK_ADVERTISEMENT_RANGE | cut -d "-" -f1)          #Get ip addres from TRAEFIK_ADVERTISEMENT_RANGE
+# export CONTROLLER_ONVIF_EXTERNAL_HOST=$(echo $TRAEFIK_ADVERTISEMENT_RANGE | cut -d "-" -f1)          #Get ip addres from TRAEFIK_ADVERTISEMENT_RANGE
+export CONTROLLER_ONVIF_EXTERNAL_HOST=$(kubectl -n ${TRAEFIK_NAMESPACE} get svc traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')          #Get ip addres from traefik service external IP
 
 #Creating configs files for vms
 cp -n ./sources.sh.sample ./sources.sh
@@ -38,7 +39,7 @@ sed -i "s@PRIVATE_AWS_ACCESS_KEY_ID=.*@PRIVATE_AWS_ACCESS_KEY_ID=${MINIO_BACKEND
 sed -i "s@PRIVATE_AWS_SECRET_ACCESS_KEY=.*@PRIVATE_AWS_SECRET_ACCESS_KEY=${MINIO_BACKEND_SECRET_KEY_PRIV}@g" ../vms-backend/environments/.env
 sed -i "s@PRIVATE_AWS_ENDPOINT=.*@PRIVATE_AWS_ENDPOINT=http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../vms-backend/environments/.env
 sed -i "s@PRIVATE_AWS_URL=.*@PRIVATE_AWS_URL=https://${VMS_DOMAIN}/s3@g" ../vms-backend/environments/.env
-if [ ${PORTAL} == "yes" ]; then
+if [[ ${PORTAL} == "yes" ]] && [[ ${TYPE} != "prod" ]]; then
     sed -i "s@USER_TYPES=.*@USER_TYPES=b2b,b2c@g" ../vms-backend/environments/.env
 fi
 

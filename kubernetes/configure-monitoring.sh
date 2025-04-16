@@ -74,7 +74,7 @@ cp  ../monitoring/syslog-service.yaml ../kustomize/deployments/monitoring1/
 if [ ${TYPE} == "prod" ]; then
 	export S3_PORT_INTERNAL=""
 else
-	export S3_PORT_INTERNAL="9000"
+	export S3_PORT_INTERNAL=":9000"
 fi
 envsubst \
 	    < ../monitoring/loki-values.yaml.sample \

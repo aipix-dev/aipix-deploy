@@ -9,7 +9,7 @@ loki:
       ruler: ruler
     type: 's3'
     s3:
-      endpoint: http://minio.${NS_MINIO}.svc:${S3_PORT_INTERNAL}
+      endpoint: http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}
       secretAccessKey: ${MINIO_LOGS_SECRET_KEY}
       accessKeyId: ${MINIO_LOGS_ACCESS_KEY}
       insecure: true
@@ -59,7 +59,7 @@ singleBinary:
 #            values:
 #            - "true"
   persistence:
-    storageClass: local-storage
+    storageClass: ${RWO_STORAGE}
 #write:
 #  replicas: 0
 #read:

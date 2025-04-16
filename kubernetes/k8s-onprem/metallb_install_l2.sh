@@ -1,13 +1,22 @@
 #!/bin/bash
 
-MetalLB_VER="0.14.9"
-
 # script_path=$(pwd)
-
 scriptdir="$(dirname "$0")"
 cd "$scriptdir"
 
+if [ ! -f "./sources.sh" ]; then
+    echo >&2 "ERROR: File sources.sh does not exist. Please make a copy from sources.sh.sample and edit as required"
+    exit 2
+fi
 source ./sources.sh
+if [ -z "${SRC_MetalLB_VER}" ]; then
+    echo >&2  "ERROR: File sources.sh does not contain K8S version variables. Copy system variables fom sources.sh.sample file."
+    exit 2
+fi
+
+
+MetalLB_VER=${SRC_MetalLB_VER}
+
 
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v${MetalLB_VER}/config/manifests/metallb-native.yaml
 

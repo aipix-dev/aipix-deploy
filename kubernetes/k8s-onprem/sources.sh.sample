@@ -6,3 +6,15 @@ export SERVICE_SUBNET="10.245.0.0/16"
 export TRAEFIK_ADVERTISEMENT_RANGE="192.168.205.96-192.168.205.96"
 export L2_ADVERTISEMENT_RANGE="192.168.205.97-192.168.205.103" # Additional services advertisement range. Comment this line if only traefik is used as external service.
 export MS1_IP="192.168.205.164" # it is used for demo mediaserver installation in container only
+
+
+
+### System variables
+export SRC_K8S_VER="1.32"
+export SRC_K8S_VER_PATCH="3"
+export SRC_K8S_VER_BUILD="1.1"
+export SRC_CONTAINERD_VER="2.0.4"
+export SRC_RUNC_VER="1.2.6"
+export SRC_NET_PLUGINS_VER="1.6.2"
+export SRC_CALICO_VER="3.29.3"
+export SRC_MetalLB_VER="0.14.9"

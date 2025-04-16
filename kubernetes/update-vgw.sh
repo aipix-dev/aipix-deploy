@@ -15,7 +15,7 @@ helm repo update
 
 if [ -z "${VALUES}" ]; then
 	echo -e "\033[0;31mvgw values are not set!!!"
-	echo "Use deploy-vgw.sh <name_space> <values.yaml>"
+	echo "Use 'helm show values ${BRAND}/vgw >> ${VALUES}'"
 	exit 1
 fi
 

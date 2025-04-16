@@ -19,7 +19,7 @@ restartPolicy: OnFailure
 
 imagePullPolicy: Always
 
-configMap: robot-tests
+configMapRef: robot-tests-env
 
 # -- This field override the default Release Namespace for Helm.
 namespaceOverride:

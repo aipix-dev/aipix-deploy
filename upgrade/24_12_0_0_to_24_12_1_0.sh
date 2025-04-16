@@ -22,7 +22,7 @@ yq -i '.additionalArguments += "--entrypoints.logger.address=:8109/udp"' ../trae
 ### Update VMS
 
 # Update VGW
-if [[ $(kubectl -n vsaas-vms get statefulsets.apps vgw) ]]; then
+if [[ $(kubectl --namespace=${NS_VMS} get statefulsets.apps vgw) ]]; then
     ../kubernetes/update-vgw.sh
 else
     echo "VGW is not installed, continue update"
@@ -50,12 +50,7 @@ fi
 
 # Update monitoring
 if [ ${MONITORING} == "yes" ]; then
-    if [ ${TYPE} == "prod" ]; then
-        export S3_PORT_INTERNAL=""
-    else
-        export S3_PORT_INTERNAL="9000"
-    fi
-    mc mb -p local/${MINIO_LOGS_BUCKET_NAME}
+    
     cat <<EOF > /tmp/${MINIO_LOGS_BUCKET_NAME}-policy.json
 {
     "Version": "2012-10-17",
@@ -72,11 +67,38 @@ if [ ${MONITORING} == "yes" ]; then
     ]
 }
 EOF
-    mc admin policy create local ${MINIO_LOGS_BUCKET_NAME}-policy /tmp/${MINIO_LOGS_BUCKET_NAME}-policy.json
-    mc admin user add local ${MINIO_LOGS_BUCKET_NAME}-user ${MINIO_PSW}
-    mc admin user svcacct add local ${MINIO_LOGS_BUCKET_NAME}-user --access-key ${MINIO_LOGS_ACCESS_KEY} --secret-key ${MINIO_LOGS_SECRET_KEY}
-    mc admin policy attach local ${MINIO_LOGS_BUCKET_NAME}-policy --user ${MINIO_LOGS_BUCKET_NAME}-user
-    mc ilm rule add local/${MINIO_LOGS_BUCKET_NAME} --expire-days "3"
+
+    if [ ${TYPE} == "prod" ]; then
+        export S3_PORT_INTERNAL=""
+        mc mb -p minio-1/${MINIO_LOGS_BUCKET_NAME}
+        mc mb -p minio-2/${MINIO_LOGS_BUCKET_NAME}
+        mc admin policy create minio-1 ${MINIO_LOGS_BUCKET_NAME}-policy /tmp/${MINIO_LOGS_BUCKET_NAME}-policy.json
+        mc admin user add minio-1 ${MINIO_LOGS_BUCKET_NAME}-user ${MINIO_PSW}
+        mc admin user svcacct add minio-1 ${MINIO_LOGS_BUCKET_NAME}-user --access-key ${MINIO_LOGS_ACCESS_KEY} --secret-key ${MINIO_LOGS_SECRET_KEY}
+        mc admin policy attach minio-1 ${MINIO_LOGS_BUCKET_NAME}-policy --user ${MINIO_LOGS_BUCKET_NAME}-user
+        mc version enable minio-1/${MINIO_LOGS_BUCKET_NAME}
+        mc ilm rule add minio-1/${MINIO_LOGS_BUCKET_NAME} --noncurrent-expire-days "3" --expire-delete-marker
+        mc admin policy create minio-2 ${MINIO_LOGS_BUCKET_NAME}-policy /tmp/${MINIO_LOGS_BUCKET_NAME}-policy.json
+        mc admin user add minio-2 ${MINIO_LOGS_BUCKET_NAME}-user ${MINIO_PSW}
+        mc admin user svcacct add minio-2 ${MINIO_LOGS_BUCKET_NAME}-user --access-key ${MINIO_LOGS_ACCESS_KEY} --secret-key ${MINIO_LOGS_SECRET_KEY}
+        mc admin policy attach minio-2 ${MINIO_LOGS_BUCKET_NAME}-policy --user ${MINIO_LOGS_BUCKET_NAME}-user
+        mc version enable minio-2/${MINIO_LOGS_BUCKET_NAME}
+        mc ilm rule add minio-1/${MINIO_LOGS_BUCKET_NAME} --noncurrent-expire-days "3" --expire-delete-marker
+        mc replicate add minio-1/${MINIO_LOGS_BUCKET_NAME} \
+        --remote-bucket "http://replication-user:${MINIO_PSW}@minio-2:9000/${MINIO_LOGS_BUCKET_NAME}" \
+        --replicate "delete,delete-marker,existing-objects,metadata-sync"
+        mc replicate add minio-2/${MINIO_LOGS_BUCKET_NAME} \
+        --remote-bucket "http://replication-user:${MINIO_PSW}@minio-1:9000/${MINIO_LOGS_BUCKET_NAME}" \
+        --replicate "delete,delete-marker,existing-objects,metadata-sync"
+    else
+        export S3_PORT_INTERNAL="9000"
+        mc mb -p local/${MINIO_LOGS_BUCKET_NAME}
+        mc admin policy create local ${MINIO_LOGS_BUCKET_NAME}-policy /tmp/${MINIO_LOGS_BUCKET_NAME}-policy.json
+        mc admin user add local ${MINIO_LOGS_BUCKET_NAME}-user ${MINIO_PSW}
+        mc admin user svcacct add local ${MINIO_LOGS_BUCKET_NAME}-user --access-key ${MINIO_LOGS_ACCESS_KEY} --secret-key ${MINIO_LOGS_SECRET_KEY}
+        mc admin policy attach local ${MINIO_LOGS_BUCKET_NAME}-policy --user ${MINIO_LOGS_BUCKET_NAME}-user
+        mc ilm rule add local/${MINIO_LOGS_BUCKET_NAME} --expire-days "3"
+    fi
 
     rm ../monitoring/fluentbit-values.yaml ../monitoring/loki-values.yaml 
     cp ../monitoring/fluentbit-values.yaml.sample ../monitoring/fluentbit-values.yaml
