@@ -14,15 +14,15 @@ MS_TYPE="vsaas"
 BRAND="aipix"
 
 if [ -z "${MS_IP}" ]; then
-    echo >&2  "ERROR: MSE IP address is not defined"
-    exit 2
+	echo >&2 "ERROR: MSE IP address is not defined"
+	exit 2
 fi
 
 #Creating base configs for MSE
 if [ -z "${CONFIGURE}" ]; then
 	cp -n ./sources.sh.sample ./sources.sh
-    cp -n ../mse/key.pem.sample ../mse/key.pem
-    cp -n ../mse/cert.pem.sample ../mse/cert.pem
+	cp -n ../mse/key.pem.sample ../mse/key.pem
+	cp -n ../mse/cert.pem.sample ../mse/cert.pem
 	cp -n ../mse/public.key.sample ../mse/public.key
 	cp -n ../mse/license.json.sample ../mse/license.json
 	cp -n ../mse/server.json.sample ../mse/server.json.${MS_IP}.${MS_TYPE}

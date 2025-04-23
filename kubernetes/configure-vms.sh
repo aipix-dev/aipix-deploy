@@ -7,9 +7,9 @@ source ./sources.sh
 source ./k8s-onprem/sources.sh
 
 if [ ${TYPE} == "prod" ]; then
-    S3_PORT_INTERNAL=""
+	S3_PORT_INTERNAL=""
 else
-    S3_PORT_INTERNAL=":9000"
+	S3_PORT_INTERNAL=":9000"
 fi
 
 # export CONTROLLER_ONVIF_EXTERNAL_HOST=$(echo $TRAEFIK_ADVERTISEMENT_RANGE | cut -d "-" -f1)          #Get ip addres from TRAEFIK_ADVERTISEMENT_RANGE
@@ -20,8 +20,8 @@ cp -n ./sources.sh.sample ./sources.sh
 cp -n ../vms-backend/environments/env.sample ../vms-backend/environments/.env
 cp -n ../vms-backend/certificates/fcm.json.sample ../vms-backend/certificates/fcm.json
 cp -n ../vms-backend/certificates/voip.p8.sample ../vms-backend/certificates/voip.p8
-cp -n ../vms-backend/99-overrides-php.ini.sample ../vms-backend/99-overrides-php.ini
-cp -n ../vms-backend/z-overrides-pool-www.conf.sample ../vms-backend/z-overrides-pool-www.conf
+# cp -n ../vms-backend/99-overrides-php.ini.sample ../vms-backend/99-overrides-php.ini
+# cp -n ../vms-backend/z-overrides-pool-www.conf.sample ../vms-backend/z-overrides-pool-www.conf
 cp -n ../push1st/app.yml.sample ../push1st/app.yml
 cp -n ../push1st/cluster.yml.sample ../push1st/cluster.yml
 cp -n ../push1st/orchestrator.yml.sample ../push1st/orchestrator.yml
@@ -40,19 +40,19 @@ sed -i "s@PRIVATE_AWS_SECRET_ACCESS_KEY=.*@PRIVATE_AWS_SECRET_ACCESS_KEY=${MINIO
 sed -i "s@PRIVATE_AWS_ENDPOINT=.*@PRIVATE_AWS_ENDPOINT=http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../vms-backend/environments/.env
 sed -i "s@PRIVATE_AWS_URL=.*@PRIVATE_AWS_URL=https://${VMS_DOMAIN}/s3@g" ../vms-backend/environments/.env
 if [[ ${PORTAL} == "yes" ]] && [[ ${TYPE} != "prod" ]]; then
-    sed -i "s@USER_TYPES=.*@USER_TYPES=b2b,b2c@g" ../vms-backend/environments/.env
+	sed -i "s@USER_TYPES=.*@USER_TYPES=b2b,b2c@g" ../vms-backend/environments/.env
 fi
 
 if [[ ${TYPE} == "single" ]] && [[ ${BACKEND_STORAGE_TYPE} == "disk" ]]; then
-    sed -E -i "s@^ *#? *FILESYSTEM_DISK_PUBLIC=.*@#FILESYSTEM_DISK_PUBLIC=s3-public@g" ../vms-backend/environments/.env
-    sed -E -i "s@^ *#? *FILESYSTEM_DISK_PRIVATE=.*@#FILESYSTEM_DISK_PRIVATE=s3-private@g" ../vms-backend/environments/.env
-    sed -E -i "s@^ *#? *S3_BACKUP_PATH=.*@#S3_BACKUP_PATH=database_backups@g" ../vms-backend/environments/.env
+	sed -E -i "s@^ *#? *FILESYSTEM_DISK_PUBLIC=.*@#FILESYSTEM_DISK_PUBLIC=s3-public@g" ../vms-backend/environments/.env
+	sed -E -i "s@^ *#? *FILESYSTEM_DISK_PRIVATE=.*@#FILESYSTEM_DISK_PRIVATE=s3-private@g" ../vms-backend/environments/.env
+	sed -E -i "s@^ *#? *S3_BACKUP_PATH=.*@#S3_BACKUP_PATH=database_backups@g" ../vms-backend/environments/.env
 elif [ -z "${BACKEND_STORAGE_TYPE}" ]; then
 	echo "Skipping FILESYSTEM_DISK config"
 else
 	sed -E -i "s@^ *#? *FILESYSTEM_DISK_PUBLIC=.*@FILESYSTEM_DISK_PUBLIC=s3-public@g" ../vms-backend/environments/.env
-    sed -E -i "s@^ *#? *FILESYSTEM_DISK_PRIVATE=.*@FILESYSTEM_DISK_PRIVATE=s3-private@g" ../vms-backend/environments/.env
-    sed -E -i "s@^ *#? *S3_BACKUP_PATH=.*@S3_BACKUP_PATH=database_backups@g" ../vms-backend/environments/.env
+	sed -E -i "s@^ *#? *FILESYSTEM_DISK_PRIVATE=.*@FILESYSTEM_DISK_PRIVATE=s3-private@g" ../vms-backend/environments/.env
+	sed -E -i "s@^ *#? *S3_BACKUP_PATH=.*@S3_BACKUP_PATH=database_backups@g" ../vms-backend/environments/.env
 fi
 
 cp -n ../controller/environments/env.sample ../controller/environments/.env
@@ -68,49 +68,49 @@ sed -i "s@ONVIF_EXTERNAL_HOST=.*@ONVIF_EXTERNAL_HOST=http://${CONTROLLER_ONVIF_E
 cp -n ../vms-frontend/admin.env.sample ../vms-frontend/admin.env
 
 if [ ${ANALYTICS} == "yes" ]; then
-    sed -i "s@ORCHESTRATOR_ENDPOINT=http://.*@ORCHESTRATOR_ENDPOINT=http://orchestrator.${NS_A}.svc@g" ../vms-backend/environments/.env
-    sed -i "s@CLICKHOUSE_HOST=.*@CLICKHOUSE_HOST=clickhouse-server.${NS_A}.svc@g" ../vms-backend/environments/.env
-    sed -i "s@ANALYTIC_CASE_CALLBACK_ENDPOINT=.*@ANALYTIC_CASE_CALLBACK_ENDPOINT=http://backend.${NS_VMS}.svc@g" ../vms-backend/environments/.env
+	sed -i "s@ORCHESTRATOR_ENDPOINT=http://.*@ORCHESTRATOR_ENDPOINT=http://orchestrator.${NS_A}.svc@g" ../vms-backend/environments/.env
+	sed -i "s@CLICKHOUSE_HOST=.*@CLICKHOUSE_HOST=clickhouse-server.${NS_A}.svc@g" ../vms-backend/environments/.env
+	sed -i "s@ANALYTIC_CASE_CALLBACK_ENDPOINT=.*@ANALYTIC_CASE_CALLBACK_ENDPOINT=http://backend.${NS_VMS}.svc@g" ../vms-backend/environments/.env
 fi
 
 # if [ ${MONITORING} == "yes" ]; then
-#     sed -E -i "s@^ *#? *LOG_CHANNEL=.*@LOG_CHANNEL=syslogudp@g" ../vms-backend/environments/.env
-#     sed -E -i "s@^ *#? *SYSLOG_UDP_HOST=.*@SYSLOG_UDP_HOST=syslog.monitoring.svc@g" ../vms-backend/environments/.env
-#     sed -E -i "s@^ *#? *SYSLOG_UDP_PORT=.*@SYSLOG_UDP_PORT=5140@g" ../vms-backend/environments/.env
-#     sed -E -i "s@^ *#? *LOG_CHANNEL=.*@LOG_CHANNEL=syslogudp@g" ../controller/environments/.env
-#     sed -E -i "s@^ *#? *SYSLOG_UDP_HOST=.*@SYSLOG_UDP_HOST=syslog.monitoring.svc@g" ../controller/environments/.env
-#     sed -E -i "s@^ *#? *SYSLOG_UDP_PORT=.*@SYSLOG_UDP_PORT=5140@g" ../controller/environments/.env
+# 	sed -E -i "s@^ *#? *LOG_CHANNEL=.*@LOG_CHANNEL=syslogudp@g" ../vms-backend/environments/.env
+# 	sed -E -i "s@^ *#? *SYSLOG_UDP_HOST=.*@SYSLOG_UDP_HOST=syslog.monitoring.svc@g" ../vms-backend/environments/.env
+# 	sed -E -i "s@^ *#? *SYSLOG_UDP_PORT=.*@SYSLOG_UDP_PORT=5140@g" ../vms-backend/environments/.env
+# 	sed -E -i "s@^ *#? *LOG_CHANNEL=.*@LOG_CHANNEL=syslogudp@g" ../controller/environments/.env
+# 	sed -E -i "s@^ *#? *SYSLOG_UDP_HOST=.*@SYSLOG_UDP_HOST=syslog.monitoring.svc@g" ../controller/environments/.env
+# 	sed -E -i "s@^ *#? *SYSLOG_UDP_PORT=.*@SYSLOG_UDP_PORT=5140@g" ../controller/environments/.env
 # fi
 
 cp -n ../vms-backend/license/license.json.sample ../vms-backend/license/license.json
 
 if [ ${PORTAL} == "yes" ]; then
-    cp -n ../portal/environments/env.sample ../portal/environments/.env
-    cp -n ../portal/environments-stub/env.sample ../portal/environments-stub/.env
-    sed -i "s@BILLING_PAYMENT_GETAWAY_URL=.*@BILLING_PAYMENT_GETAWAY_URL=https://${PORTAL_STUB_DOMAIN}@g" ../portal/environments/.env
-    sed -i "s@BILLING_PAYMENT_GETAWAY_AUTH_ENDPOINT=.*@BILLING_PAYMENT_GETAWAY_AUTH_ENDPOINT=https://${PORTAL_STUB_DOMAIN}/connect/token@g" ../portal/environments/.env
-    sed -i "s@EXTERNAL_OAUTH_REDIRECT_URI_WEB=.*@EXTERNAL_OAUTH_REDIRECT_URI_WEB=https://${VMS_DOMAIN}/auth/login@g" ../portal/environments/.env
-    sed -i "s@EXTERNAL_OAUTH_REDIRECT_URI_MOBILE=.*@EXTERNAL_OAUTH_REDIRECT_URI_MOBILE=https://${VMS_DOMAIN}/auth/login@g" ../portal/environments/.env
-    sed -i "s@PUBLIC_AWS_BUCKET=.*@PUBLIC_AWS_BUCKET=${MINIO_PORTAL_BUCKET_NAME}@g" ../portal/environments/.env
-    sed -i "s@PUBLIC_AWS_ACCESS_KEY_ID=.*@PUBLIC_AWS_ACCESS_KEY_ID=${MINIO_PORTAL_ACCESS_KEY}@g" ../portal/environments/.env
-    sed -i "s@PUBLIC_AWS_SECRET_ACCESS_KEY=.*@PUBLIC_AWS_SECRET_ACCESS_KEY=${MINIO_PORTAL_SECRET_KEY}@g" ../portal/environments/.env
-    sed -i "s@PUBLIC_AWS_ENDPOINT=.*@PUBLIC_AWS_ENDPOINT=http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../portal/environments/.env
-    sed -i "s@PUBLIC_AWS_URL=.*@PUBLIC_AWS_URL=https://${VMS_DOMAIN}/s3@g" ../portal/environments/.env
-    sed -i "s@PRIVATE_AWS_BUCKET=.*@PRIVATE_AWS_BUCKET=${MINIO_PORTAL_BUCKET_NAME_PRIV}@g" ../portal/environments/.env
-    sed -i "s@PRIVATE_AWS_ACCESS_KEY_ID=.*@PRIVATE_AWS_ACCESS_KEY_ID=${MINIO_PORTAL_ACCESS_KEY_PRIV}@g" ../portal/environments/.env
-    sed -i "s@PRIVATE_AWS_SECRET_ACCESS_KEY=.*@PRIVATE_AWS_SECRET_ACCESS_KEY=${MINIO_PORTAL_SECRET_KEY_PRIV}@g" ../portal/environments/.env
-    sed -i "s@PRIVATE_AWS_ENDPOINT=.*@PRIVATE_AWS_ENDPOINT=http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../portal/environments/.env
-    sed -i "s@PRIVATE_AWS_URL=.*@PRIVATE_AWS_URL=https://${VMS_DOMAIN}/s3@g" ../portal/environments/.env
+	cp -n ../portal/environments/env.sample ../portal/environments/.env
+	cp -n ../portal/environments-stub/env.sample ../portal/environments-stub/.env
+	sed -i "s@BILLING_PAYMENT_GETAWAY_URL=.*@BILLING_PAYMENT_GETAWAY_URL=https://${PORTAL_STUB_DOMAIN}@g" ../portal/environments/.env
+	sed -i "s@BILLING_PAYMENT_GETAWAY_AUTH_ENDPOINT=.*@BILLING_PAYMENT_GETAWAY_AUTH_ENDPOINT=https://${PORTAL_STUB_DOMAIN}/connect/token@g" ../portal/environments/.env
+	sed -i "s@EXTERNAL_OAUTH_REDIRECT_URI_WEB=.*@EXTERNAL_OAUTH_REDIRECT_URI_WEB=https://${VMS_DOMAIN}/auth/login@g" ../portal/environments/.env
+	sed -i "s@EXTERNAL_OAUTH_REDIRECT_URI_MOBILE=.*@EXTERNAL_OAUTH_REDIRECT_URI_MOBILE=https://${VMS_DOMAIN}/auth/login@g" ../portal/environments/.env
+	sed -i "s@PUBLIC_AWS_BUCKET=.*@PUBLIC_AWS_BUCKET=${MINIO_PORTAL_BUCKET_NAME}@g" ../portal/environments/.env
+	sed -i "s@PUBLIC_AWS_ACCESS_KEY_ID=.*@PUBLIC_AWS_ACCESS_KEY_ID=${MINIO_PORTAL_ACCESS_KEY}@g" ../portal/environments/.env
+	sed -i "s@PUBLIC_AWS_SECRET_ACCESS_KEY=.*@PUBLIC_AWS_SECRET_ACCESS_KEY=${MINIO_PORTAL_SECRET_KEY}@g" ../portal/environments/.env
+	sed -i "s@PUBLIC_AWS_ENDPOINT=.*@PUBLIC_AWS_ENDPOINT=http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../portal/environments/.env
+	sed -i "s@PUBLIC_AWS_URL=.*@PUBLIC_AWS_URL=https://${VMS_DOMAIN}/s3@g" ../portal/environments/.env
+	sed -i "s@PRIVATE_AWS_BUCKET=.*@PRIVATE_AWS_BUCKET=${MINIO_PORTAL_BUCKET_NAME_PRIV}@g" ../portal/environments/.env
+	sed -i "s@PRIVATE_AWS_ACCESS_KEY_ID=.*@PRIVATE_AWS_ACCESS_KEY_ID=${MINIO_PORTAL_ACCESS_KEY_PRIV}@g" ../portal/environments/.env
+	sed -i "s@PRIVATE_AWS_SECRET_ACCESS_KEY=.*@PRIVATE_AWS_SECRET_ACCESS_KEY=${MINIO_PORTAL_SECRET_KEY_PRIV}@g" ../portal/environments/.env
+	sed -i "s@PRIVATE_AWS_ENDPOINT=.*@PRIVATE_AWS_ENDPOINT=http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../portal/environments/.env
+	sed -i "s@PRIVATE_AWS_URL=.*@PRIVATE_AWS_URL=https://${VMS_DOMAIN}/s3@g" ../portal/environments/.env
 
-    if [[ ${TYPE} == "single" ]] && [[ ${BACKEND_STORAGE_TYPE} == "disk" ]]; then
-        sed -E -i "s@^ *#? *FILESYSTEM_DISK_PUBLIC=.*@#FILESYSTEM_DISK_PUBLIC=s3-public@g" ../portal/environments/.env
-        sed -E -i "s@^ *#? *FILESYSTEM_DISK_PRIVATE=.*@#FILESYSTEM_DISK_PRIVATE=s3-private@g" ../portal/environments/.env
-    elif [ -z "${BACKEND_STORAGE_TYPE}" ]; then
-        echo "Skipping FILESYSTEM_DISK config"
-    else
-        sed -E -i "s@^ *#? *FILESYSTEM_DISK_PUBLIC=.*@FILESYSTEM_DISK_PUBLIC=s3-public@g" ../portal/environments/.env
-        sed -E -i "s@^ *#? *FILESYSTEM_DISK_PRIVATE=.*@FILESYSTEM_DISK_PRIVATE=s3-private@g" ../portal/environments/.env
-    fi
+	if [[ ${TYPE} == "single" ]] && [[ ${BACKEND_STORAGE_TYPE} == "disk" ]]; then
+		sed -E -i "s@^ *#? *FILESYSTEM_DISK_PUBLIC=.*@#FILESYSTEM_DISK_PUBLIC=s3-public@g" ../portal/environments/.env
+		sed -E -i "s@^ *#? *FILESYSTEM_DISK_PRIVATE=.*@#FILESYSTEM_DISK_PRIVATE=s3-private@g" ../portal/environments/.env
+	elif [ -z "${BACKEND_STORAGE_TYPE}" ]; then
+		echo "Skipping FILESYSTEM_DISK config"
+	else
+		sed -E -i "s@^ *#? *FILESYSTEM_DISK_PUBLIC=.*@FILESYSTEM_DISK_PUBLIC=s3-public@g" ../portal/environments/.env
+		sed -E -i "s@^ *#? *FILESYSTEM_DISK_PRIVATE=.*@FILESYSTEM_DISK_PRIVATE=s3-private@g" ../portal/environments/.env
+	fi
 fi
 
 echo """

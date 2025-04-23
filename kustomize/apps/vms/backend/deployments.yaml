@@ -632,3 +632,102 @@ spec:
         - name: vms-backend-oauth
           secret:
             secretName: vms-backend-oauth
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: queue-calculate-cameras
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: queue-calculate-cameras
+  namespace: vms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: queue-calculate-cameras
+      app.kubernetes.io/component: worker
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: queue-calculate-cameras
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: queue-calculate-cameras
+                  app.kubernetes.io/component: worker
+                  app.kubernetes.io/part-of: vms
+                  global-app-name: vsaas
+              topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+      containers:
+        - name: queue-calculate-cameras
+          args:
+            - php
+            - /var/www/api/artisan
+            - queue:work
+            - --queue=calculate_cameras
+            - --sleep=3
+            - --tries=3
+          envFrom:
+            - configMapRef:
+                name: vms-backend-env
+          image: download.aipix.ai:8443/vms-backend/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: vms-fcm-json
+              mountPath: /var/www/api/fcm.json
+              subPath: fcm.json
+              readOnly: true
+            - name: vms-voip-p8
+              mountPath: /var/www/api/voip.p8
+              subPath: voip.p8
+              readOnly: true
+            - mountPath: /var/www/api/storage/oauth-private.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-private.key
+            - mountPath: /var/www/api/storage/oauth-public.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-public.key
+            - mountPath: /var/www/api/storage/file.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: file.key
+          resources:
+            requests:
+              cpu: 80m
+              memory: 400Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: queue-controller-webhooks
+      restartPolicy: Always
+      volumes:
+        - name: vms-backend-oauth
+          secret:
+            secretName: vms-backend-oauth
+        - name: vms-fcm-json
+          configMap:
+            name: vms-fcm-json
+        - name: vms-voip-p8
+          configMap:
+            name: vms-voip-p8

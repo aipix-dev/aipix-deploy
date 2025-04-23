@@ -28,7 +28,7 @@ export MS_LIC_OFFLINE=no 			                #If mediaserver offline license will
 export A_LIC_OFFLINE=no 			                #If analytics offline license will be used ("yes" or "no")
 
 #S3 minio basic deployment parameters:
-export BACKEND_STORAGE_TYPE=s3        				#backend storage type for demo installation: s3, disk or s3_and_disk (for migration to s3)
+export BACKEND_STORAGE_TYPE=s3											#backend storage type for demo installation: s3, disk or s3_and_disk (for migration to s3)
 export MINIO_CONSOLE_DOMAIN=minio-console.example.com                   #define minio console domain name for single installation
 export MINIO_CONSOLE_DOMAIN_1=minio-console-1.example.com               #define minio console domain name for redundant installation
 export MINIO_CONSOLE_DOMAIN_2=minio-console-2.example.com               #define minio console domain name for redundant installation
@@ -54,7 +54,7 @@ export MINIO_LOGS_ACCESS_KEY=TW2N577S01BDXSSRCJB2                               
 export MINIO_LOGS_SECRET_KEY=uTgCH2La9fH749uE5v2RqpaCOsxfRUmGLktyN2dn                       # define minio secret key for logs bucket
 
 #Monitoring parameters
-export MONITORING=no  			                          	#If monitoring will be deployed ("yes" or "no")
+export MONITORING=no			                          	#If monitoring will be deployed ("yes" or "no")
 export PROVISION_DASHBOARDS=yes						#If grafana dashboards will be provisioned automaticaly ("yes" or "no")
 export INFLUX_USR=admin 						#define influxdb admin user
 export INFLUX_PSW=0hmSYYaRci6yJblARc6aHbHZ4YelTXTo			#define influxdb admin userpassword (use letters and numbers only)
@@ -68,19 +68,19 @@ export PORTAL_STUB_DOMAIN=portal-stub.example.com                          	#def
 
 
 if [ ${TYPE} == "single" ]; then
-    VMS_TEMPLATE="vms1"
-    MS_TEMPLATE="mediaserver1"
-    MSE_TEMPLATE="mse1"
-    A_TEMPLATE="analytics1"
-    MINIO_TEMPLATE="minio1"
+	VMS_TEMPLATE="vms1"
+	MS_TEMPLATE="mediaserver1"
+	MSE_TEMPLATE="mse1"
+	A_TEMPLATE="analytics1"
+	MINIO_TEMPLATE="minio1"
 elif [ ${TYPE} == "prod" ]; then
-    VMS_TEMPLATE="vms2"
-    MS_TEMPLATE="mediaserver1"
-    MSE_TEMPLATE="mse1"
-    A_TEMPLATE="analytics2"
-    MINIO_TEMPLATE="minio2"
+	VMS_TEMPLATE="vms2"
+	MS_TEMPLATE="mediaserver1"
+	MSE_TEMPLATE="mse1"
+	A_TEMPLATE="analytics2"
+	MINIO_TEMPLATE="minio2"
 else
-    echo >&2  "ERROR: Variable TYPE is not correct"
-    exit 2
+	echo >&2 "ERROR: Variable TYPE is not correct"
+	exit 2
 fi
 

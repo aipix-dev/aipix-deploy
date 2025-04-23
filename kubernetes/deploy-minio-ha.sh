@@ -22,14 +22,15 @@ sleep 10
 wait_period=0
 until [[ $(kubectl get deployments.apps minio-1 -n ${NS_MINIO} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] && \
 	[[ $(kubectl get deployments.apps minio-2 -n ${NS_MINIO} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]; do
-    echo "Waiting for starting minio container ..."
-    sleep 10
-    wait_period=$(($wait_period+10))
-    if [ $wait_period -gt 300 ];then
-        echo "The script ran for 5 minutes to start containers, exiting now.."
-        exit 1
-    fi
+	echo "Waiting for starting minio container ..."
+	sleep 10
+	wait_period=$(($wait_period+10))
+	if [ $wait_period -gt 300 ];then
+		echo "The script ran for 5 minutes to start containers, exiting now.."
+		exit 1
+	fi
 done
+
 
 export MINIO_IP1=$(kubectl -n ${NS_MINIO} get service/minio-1 -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')
 export MINIO_IP2=$(kubectl -n ${NS_MINIO} get service/minio-2 -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')
@@ -39,248 +40,166 @@ export MINIO_IP2=$(kubectl -n ${NS_MINIO} get service/minio-2 -o=jsonpath='{.sta
 
 mc alias set minio-1 http://${MINIO_IP1}:9000 ${MINIO_USR} ${MINIO_PSW}
 mc alias set minio-2 http://${MINIO_IP2}:9000 ${MINIO_USR} ${MINIO_PSW}
-mc mb -p minio-1/${MINIO_BACKEND_BUCKET_NAME}
-mc mb -p minio-2/${MINIO_BACKEND_BUCKET_NAME}
-mc mb -p minio-1/${MINIO_BACKEND_BUCKET_NAME_PRIV}
-mc mb -p minio-2/${MINIO_BACKEND_BUCKET_NAME_PRIV}
-mc mb -p minio-1/${MINIO_PORTAL_BUCKET_NAME}
-mc mb -p minio-2/${MINIO_PORTAL_BUCKET_NAME}
-mc mb -p minio-1/${MINIO_PORTAL_BUCKET_NAME_PRIV}
-mc mb -p minio-2/${MINIO_PORTAL_BUCKET_NAME_PRIV}
-mc mb -p minio-1/${MINIO_ANALYTICS_BUCKET_NAME}
-mc mb -p minio-2/${MINIO_ANALYTICS_BUCKET_NAME}
-mc mb -p minio-1/${MINIO_LOGS_BUCKET_NAME}
-mc mb -p minio-2/${MINIO_LOGS_BUCKET_NAME}
 
-cat <<EOF > /tmp/${MINIO_BACKEND_BUCKET_NAME}-policy.json
+
+create_minio_bucket () {
+	local OPTIND
+	local OPTSTRING=":m:b:a:s:pve:d:"
+	while getopts ${OPTSTRING} opt; do
+		case ${opt} in
+			m) local MINIO_ALIAS=${OPTARG};;
+			b) local BUCKET_NAME=${OPTARG};;
+			a) local BUCKET_ACCESS_KEY=${OPTARG};;
+			s) local BUCKET_SECRET_KEY=${OPTARG};;
+			p) local PUBLIC="public";;
+			v) local VERSIONING="enabled";;
+			e) local EXPIRE=${OPTARG};;
+			d) local BUCKET_PATH1=${OPTARG};;
+			:)
+				echo "Option -${OPTARG} in create_minio_bucket function requires an argument." >&2
+				exit 1
+				;;
+			?)
+				echo "Invalid option in create_minio_bucket function: -${OPTARG}." >&2
+				exit 1
+				;;
+		esac
+	done
+
+	if [[ $(mc ls ${MINIO_ALIAS} | grep ${BUCKET_NAME}/) ]]; then
+		echo "Bucket ${BUCKET_NAME} already exists"
+		return
+	fi
+	mc mb -p ${MINIO_ALIAS}/${BUCKET_NAME}
+	cat <<EOF > /tmp/${BUCKET_NAME}-policy.json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${MINIO_BACKEND_BUCKET_NAME}/*"
-            ]
-        }
-    ]
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"s3:*"
+			],
+			"Resource": [
+				"arn:aws:s3:::${BUCKET_NAME}/*"
+			]
+		}
+	]
 }
 EOF
-
-cat <<EOF > /tmp/${MINIO_BACKEND_BUCKET_NAME_PRIV}-policy.json
+	mc admin policy create ${MINIO_ALIAS} ${BUCKET_NAME}-policy /tmp/${BUCKET_NAME}-policy.json
+	mc admin user add ${MINIO_ALIAS} ${BUCKET_NAME}-user ${MINIO_PSW}
+	mc admin user svcacct add ${MINIO_ALIAS} ${BUCKET_NAME}-user --access-key ${BUCKET_ACCESS_KEY} --secret-key ${BUCKET_SECRET_KEY}
+	mc admin policy attach ${MINIO_ALIAS} ${BUCKET_NAME}-policy --user ${BUCKET_NAME}-user
+	if [[ ${PUBLIC} == "public" ]]; then
+		cat <<EOF > /tmp/${BUCKET_NAME}-anonymous-policy.json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${MINIO_BACKEND_BUCKET_NAME_PRIV}/*"
-            ]
-        }
+ "Statement": [
+  {
+   "Action": [
+    "s3:GetBucketLocation"
+   ],
+   "Effect": "Allow",
+   "Principal": {
+    "AWS": [
+     "*"
     ]
+   },
+   "Resource": [
+    "arn:aws:s3:::${BUCKET_NAME}"
+   ]
+  },
+  {
+   "Action": [
+    "s3:GetObject"
+   ],
+   "Effect": "Allow",
+   "Principal": {
+    "AWS": [
+     "*"
+    ]
+   },
+   "Resource": [
+    "arn:aws:s3:::${BUCKET_NAME}/*"
+   ]
+  }
+ ],
+ "Version": "2012-10-17"
 }
 EOF
+		mc anonymous set-json /tmp/${BUCKET_NAME}-anonymous-policy.json ${MINIO_ALIAS}/${BUCKET_NAME}
+	fi
+	if [[ ${VERSIONING} == "enabled" ]]; then
+		mc version enable ${MINIO_ALIAS}/${BUCKET_NAME}
+		mc ilm rule add ${MINIO_ALIAS}/${BUCKET_NAME} --noncurrent-expire-days "1" --expire-delete-marker
+	fi
 
-cat <<EOF > /tmp/${MINIO_PORTAL_BUCKET_NAME}-policy.json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${MINIO_PORTAL_BUCKET_NAME}/*"
-            ]
-        }
-    ]
+	if [[ -n ${EXPIRE} ]]; then
+		if [[ -z ${BUCKET_PATH1} ]]; then
+			mc ilm rule add ${MINIO_ALIAS}/${BUCKET_NAME} --expire-days "${EXPIRE}"
+		else
+			mc ilm rule add ${MINIO_ALIAS}/${BUCKET_NAME}/${BUCKET_PATH1} --expire-days "${EXPIRE}"
+		fi
+	fi
 }
-EOF
 
-cat <<EOF > /tmp/${MINIO_PORTAL_BUCKET_NAME_PRIV}-policy.json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${MINIO_PORTAL_BUCKET_NAME_PRIV}/*"
-            ]
-        }
-    ]
+
+create_minio_bucket -m minio-1 -b ${MINIO_BACKEND_BUCKET_NAME} -a ${MINIO_BACKEND_ACCESS_KEY} -s ${MINIO_BACKEND_SECRET_KEY} -v -p -e 1 -d archive 
+create_minio_bucket -m minio-2 -b ${MINIO_BACKEND_BUCKET_NAME} -a ${MINIO_BACKEND_ACCESS_KEY} -s ${MINIO_BACKEND_SECRET_KEY} -v -p -e 1 -d archive
+create_minio_bucket -m minio-1 -b ${MINIO_BACKEND_BUCKET_NAME_PRIV} -a ${MINIO_BACKEND_ACCESS_KEY_PRIV} -s ${MINIO_BACKEND_SECRET_KEY_PRIV} -v -e 14 -d database_backups
+create_minio_bucket -m minio-2 -b ${MINIO_BACKEND_BUCKET_NAME_PRIV} -a ${MINIO_BACKEND_ACCESS_KEY_PRIV} -s ${MINIO_BACKEND_SECRET_KEY_PRIV} -v -e 14 -d database_backups
+create_minio_bucket -m minio-1 -b ${MINIO_PORTAL_BUCKET_NAME} -a ${MINIO_PORTAL_ACCESS_KEY} -s ${MINIO_PORTAL_SECRET_KEY} -v -p
+create_minio_bucket -m minio-2 -b ${MINIO_PORTAL_BUCKET_NAME} -a ${MINIO_PORTAL_ACCESS_KEY} -s ${MINIO_PORTAL_SECRET_KEY} -v -p
+create_minio_bucket -m minio-1 -b ${MINIO_PORTAL_BUCKET_NAME_PRIV} -a ${MINIO_PORTAL_ACCESS_KEY_PRIV} -s ${MINIO_PORTAL_SECRET_KEY_PRIV} -v
+create_minio_bucket -m minio-2 -b ${MINIO_PORTAL_BUCKET_NAME_PRIV} -a ${MINIO_PORTAL_ACCESS_KEY_PRIV} -s ${MINIO_PORTAL_SECRET_KEY_PRIV} -v
+create_minio_bucket -m minio-1 -b ${MINIO_ANALYTICS_BUCKET_NAME} -a ${MINIO_ANALYTICS_ACCESS_KEY} -s ${MINIO_ANALYTICS_SECRET_KEY} -v -p -e 14
+create_minio_bucket -m minio-2 -b ${MINIO_ANALYTICS_BUCKET_NAME} -a ${MINIO_ANALYTICS_ACCESS_KEY} -s ${MINIO_ANALYTICS_SECRET_KEY} -v -p -e 14
+create_minio_bucket -m minio-1 -b ${MINIO_LOGS_BUCKET_NAME} -a ${MINIO_LOGS_ACCESS_KEY} -s ${MINIO_LOGS_SECRET_KEY} -v -e 3
+create_minio_bucket -m minio-2 -b ${MINIO_LOGS_BUCKET_NAME} -a ${MINIO_LOGS_ACCESS_KEY} -s ${MINIO_LOGS_SECRET_KEY} -v -e 3
+
+
+#Replication
+export MINIO_REPLICATION_USER=replication-user
+mc admin user add minio-1 ${MINIO_REPLICATION_USER} ${MINIO_PSW}
+mc admin user add minio-2 ${MINIO_REPLICATION_USER} ${MINIO_PSW}
+mc admin policy attach minio-1 consoleAdmin --user ${MINIO_REPLICATION_USER}
+mc admin policy attach minio-2 consoleAdmin --user ${MINIO_REPLICATION_USER}
+
+
+replicate_minio_bucket () {
+	local OPTIND
+	local OPTSTRING=":m:r:b:"
+	while getopts ${OPTSTRING} opt; do
+		case ${opt} in
+			m) local MINIO_ALIAS_1=${OPTARG};;
+			r) local MINIO_ALIAS_2=${OPTARG};;
+			b) local BUCKET_NAME=${OPTARG};;
+			:)
+				echo "Option -${OPTARG} in replicate_minio_bucket function requires an argument." >&2
+				exit 1
+				;;
+			?)
+				echo "Invalid option in replicate_minio_bucket function: -${OPTARG}." >&2
+				exit 1
+				;;
+		esac
+	done
+	mc replicate add ${MINIO_ALIAS_1}/${BUCKET_NAME} \
+			--remote-bucket "http://${MINIO_REPLICATION_USER}:${MINIO_PSW}@${MINIO_ALIAS_2}:9000/${BUCKET_NAME}" \
+			--replicate "delete,delete-marker,existing-objects,metadata-sync"
+	mc replicate add ${MINIO_ALIAS_2}/${BUCKET_NAME} \
+			--remote-bucket "http://${MINIO_REPLICATION_USER}:${MINIO_PSW}@${MINIO_ALIAS_1}:9000/${BUCKET_NAME}" \
+			--replicate "delete,delete-marker,existing-objects,metadata-sync"
 }
-EOF
-
-cat <<EOF > /tmp/${MINIO_ANALYTICS_BUCKET_NAME}-policy.json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${MINIO_ANALYTICS_BUCKET_NAME}/*"
-            ]
-        }
-    ]
-}
-EOF
-
-cat <<EOF > /tmp/${MINIO_LOGS_BUCKET_NAME}-policy.json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${MINIO_LOGS_BUCKET_NAME}/*"
-            ]
-        }
-    ]
-}
-EOF
-
-mc admin policy create minio-1 ${MINIO_BACKEND_BUCKET_NAME}-policy /tmp/${MINIO_BACKEND_BUCKET_NAME}-policy.json
-mc admin policy create minio-1 ${MINIO_BACKEND_BUCKET_NAME_PRIV}-policy /tmp/${MINIO_BACKEND_BUCKET_NAME_PRIV}-policy.json
-mc admin policy create minio-1 ${MINIO_PORTAL_BUCKET_NAME}-policy /tmp/${MINIO_PORTAL_BUCKET_NAME}-policy.json
-mc admin policy create minio-1 ${MINIO_PORTAL_BUCKET_NAME_PRIV}-policy /tmp/${MINIO_PORTAL_BUCKET_NAME_PRIV}-policy.json
-mc admin policy create minio-1 ${MINIO_ANALYTICS_BUCKET_NAME}-policy /tmp/${MINIO_ANALYTICS_BUCKET_NAME}-policy.json
-mc admin policy create minio-1 ${MINIO_LOGS_BUCKET_NAME}-policy /tmp/${MINIO_LOGS_BUCKET_NAME}-policy.json
-mc admin user add minio-1 ${MINIO_BACKEND_BUCKET_NAME}-user ${MINIO_PSW}
-mc admin user add minio-1 ${MINIO_BACKEND_BUCKET_NAME_PRIV}-user ${MINIO_PSW}
-mc admin user add minio-1 ${MINIO_PORTAL_BUCKET_NAME}-user ${MINIO_PSW}
-mc admin user add minio-1 ${MINIO_PORTAL_BUCKET_NAME_PRIV}-user ${MINIO_PSW}
-mc admin user add minio-1 ${MINIO_ANALYTICS_BUCKET_NAME}-user ${MINIO_PSW}
-mc admin user add minio-1 ${MINIO_LOGS_BUCKET_NAME}-user ${MINIO_PSW}
-mc admin user svcacct add minio-1 ${MINIO_BACKEND_BUCKET_NAME}-user --access-key ${MINIO_BACKEND_ACCESS_KEY} --secret-key ${MINIO_BACKEND_SECRET_KEY}
-mc admin user svcacct add minio-1 ${MINIO_BACKEND_BUCKET_NAME_PRIV}-user --access-key ${MINIO_BACKEND_ACCESS_KEY_PRIV} --secret-key ${MINIO_BACKEND_SECRET_KEY_PRIV}
-mc admin user svcacct add minio-1 ${MINIO_PORTAL_BUCKET_NAME}-user --access-key ${MINIO_PORTAL_ACCESS_KEY} --secret-key ${MINIO_PORTAL_SECRET_KEY}
-mc admin user svcacct add minio-1 ${MINIO_PORTAL_BUCKET_NAME_PRIV}-user --access-key ${MINIO_PORTAL_ACCESS_KEY_PRIV} --secret-key ${MINIO_PORTAL_SECRET_KEY_PRIV}
-mc admin user svcacct add minio-1 ${MINIO_ANALYTICS_BUCKET_NAME}-user --access-key ${MINIO_ANALYTICS_ACCESS_KEY} --secret-key ${MINIO_ANALYTICS_SECRET_KEY}
-mc admin user svcacct add minio-1 ${MINIO_LOGS_BUCKET_NAME}-user --access-key ${MINIO_LOGS_ACCESS_KEY} --secret-key ${MINIO_LOGS_SECRET_KEY}
-mc admin policy attach minio-1 ${MINIO_BACKEND_BUCKET_NAME}-policy --user ${MINIO_BACKEND_BUCKET_NAME}-user
-mc admin policy attach minio-1 ${MINIO_BACKEND_BUCKET_NAME_PRIV}-policy --user ${MINIO_BACKEND_BUCKET_NAME_PRIV}-user
-mc admin policy attach minio-1 ${MINIO_PORTAL_BUCKET_NAME}-policy --user ${MINIO_PORTAL_BUCKET_NAME}-user
-mc admin policy attach minio-1 ${MINIO_PORTAL_BUCKET_NAME_PRIV}-policy --user ${MINIO_PORTAL_BUCKET_NAME_PRIV}-user
-mc admin policy attach minio-1 ${MINIO_ANALYTICS_BUCKET_NAME}-policy --user ${MINIO_ANALYTICS_BUCKET_NAME}-user
-mc admin policy attach minio-1 ${MINIO_LOGS_BUCKET_NAME}-policy --user ${MINIO_LOGS_BUCKET_NAME}-user
-mc anonymous set download minio-1/${MINIO_BACKEND_BUCKET_NAME}
-mc anonymous set download minio-1/${MINIO_PORTAL_BUCKET_NAME}
-mc anonymous set download minio-1/${MINIO_ANALYTICS_BUCKET_NAME}
-mc version enable minio-1/${MINIO_BACKEND_BUCKET_NAME}
-mc version enable minio-1/${MINIO_BACKEND_BUCKET_NAME_PRIV}
-mc version enable minio-1/${MINIO_PORTAL_BUCKET_NAME}
-mc version enable minio-1/${MINIO_PORTAL_BUCKET_NAME_PRIV}
-mc version enable minio-1/${MINIO_ANALYTICS_BUCKET_NAME}
-mc version enable minio-1/${MINIO_LOGS_BUCKET_NAME}
-mc ilm rule add minio-1/${MINIO_BACKEND_BUCKET_NAME} --noncurrent-expire-days "1" --expire-delete-marker
-mc ilm rule add minio-1/${MINIO_BACKEND_BUCKET_NAME}/archive --expire-days "1"
-mc ilm rule add minio-1/${MINIO_BACKEND_BUCKET_NAME_PRIV} --noncurrent-expire-days "1" --expire-delete-marker
-mc ilm rule add minio-1/${MINIO_BACKEND_BUCKET_NAME_PRIV}/database_backups --expire-days "14"
-mc ilm rule add minio-1/${MINIO_PORTAL_BUCKET_NAME} --noncurrent-expire-days "1" --expire-delete-marker
-mc ilm rule add minio-1/${MINIO_PORTAL_BUCKET_NAME_PRIV} --noncurrent-expire-days "1" --expire-delete-marker
-mc ilm rule add minio-1/${MINIO_ANALYTICS_BUCKET_NAME} --expire-days "14"
-mc ilm rule add minio-1/${MINIO_ANALYTICS_BUCKET_NAME} --noncurrent-expire-days "1" --expire-delete-marker
-mc ilm rule add minio-1/${MINIO_LOGS_BUCKET_NAME} --noncurrent-expire-days "3" --expire-delete-marker
-
-mc admin policy create minio-2 ${MINIO_BACKEND_BUCKET_NAME}-policy /tmp/${MINIO_BACKEND_BUCKET_NAME}-policy.json
-mc admin policy create minio-2 ${MINIO_BACKEND_BUCKET_NAME_PRIV}-policy /tmp/${MINIO_BACKEND_BUCKET_NAME_PRIV}-policy.json
-mc admin policy create minio-2 ${MINIO_PORTAL_BUCKET_NAME}-policy /tmp/${MINIO_PORTAL_BUCKET_NAME}-policy.json
-mc admin policy create minio-2 ${MINIO_PORTAL_BUCKET_NAME_PRIV}-policy /tmp/${MINIO_PORTAL_BUCKET_NAME_PRIV}-policy.json
-mc admin policy create minio-2 ${MINIO_ANALYTICS_BUCKET_NAME}-policy /tmp/${MINIO_ANALYTICS_BUCKET_NAME}-policy.json
-mc admin policy create minio-2 ${MINIO_LOGS_BUCKET_NAME}-policy /tmp/${MINIO_LOGS_BUCKET_NAME}-policy.json
-mc admin user add minio-2 ${MINIO_BACKEND_BUCKET_NAME}-user ${MINIO_PSW}
-mc admin user add minio-2 ${MINIO_BACKEND_BUCKET_NAME_PRIV}-user ${MINIO_PSW}
-mc admin user add minio-2 ${MINIO_PORTAL_BUCKET_NAME}-user ${MINIO_PSW}
-mc admin user add minio-2 ${MINIO_PORTAL_BUCKET_NAME_PRIV}-user ${MINIO_PSW}
-mc admin user add minio-2 ${MINIO_ANALYTICS_BUCKET_NAME}-user ${MINIO_PSW}
-mc admin user add minio-2 ${MINIO_LOGS_BUCKET_NAME}-user ${MINIO_PSW}
-mc admin user svcacct add minio-2 ${MINIO_BACKEND_BUCKET_NAME}-user --access-key ${MINIO_BACKEND_ACCESS_KEY} --secret-key ${MINIO_BACKEND_SECRET_KEY}
-mc admin user svcacct add minio-2 ${MINIO_BACKEND_BUCKET_NAME_PRIV}-user --access-key ${MINIO_BACKEND_ACCESS_KEY_PRIV} --secret-key ${MINIO_BACKEND_SECRET_KEY_PRIV}
-mc admin user svcacct add minio-2 ${MINIO_PORTAL_BUCKET_NAME}-user --access-key ${MINIO_PORTAL_ACCESS_KEY} --secret-key ${MINIO_PORTAL_SECRET_KEY}
-mc admin user svcacct add minio-2 ${MINIO_PORTAL_BUCKET_NAME_PRIV}-user --access-key ${MINIO_PORTAL_ACCESS_KEY_PRIV} --secret-key ${MINIO_PORTAL_SECRET_KEY_PRIV}
-mc admin user svcacct add minio-2 ${MINIO_ANALYTICS_BUCKET_NAME}-user --access-key ${MINIO_ANALYTICS_ACCESS_KEY} --secret-key ${MINIO_ANALYTICS_SECRET_KEY}
-mc admin user svcacct add minio-2 ${MINIO_LOGS_BUCKET_NAME}-user --access-key ${MINIO_LOGS_ACCESS_KEY} --secret-key ${MINIO_LOGS_SECRET_KEY}
-mc admin policy attach minio-2 ${MINIO_BACKEND_BUCKET_NAME}-policy --user ${MINIO_BACKEND_BUCKET_NAME}-user
-mc admin policy attach minio-2 ${MINIO_BACKEND_BUCKET_NAME_PRIV}-policy --user ${MINIO_BACKEND_BUCKET_NAME_PRIV}-user
-mc admin policy attach minio-2 ${MINIO_PORTAL_BUCKET_NAME}-policy --user ${MINIO_PORTAL_BUCKET_NAME}-user
-mc admin policy attach minio-2 ${MINIO_PORTAL_BUCKET_NAME_PRIV}-policy --user ${MINIO_PORTAL_BUCKET_NAME_PRIV}-user
-mc admin policy attach minio-2 ${MINIO_ANALYTICS_BUCKET_NAME}-policy --user ${MINIO_ANALYTICS_BUCKET_NAME}-user
-mc admin policy attach minio-2 ${MINIO_LOGS_BUCKET_NAME}-policy --user ${MINIO_LOGS_BUCKET_NAME}-user
-mc anonymous set download minio-2/${MINIO_BACKEND_BUCKET_NAME}
-mc anonymous set download minio-2/${MINIO_PORTAL_BUCKET_NAME}
-mc anonymous set download minio-2/${MINIO_ANALYTICS_BUCKET_NAME}
-mc version enable minio-2/${MINIO_BACKEND_BUCKET_NAME}
-mc version enable minio-2/${MINIO_BACKEND_BUCKET_NAME_PRIV}
-mc version enable minio-2/${MINIO_PORTAL_BUCKET_NAME}
-mc version enable minio-2/${MINIO_PORTAL_BUCKET_NAME_PRIV}
-mc version enable minio-2/${MINIO_ANALYTICS_BUCKET_NAME}
-mc version enable minio-2/${MINIO_LOGS_BUCKET_NAME}
-mc ilm rule add minio-2/${MINIO_BACKEND_BUCKET_NAME} --noncurrent-expire-days "1" --expire-delete-marker
-mc ilm rule add minio-2/${MINIO_BACKEND_BUCKET_NAME}/archive --expire-days "1"
-mc ilm rule add minio-2/${MINIO_BACKEND_BUCKET_NAME_PRIV} --noncurrent-expire-days "1" --expire-delete-marker
-mc ilm rule add minio-2/${MINIO_BACKEND_BUCKET_NAME_PRIV}/database_backups --expire-days "14"
-mc ilm rule add minio-2/${MINIO_PORTAL_BUCKET_NAME} --noncurrent-expire-days "1" --expire-delete-marker
-mc ilm rule add minio-2/${MINIO_PORTAL_BUCKET_NAME_PRIV} --noncurrent-expire-days "1" --expire-delete-marker
-mc ilm rule add minio-2/${MINIO_ANALYTICS_BUCKET_NAME} --expire-days "14"
-mc ilm rule add minio-2/${MINIO_ANALYTICS_BUCKET_NAME} --noncurrent-expire-days "1" --expire-delete-marker
-mc ilm rule add minio-1/${MINIO_LOGS_BUCKET_NAME} --noncurrent-expire-days "3" --expire-delete-marker
 
 
-mc admin user add minio-1 replication-user ${MINIO_PSW}
-mc admin user add minio-2 replication-user ${MINIO_PSW}
-mc admin policy attach minio-1 consoleAdmin --user replication-user
-mc admin policy attach minio-2 consoleAdmin --user replication-user
-mc replicate add minio-1/${MINIO_BACKEND_BUCKET_NAME} \
-   --remote-bucket "http://replication-user:${MINIO_PSW}@minio-2:9000/${MINIO_BACKEND_BUCKET_NAME}" \
-   --replicate "delete,delete-marker,existing-objects,metadata-sync"
-mc replicate add minio-2/${MINIO_BACKEND_BUCKET_NAME} \
-   --remote-bucket "http://replication-user:${MINIO_PSW}@minio-1:9000/${MINIO_BACKEND_BUCKET_NAME}" \
-   --replicate "delete,delete-marker,existing-objects,metadata-sync"
-mc replicate add minio-1/${MINIO_BACKEND_BUCKET_NAME_PRIV} \
-   --remote-bucket "http://replication-user:${MINIO_PSW}@minio-2:9000/${MINIO_BACKEND_BUCKET_NAME_PRIV}" \
-   --replicate "delete,delete-marker,existing-objects,metadata-sync"
-mc replicate add minio-2/${MINIO_BACKEND_BUCKET_NAME_PRIV} \
-   --remote-bucket "http://replication-user:${MINIO_PSW}@minio-1:9000/${MINIO_BACKEND_BUCKET_NAME_PRIV}" \
-   --replicate "delete,delete-marker,existing-objects,metadata-sync"
-mc replicate add minio-1/${MINIO_PORTAL_BUCKET_NAME} \
-   --remote-bucket "http://replication-user:${MINIO_PSW}@minio-2:9000/${MINIO_PORTAL_BUCKET_NAME}" \
-   --replicate "delete,delete-marker,existing-objects,metadata-sync"
-mc replicate add minio-2/${MINIO_PORTAL_BUCKET_NAME} \
-   --remote-bucket "http://replication-user:${MINIO_PSW}@minio-1:9000/${MINIO_PORTAL_BUCKET_NAME}" \
-   --replicate "delete,delete-marker,existing-objects,metadata-sync"
-mc replicate add minio-1/${MINIO_PORTAL_BUCKET_NAME_PRIV} \
-   --remote-bucket "http://replication-user:${MINIO_PSW}@minio-2:9000/${MINIO_PORTAL_BUCKET_NAME_PRIV}" \
-   --replicate "delete,delete-marker,existing-objects,metadata-sync"
-mc replicate add minio-2/${MINIO_PORTAL_BUCKET_NAME_PRIV} \
-   --remote-bucket "http://replication-user:${MINIO_PSW}@minio-1:9000/${MINIO_PORTAL_BUCKET_NAME_PRIV}" \
-   --replicate "delete,delete-marker,existing-objects,metadata-sync"
-mc replicate add minio-1/${MINIO_ANALYTICS_BUCKET_NAME} \
-   --remote-bucket "http://replication-user:${MINIO_PSW}@minio-2:9000/${MINIO_ANALYTICS_BUCKET_NAME}" \
-   --replicate "delete,delete-marker,existing-objects,metadata-sync"
-mc replicate add minio-2/${MINIO_ANALYTICS_BUCKET_NAME} \
-   --remote-bucket "http://replication-user:${MINIO_PSW}@minio-1:9000/${MINIO_ANALYTICS_BUCKET_NAME}" \
-   --replicate "delete,delete-marker,existing-objects,metadata-sync"
-mc replicate add minio-1/${MINIO_LOGS_BUCKET_NAME} \
-   --remote-bucket "http://replication-user:${MINIO_PSW}@minio-2:9000/${MINIO_LOGS_BUCKET_NAME}" \
-   --replicate "delete,delete-marker,existing-objects,metadata-sync"
-mc replicate add minio-2/${MINIO_LOGS_BUCKET_NAME} \
-   --remote-bucket "http://replication-user:${MINIO_PSW}@minio-1:9000/${MINIO_LOGS_BUCKET_NAME}" \
-   --replicate "delete,delete-marker,existing-objects,metadata-sync"
+replicate_minio_bucket -m minio-1 -r minio-2 ${MINIO_BACKEND_BUCKET_NAME}
+replicate_minio_bucket -m minio-1 -r minio-2 ${MINIO_BACKEND_BUCKET_NAME_PRIV}
+replicate_minio_bucket -m minio-1 -r minio-2 ${MINIO_PRTAL_BUCKET_NAME}
+replicate_minio_bucket -m minio-1 -r minio-2 ${MINIO_PRTAL_BUCKET_NAME_PRIV}
+replicate_minio_bucket -m minio-1 -r minio-2 ${MINIO_ANALYTICS_BUCKET_NAME}
+replicate_minio_bucket -m minio-1 -r minio-2 ${MINIO_LOGS_BUCKET_NAME}
+
 
 echo """
 Minio-HA deployment script completed successfuly!

@@ -16,8 +16,8 @@ update_secrets () {
 
 update_analytics-worker () {
     set -e
-    kubectl delete configmap analytics-worker-cm  --namespace=${NS_A} || true
-    kubectl create configmap analytics-worker-cm  --namespace=${NS_A} --from-file=.env=../analytics/analytics-worker.conf
+    kubectl delete configmap analytics-worker-cm --namespace=${NS_A} || true
+    kubectl create configmap analytics-worker-cm --namespace=${NS_A} --from-file=.env=../analytics/analytics-worker.conf
     TargetReplicas=$(kubectl get deployment analytics-worker --namespace=${NS_A} -o jsonpath='{.status.replicas}')
     kubectl -n ${NS_A} rollout restart deployment analytics-worker
     # Waiting for starting containers
@@ -45,7 +45,7 @@ update_orchestrator () {
     # Waiting for starting containers
     while true
     do
-        if ([[ ${TYPE} == "prod" ]] || [[ $(kubectl get  deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]) && \
+        if ([[ ${TYPE} == "prod" ]] || [[ $(kubectl get deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]) && \
             [[ $(kubectl get deployment orchestrator -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]
         then break
         fi
@@ -53,7 +53,7 @@ update_orchestrator () {
         sleep 10
     done
     sleep 10
-    kubectl exec -n ${NS_A} deployment.apps/orchestrator -c django --  python manage.py seed
+    kubectl exec -n ${NS_A} deployment.apps/orchestrator -c django -- python manage.py seed
 }
 
 update_tarantool () {
@@ -91,8 +91,8 @@ update_metrics-pusher () {
 	set -e
 	kubectl delete configmap metrics-pusher-env --namespace=${NS_A} || true
 	kubectl delete configmap telegraf-conf --namespace=${NS_A} || true
-	kubectl create configmap metrics-pusher-env  --namespace=${NS_A}  --from-env-file=../analytics/metrics-pusher.env
-	kubectl create configmap telegraf-conf  --namespace=${NS_A}  --from-file=../analytics/telegraf.conf
+	kubectl create configmap metrics-pusher-env --namespace=${NS_A} --from-env-file=../analytics/metrics-pusher.env
+	kubectl create configmap telegraf-conf --namespace=${NS_A} --from-file=../analytics/telegraf.conf
 	kubectl -n ${NS_A} rollout restart deployment metrics-pusher
 }
 

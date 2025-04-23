@@ -11,7 +11,7 @@ INFLUX_PORT=$(kubectl get service/vsaas-influxdb2 -n monitoring -o jsonpath='{.s
 
 echo """
 VMS URL for admins: https://${VMS_DOMAIN}/admin
-VMS URL dor clients: https://${VMS_DOMAIN}/  
+VMS URL dor clients: https://${VMS_DOMAIN}/
 MINIO DOMAIN: https://${MINIO_CONSOLE_DOMAIN}
 Analytics Orchestrator URL: https://${ANALYTICS_DOMAIN}/orch-admin/
 Monitoring URL: https://${VMS_DOMAIN}/monitoring

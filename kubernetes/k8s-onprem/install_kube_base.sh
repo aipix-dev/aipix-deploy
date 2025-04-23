@@ -9,15 +9,15 @@ scriptdir="$(dirname "$0")"
 cd "$scriptdir"
 
 if [ ! -f "./sources.sh" ]; then
-    echo "Using ENV from sources.sh.sample"
-    source ./sources.sh.sample
+	echo "Using ENV from sources.sh.sample"
+	source ./sources.sh.sample
 else
-    echo "Using ENV from sources.sh"
-    source ./sources.sh
-    if [ -z "${SRC_K8S_VER}" ]; then
-        echo >&2  "ERROR: File sources.sh does not contain K8S version variables. Copy system variables fom sources.sh.sample file."
-        exit 2
-    fi
+	echo "Using ENV from sources.sh"
+	source ./sources.sh
+	if [ -z "${SRC_K8S_VER}" ]; then
+		echo >&2  "ERROR: File sources.sh does not contain K8S version variables. Copy system variables fom sources.sh.sample file."
+		exit 2
+	fi
 fi
 
 
@@ -41,8 +41,8 @@ echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https:/
 
 sudo apt update -y
 sudo apt install -y kubelet=${K8S_VER}.${K8S_VER_PATCH}-${K8S_VER_BUILD} \
-                    kubeadm=${K8S_VER}.${K8S_VER_PATCH}-${K8S_VER_BUILD} \
-		            kubectl=${K8S_VER}.${K8S_VER_PATCH}-${K8S_VER_BUILD}
+					kubeadm=${K8S_VER}.${K8S_VER_PATCH}-${K8S_VER_BUILD} \
+					kubectl=${K8S_VER}.${K8S_VER_PATCH}-${K8S_VER_BUILD}
 sudo apt-mark hold kubelet kubeadm kubectl
 
 cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
@@ -59,7 +59,10 @@ net.bridge.bridge-nf-call-iptables  = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 net.ipv4.ip_forward                 = 1
 EOF
-echo "fs.inotify.max_user_instances = 8192" > /etc/sysctl.d/99-inotify.conf
+
+cat <<EOF | sudo tee /etc/sysctl.d/99-inotify.conf
+fs.inotify.max_user_instances = 8192
+EOF
 
 # Apply sysctl params without reboot
 sudo sysctl --system
@@ -102,9 +105,9 @@ sudo chmod +x calicoctl
 #Define internal ip address
 HOST_NETWORK=$1
 if [[ -n "${HOST_NETWORK}" ]]; then
-    K8S_INTERNAL_IP=$(ip route | grep "${HOST_NETWORK}" | awk '{print $9}')
-    sudo sh -c "echo KUBELET_EXTRA_ARGS=--node-ip=${K8S_INTERNAL_IP} > /etc/default/kubelet"
-    sudo systemctl restart kubelet
+	K8S_INTERNAL_IP=$(ip route | grep "${HOST_NETWORK}" | awk '{print $9}')
+	sudo sh -c "echo KUBELET_EXTRA_ARGS=--node-ip=${K8S_INTERNAL_IP} > /etc/default/kubelet"
+	sudo systemctl restart kubelet
 fi
 
 echo "

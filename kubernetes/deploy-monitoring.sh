@@ -11,10 +11,10 @@ kubectl create ns monitoring || true
 kubectl delete secret download-aipix-ai --namespace=monitoring || true
 
 if [ ${PROVISION_DASHBOARDS} == "yes" ]; then
-    kubectl -n monitoring delete cm grafana-dashboards > /dev/null 2>&1 || true 
-    kubectl -n monitoring delete cm grafana-dashboards-config > /dev/null 2>&1 || true
-    kubectl -n monitoring create cm grafana-dashboards --from-file ../monitoring/grafana-dashboards
-    kubectl -n monitoring create cm grafana-dashboards-config --from-file ../monitoring/grafana-dashboards-config.yaml
+	kubectl -n monitoring delete cm grafana-dashboards > /dev/null 2>&1 || true 
+	kubectl -n monitoring delete cm grafana-dashboards-config > /dev/null 2>&1 || true
+	kubectl -n monitoring create cm grafana-dashboards --from-file ../monitoring/grafana-dashboards
+	kubectl -n monitoring create cm grafana-dashboards-config --from-file ../monitoring/grafana-dashboards-config.yaml
 fi
 
 #copy config-maps 
@@ -34,9 +34,9 @@ INFLUX_PORT=$(kubectl get service/vsaas-influxdb2 -n monitoring -o jsonpath='{.s
 
 # deploy vsaas-logger
 kubectl create secret docker-registry download-aipix-ai --namespace=monitoring \
-                                                        --docker-server=https://download.aipix.ai:8443 \
-                                                        --docker-username=${DOCKER_USERNAME} \
-                                                        --docker-password=${DOCKER_PASSWORD}
+														--docker-server=https://download.aipix.ai:8443 \
+														--docker-username=${DOCKER_USERNAME} \
+														--docker-password=${DOCKER_PASSWORD}
 
 helm -n monitoring upgrade -i vsaas-media-logger --set imagePullSecrets[0].name=download-aipix-ai aipix/vsaas-media-logger
 

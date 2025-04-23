@@ -60,7 +60,7 @@ EOF
 
 cp -n ../monitoring/prometheus-config-map.yaml.sample ../monitoring/prometheus-config-map.yaml
 cp ../monitoring/prometheus-config-map.yaml ../kustomize/deployments/monitoring1/
-envsubst < ../monitoring/grafana-datasources-config.yaml.sample  > ../monitoring/grafana-datasources-config.yaml
+envsubst < ../monitoring/grafana-datasources-config.yaml.sample > ../monitoring/grafana-datasources-config.yaml
 cp ../monitoring/grafana-datasources-config.yaml ../kustomize/deployments/monitoring1/
 cp -n ../monitoring/grafana-dashboards-config.yaml.sample ../monitoring/grafana-dashboards-config.yaml
 
@@ -68,7 +68,7 @@ cp -n ../monitoring/grafana-dashboards-config.yaml.sample ../monitoring/grafana-
 ## Configure fluent-bit
 cp -n ../monitoring/fluentbit-values.yaml.sample ../monitoring/fluentbit-values.yaml
 helm -n monitoring template --debug fluent-bit fluent/fluent-bit --set testFramework.enabled=false -f ../monitoring/fluentbit-values.yaml --version 0.48.9 > ../kustomize/deployments/monitoring1/fluent-bit.yaml
-cp  ../monitoring/syslog-service.yaml ../kustomize/deployments/monitoring1/
+cp ../monitoring/syslog-service.yaml ../kustomize/deployments/monitoring1/
 
 ## Configure loki
 if [ ${TYPE} == "prod" ]; then
@@ -77,8 +77,8 @@ else
 	export S3_PORT_INTERNAL=":9000"
 fi
 envsubst \
-	    < ../monitoring/loki-values.yaml.sample \
-	    > ../monitoring/loki-values.yaml
+	< ../monitoring/loki-values.yaml.sample \
+	> ../monitoring/loki-values.yaml
 
 helm -n monitoring template --debug loki grafana/loki -f ../monitoring/loki-values.yaml --version 6.28.0 > ../kustomize/deployments/monitoring1/loki.yaml
 

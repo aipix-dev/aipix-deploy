@@ -6,14 +6,14 @@ cd "$scriptdir"
 source ./sources.sh
 
 if [ ${ANALYTICS} != "yes" ]; then
-    echo 'Variable ANALYTICS is not set to "yes". Exiting ...'
-    exit 1
+	echo 'Variable ANALYTICS is not set to "yes". Exiting ...'
+	exit 1
 fi
 
 if [ ${TYPE} == "prod" ]; then
-    S3_PORT_INTERNAL=""
+	S3_PORT_INTERNAL=""
 else
-    S3_PORT_INTERNAL=":9000"
+	S3_PORT_INTERNAL=":9000"
 fi
 
 #Creating configs for orchestrator and analytics-worker
@@ -41,12 +41,12 @@ sed -i "s@MINIO_SECRET_KEY=.*@MINIO_SECRET_KEY=${MINIO_ANALYTICS_SECRET_KEY}@g" 
 sed -i "s@MINIO_BUCKET_NAME=.*@MINIO_BUCKET_NAME=${MINIO_ANALYTICS_BUCKET_NAME}@g" ../analytics/analytics-worker.conf
 
 if [ ${MONITORING} == "yes" ]; then
-    sed -i 's@^#MONITORING_@MONITORING_@g' ../analytics/.env
-    sed -i "s@.DEPLOYMENT_NAME.*@DEPLOYMENT_NAME = ${NS_A}@g" ../analytics/.env
-    sed -i "s@^#PUSH_ERRORS_@PUSH_ERRORS_@g" ../analytics/analytics-worker.conf
-    # sed -i "s@^#SYS_LOG_@SYS_LOG_@g" ../analytics/analytics-worker.conf
-    envsubst < ../analytics/metrics-pusher.env.sample > ../analytics/metrics-pusher.env
-    envsubst < ../analytics/telegraf.conf.sample > ../analytics/telegraf.conf
+	sed -i 's@^#MONITORING_@MONITORING_@g' ../analytics/.env
+	sed -i "s@.DEPLOYMENT_NAME.*@DEPLOYMENT_NAME = ${NS_A}@g" ../analytics/.env
+	sed -i "s@^#PUSH_ERRORS_@PUSH_ERRORS_@g" ../analytics/analytics-worker.conf
+	# sed -i "s@^#SYS_LOG_@SYS_LOG_@g" ../analytics/analytics-worker.conf
+	envsubst < ../analytics/metrics-pusher.env.sample > ../analytics/metrics-pusher.env
+	envsubst < ../analytics/telegraf.conf.sample > ../analytics/telegraf.conf
 fi
 
 echo """

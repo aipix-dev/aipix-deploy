@@ -9,13 +9,13 @@ scriptdir="$(dirname "$0")"
 cd "$scriptdir"
 
 if [ ! -f "./sources.sh" ]; then
-    echo >&2 "ERROR: File sources.sh does not exist. Please make a copy from sources.sh.sample and edit as required"
-    exit 2
+	echo >&2 "ERROR: File sources.sh does not exist. Please make a copy from sources.sh.sample and edit as required"
+	exit 2
 fi
 source ./sources.sh
 if [ -z "${SRC_K8S_VER}" ]; then
-    echo >&2  "ERROR: File sources.sh does not contain K8S version variables. Copy system variables fom sources.sh.sample file."
-    exit 2
+	echo >&2 "ERROR: File sources.sh does not contain K8S version variables. Copy system variables fom sources.sh.sample file."
+	exit 2
 fi
 
 
@@ -74,9 +74,9 @@ echo /dev/sdb /mnt/disk-sdb ext4 defaults,nofail 0 2 | sudo tee -a /etc/fstab
 echo /dev/sdc /storage ext4 defaults,nofail 0 2 | sudo tee -a /etc/fstab
 
 for i in $(seq 1 20); do
-    sudo mkdir -p /mnt/disk-sdb/vol${i} /mnt/disks/disk_vol${i}
-    sudo mount --bind /mnt/disk-sdb/vol${i} /mnt/disks/disk_vol${i}
-    echo /mnt/disk-sdb/vol${i} /mnt/disks/disk_vol${i} none bind 0 0 | sudo tee -a /etc/fstab
+	sudo mkdir -p /mnt/disk-sdb/vol${i} /mnt/disks/disk_vol${i}
+	sudo mount --bind /mnt/disk-sdb/vol${i} /mnt/disks/disk_vol${i}
+	echo /mnt/disk-sdb/vol${i} /mnt/disks/disk_vol${i} none bind 0 0 | sudo tee -a /etc/fstab
 done
 
 #for ubuntu 24.04 you need to apply fstab changes
@@ -96,14 +96,14 @@ cat ~/.ssh/id_rsa.pub | tee -a ~/.ssh/authorized_keys
 #Delete midnight commander if installed
 dpkg -s mc > /dev/null 2>&1
 if [ $? = 0 ]; then
-    echo "Removing midnight commander"
-    sudo apt purge -y mc > /dev/null 2>&1
+	echo "Removing midnight commander"
+	sudo apt purge -y mc > /dev/null 2>&1
 fi
 
 #Install minio client
 curl https://dl.min.io/client/mc/release/linux-amd64/mc \
-    --create-dirs \
-    -o $HOME/minio-binaries/mc
+	--create-dirs \
+	-o $HOME/minio-binaries/mc
 chmod +x $HOME/minio-binaries/mc
 export PATH=$PATH:$HOME/minio-binaries/
 echo 'export PATH=$PATH:$HOME/minio-binaries/' >> $HOME/.bashrc

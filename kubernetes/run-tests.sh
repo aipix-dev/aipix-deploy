@@ -15,9 +15,9 @@ kubectl create ns ${TEST_NS} || true
 
 kubectl delete secret download-aipix-ai --namespace=${TEST_NS} || true
 kubectl create secret docker-registry download-aipix-ai --namespace=${TEST_NS} \
-                                                        --docker-server=https://download.aipix.ai:8443 \
-                                                        --docker-username=${DOCKER_USERNAME} \
-                                                        --docker-password=${DOCKER_PASSWORD}
+														--docker-server=https://download.aipix.ai:8443 \
+														--docker-username=${DOCKER_USERNAME} \
+														--docker-password=${DOCKER_PASSWORD}
 
 kubectl delete configmap robot-tests --namespace=${TEST_NS} || true
 kubectl delete configmap robot-tests-env --namespace=${TEST_NS} || true
@@ -35,12 +35,12 @@ helm install --namespace=${TEST_NS} robot-tests ${REPO_NAME}/robot-tests -f ../t
 
 while true
 do
-    if [[ $(kubectl get deployment rtsp-server -n ${TEST_NS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] && \
-        [[ $(kubectl get jobs.batch robot-tests -n ${TEST_NS} -o jsonpath='{.status.active}') -ge 1 ]]
-        then break
-    fi
-    sleep 5
-    echo "Waiting for starting containers ..."
+	if [[ $(kubectl get deployment rtsp-server -n ${TEST_NS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] && \
+	[[ $(kubectl get jobs.batch robot-tests -n ${TEST_NS} -o jsonpath='{.status.active}') -ge 1 ]]
+		then break
+	fi
+	sleep 5
+	echo "Waiting for starting containers ..."
 done
 sleep 5
 

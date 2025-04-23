@@ -11,9 +11,9 @@ source ./k8s-onprem/sources.sh
 
 kubectl delete secret download-aipix-ai --namespace=${NS_MS} | true
 kubectl create secret docker-registry download-aipix-ai --namespace=${NS_MS} \
-                                                        --docker-server=https://download.aipix.ai:8443 \
-                                                        --docker-username=${DOCKER_USERNAME} \
-                                                        --docker-password=${DOCKER_PASSWORD}
+														--docker-server=https://download.aipix.ai:8443 \
+														--docker-username=${DOCKER_USERNAME} \
+														--docker-password=${DOCKER_PASSWORD}
 kubectl delete secret mse-key-pem --namespace=${NS_MS} | true
 kubectl create secret generic mse-key-pem --namespace=${NS_MS} --from-file=../mse/key.pem
 kubectl delete secret mse-cert-pem --namespace=${NS_MS} | true

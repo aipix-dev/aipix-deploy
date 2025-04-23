@@ -5,13 +5,13 @@ scriptdir="$(dirname "$0")"
 cd "$scriptdir"
 
 if [ ! -f "./sources.sh" ]; then
-    echo >&2 "ERROR: File sources.sh does not exist. Please make a copy from sources.sh.sample and edit as required"
-    exit 2
+	echo >&2 "ERROR: File sources.sh does not exist. Please make a copy from sources.sh.sample and edit as required"
+	exit 2
 fi
 source ./sources.sh
 if [ -z "${SRC_K8S_VER}" ]; then
-    echo >&2  "ERROR: File sources.sh does not contain K8S version variables. Copy system variables fom sources.sh.sample file."
-    exit 2
+	echo >&2 "ERROR: File sources.sh does not contain K8S version variables. Copy system variables fom sources.sh.sample file."
+	exit 2
 fi
 
 
@@ -55,7 +55,7 @@ kind: KubeProxyConfiguration
 mode: nftables
 EOF
 
-sudo kubeadm init --config kubeadm_init.yaml  --upload-certs
+sudo kubeadm init --config kubeadm_init.yaml --upload-certs
 
 
 mkdir -p $HOME/.kube
@@ -65,6 +65,6 @@ echo 'source <(kubectl completion bash)' >> $HOME/.bashrc
 
 echo "
 Kubernates instalation is finished succesfuly
-Clusetr inited with  kubeadm init --config kubeadm_init.yaml
+Cluster has been inited with kubeadm init --config kubeadm_init.yaml
 Save the output above. It will be used on the next steps.
 "

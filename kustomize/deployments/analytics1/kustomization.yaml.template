@@ -6,6 +6,7 @@ resources:
 - ../../apps/analytics/tarantool
 - ../../apps/analytics/vectorizator
 ${ADD_RESOURCE1}
+${CUSTOM_RESOURCES}
 components:
 - ../../components/storage-class-local-storage
 images:

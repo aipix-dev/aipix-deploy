@@ -21,13 +21,13 @@ sleep 10
 # Waiting for starting containers
 wait_period=0
 until [[ $(kubectl get deployments.apps minio -n ${NS_MINIO} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]; do
-    echo "Waiting for starting minio container ..."
-    sleep 10
-    wait_period=$(($wait_period+10))
-    if [ $wait_period -gt 300 ];then
-        echo "The script ran for 5 minutes to start containers, exiting now.."
-        exit 1
-    fi
+	echo "Waiting for starting minio container ..."
+	sleep 10
+	wait_period=$(($wait_period+10))
+	if [ $wait_period -gt 300 ];then
+		echo "The script ran for 5 minutes to start containers, exiting now.."
+		exit 1
+	fi
 done
 
 # export MINIO_IP=$(kubectl -n ${NS_MINIO} get service/minio -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')
@@ -36,146 +36,116 @@ export MINIO_IP=${K8S_API_ENDPOINT}
 # MINIO_IP =$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].address}') # for GKE
 
 mc alias set local http://${MINIO_IP}:30900 ${MINIO_USR} ${MINIO_PSW}
-mc mb -p local/${MINIO_BACKEND_BUCKET_NAME}
-mc mb -p local/${MINIO_BACKEND_BUCKET_NAME_PRIV}
-mc mb -p local/${MINIO_PORTAL_BUCKET_NAME}
-mc mb -p local/${MINIO_PORTAL_BUCKET_NAME_PRIV}
-mc mb -p local/${MINIO_ANALYTICS_BUCKET_NAME}
-mc mb -p local/${MINIO_LOGS_BUCKET_NAME}
 
-cat <<EOF > /tmp/${MINIO_BACKEND_BUCKET_NAME}-policy.json
+
+create_minio_bucket () {
+	local OPTIND
+	local OPTSTRING=":m:b:a:s:pve:d:"
+	while getopts ${OPTSTRING} opt; do
+		case ${opt} in
+			m) local MINIO_ALIAS=${OPTARG};;
+			b) local BUCKET_NAME=${OPTARG};;
+			a) local BUCKET_ACCESS_KEY=${OPTARG};;
+			s) local BUCKET_SECRET_KEY=${OPTARG};;
+			p) local PUBLIC="public";;
+			v) local VERSIONING="enabled";;
+			e) local EXPIRE=${OPTARG};;
+			d) local BUCKET_PATH1=${OPTARG};;
+			:)
+				echo "Option -${OPTARG} in create_minio_bucket function requires an argument." >&2
+				exit 1
+				;;
+			?)
+				echo "Invalid option in create_minio_bucket function: -${OPTARG}." >&2
+				exit 1
+				;;
+		esac
+	done
+
+	if [[ $(mc ls ${MINIO_ALIAS} | grep ${BUCKET_NAME}/) ]]; then
+		echo "Bucket ${BUCKET_NAME} already exists"
+		return
+	fi
+	mc mb -p ${MINIO_ALIAS}/${BUCKET_NAME}
+	cat <<EOF > /tmp/${BUCKET_NAME}-policy.json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${MINIO_BACKEND_BUCKET_NAME}/*"
-            ]
-        }
-    ]
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"s3:*"
+			],
+			"Resource": [
+				"arn:aws:s3:::${BUCKET_NAME}/*"
+			]
+		}
+	]
 }
 EOF
-
-cat <<EOF > /tmp/${MINIO_BACKEND_BUCKET_NAME_PRIV}-policy.json
+	mc admin policy create ${MINIO_ALIAS} ${BUCKET_NAME}-policy /tmp/${BUCKET_NAME}-policy.json
+	mc admin user add ${MINIO_ALIAS} ${BUCKET_NAME}-user ${MINIO_PSW}
+	mc admin user svcacct add ${MINIO_ALIAS} ${BUCKET_NAME}-user --access-key ${BUCKET_ACCESS_KEY} --secret-key ${BUCKET_SECRET_KEY}
+	mc admin policy attach ${MINIO_ALIAS} ${BUCKET_NAME}-policy --user ${BUCKET_NAME}-user
+	if [[ ${PUBLIC} == "public" ]]; then
+		cat <<EOF > /tmp/${BUCKET_NAME}-anonymous-policy.json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${MINIO_BACKEND_BUCKET_NAME_PRIV}/*"
-            ]
-        }
+ "Statement": [
+  {
+   "Action": [
+    "s3:GetBucketLocation"
+   ],
+   "Effect": "Allow",
+   "Principal": {
+    "AWS": [
+     "*"
     ]
+   },
+   "Resource": [
+    "arn:aws:s3:::${BUCKET_NAME}"
+   ]
+  },
+  {
+   "Action": [
+    "s3:GetObject"
+   ],
+   "Effect": "Allow",
+   "Principal": {
+    "AWS": [
+     "*"
+    ]
+   },
+   "Resource": [
+    "arn:aws:s3:::${BUCKET_NAME}/*"
+   ]
+  }
+ ],
+ "Version": "2012-10-17"
 }
 EOF
+		mc anonymous set-json /tmp/${BUCKET_NAME}-anonymous-policy.json ${MINIO_ALIAS}/${BUCKET_NAME}
+	fi
+	if [[ ${VERSIONING} == "enabled" ]]; then
+		mc version enable ${MINIO_ALIAS}/${BUCKET_NAME}
+		mc ilm rule add ${MINIO_ALIAS}/${BUCKET_NAME} --noncurrent-expire-days "1" --expire-delete-marker
+	fi
 
-cat <<EOF > /tmp/${MINIO_PORTAL_BUCKET_NAME}-policy.json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${MINIO_PORTAL_BUCKET_NAME}/*"
-            ]
-        }
-    ]
+	if [[ -n ${EXPIRE} ]]; then
+		if [[ -z ${BUCKET_PATH1} ]]; then
+			mc ilm rule add ${MINIO_ALIAS}/${BUCKET_NAME} --expire-days "${EXPIRE}"
+		else
+			mc ilm rule add ${MINIO_ALIAS}/${BUCKET_NAME}/${BUCKET_PATH1} --expire-days "${EXPIRE}"
+		fi
+	fi
 }
-EOF
 
-cat <<EOF > /tmp/${MINIO_PORTAL_BUCKET_NAME_PRIV}-policy.json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${MINIO_PORTAL_BUCKET_NAME_PRIV}/*"
-            ]
-        }
-    ]
-}
-EOF
 
-cat <<EOF > /tmp/${MINIO_ANALYTICS_BUCKET_NAME}-policy.json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${MINIO_ANALYTICS_BUCKET_NAME}/*"
-            ]
-        }
-    ]
-}
-EOF
-
-cat <<EOF > /tmp/${MINIO_LOGS_BUCKET_NAME}-policy.json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::${MINIO_LOGS_BUCKET_NAME}/*"
-            ]
-        }
-    ]
-}
-EOF
-
-mc admin policy create local ${MINIO_BACKEND_BUCKET_NAME}-policy /tmp/${MINIO_BACKEND_BUCKET_NAME}-policy.json
-mc admin policy create local ${MINIO_BACKEND_BUCKET_NAME_PRIV}-policy /tmp/${MINIO_BACKEND_BUCKET_NAME_PRIV}-policy.json
-mc admin policy create local ${MINIO_PORTAL_BUCKET_NAME}-policy /tmp/${MINIO_PORTAL_BUCKET_NAME}-policy.json
-mc admin policy create local ${MINIO_PORTAL_BUCKET_NAME_PRIV}-policy /tmp/${MINIO_PORTAL_BUCKET_NAME_PRIV}-policy.json
-mc admin policy create local ${MINIO_ANALYTICS_BUCKET_NAME}-policy /tmp/${MINIO_ANALYTICS_BUCKET_NAME}-policy.json
-mc admin policy create local ${MINIO_LOGS_BUCKET_NAME}-policy /tmp/${MINIO_LOGS_BUCKET_NAME}-policy.json
-mc admin user add local ${MINIO_BACKEND_BUCKET_NAME}-user ${MINIO_PSW}
-mc admin user add local ${MINIO_BACKEND_BUCKET_NAME_PRIV}-user ${MINIO_PSW}
-mc admin user add local ${MINIO_PORTAL_BUCKET_NAME}-user ${MINIO_PSW}
-mc admin user add local ${MINIO_PORTAL_BUCKET_NAME_PRIV}-user ${MINIO_PSW}
-mc admin user add local ${MINIO_ANALYTICS_BUCKET_NAME}-user ${MINIO_PSW}
-mc admin user add local ${MINIO_LOGS_BUCKET_NAME}-user ${MINIO_PSW}
-mc admin user svcacct add local ${MINIO_BACKEND_BUCKET_NAME}-user --access-key ${MINIO_BACKEND_ACCESS_KEY} --secret-key ${MINIO_BACKEND_SECRET_KEY}
-mc admin user svcacct add local ${MINIO_BACKEND_BUCKET_NAME_PRIV}-user --access-key ${MINIO_BACKEND_ACCESS_KEY_PRIV} --secret-key ${MINIO_BACKEND_SECRET_KEY_PRIV}
-mc admin user svcacct add local ${MINIO_PORTAL_BUCKET_NAME}-user --access-key ${MINIO_PORTAL_ACCESS_KEY} --secret-key ${MINIO_PORTAL_SECRET_KEY}
-mc admin user svcacct add local ${MINIO_PORTAL_BUCKET_NAME_PRIV}-user --access-key ${MINIO_PORTAL_ACCESS_KEY_PRIV} --secret-key ${MINIO_PORTAL_SECRET_KEY_PRIV}
-mc admin user svcacct add local ${MINIO_ANALYTICS_BUCKET_NAME}-user --access-key ${MINIO_ANALYTICS_ACCESS_KEY} --secret-key ${MINIO_ANALYTICS_SECRET_KEY}
-mc admin user svcacct add local ${MINIO_LOGS_BUCKET_NAME}-user --access-key ${MINIO_LOGS_ACCESS_KEY} --secret-key ${MINIO_LOGS_SECRET_KEY}
-mc admin policy attach local ${MINIO_BACKEND_BUCKET_NAME}-policy --user ${MINIO_BACKEND_BUCKET_NAME}-user
-mc admin policy attach local ${MINIO_BACKEND_BUCKET_NAME_PRIV}-policy --user ${MINIO_BACKEND_BUCKET_NAME_PRIV}-user
-mc admin policy attach local ${MINIO_PORTAL_BUCKET_NAME}-policy --user ${MINIO_PORTAL_BUCKET_NAME}-user
-mc admin policy attach local ${MINIO_PORTAL_BUCKET_NAME_PRIV}-policy --user ${MINIO_PORTAL_BUCKET_NAME_PRIV}-user
-mc admin policy attach local ${MINIO_ANALYTICS_BUCKET_NAME}-policy --user ${MINIO_ANALYTICS_BUCKET_NAME}-user
-mc admin policy attach local ${MINIO_LOGS_BUCKET_NAME}-policy --user ${MINIO_LOGS_BUCKET_NAME}-user
-mc anonymous set download local/${MINIO_BACKEND_BUCKET_NAME}
-mc anonymous set download local/${MINIO_PORTAL_BUCKET_NAME}
-mc anonymous set download local/${MINIO_ANALYTICS_BUCKET_NAME}
-mc ilm rule add local/${MINIO_BACKEND_BUCKET_NAME}/archive --expire-days "1"
-mc ilm rule add local/${MINIO_BACKEND_BUCKET_NAME_PRIV}/database_backups --expire-days "14"
-mc ilm rule add local/${MINIO_ANALYTICS_BUCKET_NAME} --expire-days "2"
-mc ilm rule add local/${MINIO_LOGS_BUCKET_NAME} --expire-days "3"
+create_minio_bucket -m local -b ${MINIO_BACKEND_BUCKET_NAME} -a ${MINIO_BACKEND_ACCESS_KEY} -s ${MINIO_BACKEND_SECRET_KEY} -p -e 1 -d archive
+create_minio_bucket -m local -b ${MINIO_BACKEND_BUCKET_NAME_PRIV} -a ${MINIO_BACKEND_ACCESS_KEY_PRIV} -s ${MINIO_BACKEND_SECRET_KEY_PRIV} -e 14 -d database_backups
+create_minio_bucket -m local -b ${MINIO_PORTAL_BUCKET_NAME} -a ${MINIO_PORTAL_ACCESS_KEY} -s ${MINIO_PORTAL_SECRET_KEY} -p
+create_minio_bucket -m local -b ${MINIO_PORTAL_BUCKET_NAME_PRIV} -a ${MINIO_PORTAL_ACCESS_KEY_PRIV} -s ${MINIO_PORTAL_SECRET_KEY_PRIV}
+create_minio_bucket -m local -b ${MINIO_ANALYTICS_BUCKET_NAME} -a ${MINIO_ANALYTICS_ACCESS_KEY} -s ${MINIO_ANALYTICS_SECRET_KEY} -p -e 14
+create_minio_bucket -m local -b ${MINIO_LOGS_BUCKET_NAME} -a ${MINIO_LOGS_ACCESS_KEY} -s ${MINIO_LOGS_SECRET_KEY} -e 3
 
 
 echo """

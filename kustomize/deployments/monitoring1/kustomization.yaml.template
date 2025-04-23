@@ -13,6 +13,7 @@ resources:
 - ./fluent-bit.yaml
 - ./syslog-service.yaml
 - ./loki.yaml
+${CUSTOM_RESOURCES}
 components:
 - ../../components/tolerations
 

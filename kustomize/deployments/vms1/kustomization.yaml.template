@@ -12,6 +12,7 @@ resources:
 - ../../apps/controller
 ${ADD_RESOURCE1}
 ${ADD_RESOURCE2}
+${CUSTOM_RESOURCES}
 components:
 - ../../components/single-replica
 - ../../components/middlewares/cors-middleware
@@ -27,13 +28,13 @@ ${ADD_COMPONENT3}
 images:
 - name: download.aipix.ai:8443/vms-backend/release
   newName: download.aipix.ai:8443/vms-backend/release
-  newTag: 24.12.1.0
+  newTag: 24.12.1.1
 - name: download.aipix.ai:8443/vms-frontend-admin/release
   newName: download.aipix.ai:8443/vms-frontend-admin/release
-  newTag: 24.12.1.0
+  newTag: 24.12.1.1
 - name: download.aipix.ai:8443/vms-frontend-client/release
   newName: download.aipix.ai:8443/vms-frontend-client/release
-  newTag: 24.12.1.0
+  newTag: 24.12.1.1
 - name: download.aipix.ai:8443/controller/release
   newName: download.aipix.ai:8443/controller/release
   newTag: 24.12.1.0
@@ -80,12 +81,6 @@ patches:
     group: traefik.io
     version: v1alpha1
     kind: IngressRoute
-    name: grafana
-  path: patch-ingressroute-monitoring.yaml
-- target:
-    group: traefik.io
-    version: v1alpha1
-    kind: IngressRoute
     name: backend
   path: patch-ingressroute-backend.yaml
 - target:
@@ -94,12 +89,6 @@ patches:
     kind: IngressRoute
     name: frontend-admin
   path: patch-ingressroute-frontend-admin.yaml
-- target:
-    group: traefik.io
-    version: v1alpha1
-    kind: IngressRoute
-    name: frontend-client
-  path: patch-ingressroute-frontend-client.yaml
 - target:
     group: traefik.io
     version: v1alpha1

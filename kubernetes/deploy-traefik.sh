@@ -10,8 +10,8 @@ kubectl create ns ${TRAEFIK_NAMESPACE} || true
 
 # Create secrets from certificates
 kubectl -n ${TRAEFIK_NAMESPACE} create secret tls certificate \
-   --cert=../nginx/ssl/tls.crt \
-   --key=../nginx/ssl/tls.key >/dev/null
+	--cert=../nginx/ssl/tls.crt \
+	--key=../nginx/ssl/tls.key >/dev/null
 
 helm repo add traefik https://helm.traefik.io/traefik >/dev/null || true
 helm repo update >/dev/null
@@ -19,11 +19,11 @@ helm install --namespace=${TRAEFIK_NAMESPACE} traefik traefik/traefik -f ../trae
 
 while true
 do
-    if [[ $(kubectl get deployment traefik -n ${TRAEFIK_NAMESPACE} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]
-        then break
-    fi
-    sleep 5
-    echo "Waiting for starting containers ..."
+	if [[ $(kubectl get deployment traefik -n ${TRAEFIK_NAMESPACE} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]
+		then break
+	fi
+	sleep 5
+	echo "Waiting for starting containers ..."
 done
 sleep 5
 

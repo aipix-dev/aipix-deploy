@@ -16,12 +16,14 @@ additionalArguments:
 #  - --accesslog.format=json
   - --accesslog.fields.headers.defaultmode=keep
   - --serversTransport.insecureSkipVerify=true
-  - --entrypoints.controller-rtsp.address=:5554/tcp
-  - --entrypoints.contr-onvif.address=:8888/tcp
-  - --entrypoints.logger.address=:8109/udp
+#  - --entrypoints.controller-rtsp.address=:5554/tcp
+#  - --entrypoints.contr-onvif.address=:8888/tcp
+#  - --entrypoints.logger.address=:8109/udp
   - --entryPoints.web.http.redirections.entryPoint.to=:443
   - --entrypoints.web.http.redirections.entrypoint.scheme=https
   - --entrypoints.web.http.redirections.entrypoint.priority=100
+  # Allow to upload large files with slow internet
+  - --entryPoints.websecure.transport.respondingTimeouts.readTimeout=120
 
 ingressRoute:
   dashboard:

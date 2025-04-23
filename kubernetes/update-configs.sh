@@ -6,39 +6,44 @@ cd "$scriptdir"
 
 # Reads the file and gather all enviroments variables
 get_env_dict_from_file () {
-        file=$1
-        declare -A dict
-        dict=()
-        IFS=$'\n'
-        for line in $(cat ${file} | sed -e 's/ *= */=/g'); do
-                set "${line}"
-                for word in "$@"; do
-                        if [[ $(echo $word | grep "=") ]]; then
-                                IFS='=' read -r key val <<< "$word"
-                                if [[ -n "${val}" ]]; then
-                                        key=$(echo $key | sed -e 's/#//g')
-                                        dict["${key}"]="${val}"
-                                else
-                                        key=$(echo $key | sed -e 's/#//g')
-                                        dict["${key}"]=""
-                                fi
-                        fi
-                done
-        done
-        echo '('
-        for key in "${!dict[@]}"; do echo "['$key']=\"${dict[$key]//[\"\']}\""; done
-        echo ')'
+	file=$1
+	declare -A dict
+	dict=()
+	IFS=$'\n'
+	for line in $(cat ${file} | sed -e 's/ *= */=/g'); do
+		#if [[ $(grep 'END of the VSaaS base config' <<< $line | wc -l) != "0" ]]; then break; fi
+		set --
+		while IFS= read -r element; do
+				set -- "$@" "$element"
+		done <<< $(xargs printf '%s\n' <<<"$line")
+		for word in "$@"; do
+				if [[ $(echo $word | grep "=") ]]; then
+						IFS='=' read -r key val <<< "$word"
+						if [[ -n "${val}" ]]; then
+								key=$(echo $key | sed -e 's/#//g')
+								dict["${key}"]="${val}"
+						else
+								key=$(echo $key | sed -e 's/#//g')
+								dict["${key}"]=""
+						fi
+				fi
+		done
+	done
+	echo '('
+	for key in "${!dict[@]}"; do echo "['$key']=\"${dict[$key]//[\"\']}\""; done
+	echo ')'
 }
+
 
 # Checks if element "$1" is in array "$2"
 # @NOTE:
-#   Be sure that array is passed in the form:
-#       "${ARR[@]}"
+#	Be sure that array is passed in the form:
+#		"${ARR[@]}"
 elementIn () {
-    # shopt -s nocasematch # Can be useful to disable case-matching
-    local e
-    for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
-    return 1
+	# shopt -s nocasematch # Can be useful to disable case-matching
+	local e
+	for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
+	return 1
 }
 
 # Update config file from new sample file

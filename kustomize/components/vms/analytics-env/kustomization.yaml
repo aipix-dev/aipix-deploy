@@ -5,5 +5,5 @@ patches:
     group: apps
     version: v1
     kind: Deployment
-    name: (backend|archive|cron|queue|schedule|analytic-events|analytic-statistics|queue-controller-webhooks)
+    name: (backend|archive|cron|queue|queue-calculate-cameras|schedule|analytic-events|analytic-statistics|queue-controller-webhooks)
   path: analytics-env.yaml

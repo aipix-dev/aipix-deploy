@@ -5,15 +5,15 @@ scriptdir="$(dirname "$0")"
 cd "$scriptdir"
 
 if [ ! -f "./sources.sh" ]; then
-    echo "Using ENV from sources.sh.sample"
-    source ./sources.sh.sample
+	echo "Using ENV from sources.sh.sample"
+	source ./sources.sh.sample
 else
-    echo "Using ENV from sources.sh"
-    source ./sources.sh
-    if [ -z "${SRC_K8S_VER}" ]; then
-        echo >&2  "ERROR: File sources.sh does not contain K8S version variables. Copy system variables fom sources.sh.sample file."
-        exit 2
-    fi
+	echo "Using ENV from sources.sh"
+	source ./sources.sh
+	if [ -z "${SRC_K8S_VER}" ]; then
+		echo >&2 "ERROR: File sources.sh does not contain K8S version variables. Copy system variables fom sources.sh.sample file."
+		exit 2
+	fi
 fi
 
 K8S_VER=${SRC_K8S_VER}
@@ -46,7 +46,7 @@ curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
 sudo apt-get update
 sudo apt-get install helm
-sudo helm completion bash | sudo tee  /etc/bash_completion.d/helm >/dev/null
+sudo helm completion bash | sudo tee /etc/bash_completion.d/helm >/dev/null
 
 
 #Calico ctl
@@ -59,14 +59,14 @@ cd ~/
 #Delete midnight commander if installed
 dpkg -s mc > /dev/null 2>&1
 if [ $? = 0 ]; then
-    echo "Removing midnight commander"
-    sudo apt purge -y mc > /dev/null 2>&1
+	echo "Removing midnight commander"
+	sudo apt purge -y mc > /dev/null 2>&1
 fi
 
 #Install minio client
 curl https://dl.min.io/client/mc/release/linux-amd64/mc \
-    --create-dirs \
-    -o $HOME/minio-binaries/mc
+	--create-dirs \
+	-o $HOME/minio-binaries/mc
 chmod +x $HOME/minio-binaries/mc
 export PATH=$PATH:$HOME/minio-binaries/
 echo 'export PATH=$PATH:$HOME/minio-binaries/' >> $HOME/.bashrc

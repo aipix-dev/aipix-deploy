@@ -14,15 +14,15 @@ MS_TYPE="vsaas"
 BRAND="aipix"
 
 if [ -z "${MS}" ]; then
-    echo >&2  "ERROR: Mediaserver IP address is not defined"
-    exit 2
+	echo >&2 "ERROR: Mediaserver IP address is not defined"
+	exit 2
 fi
 
 #Creating base configs for mediaserver
 if [ -z "${CONFIGURE}" ]; then
 	cp -n ./sources.sh.sample ./sources.sh
-    cp -n ../mediaserver/key.pem.sample ../mediaserver/key.pem
-    cp -n ../mediaserver/cert.pem.sample ../mediaserver/cert.pem
+	cp -n ../mediaserver/key.pem.sample ../mediaserver/key.pem
+	cp -n ../mediaserver/cert.pem.sample ../mediaserver/cert.pem
 	cp -n ../mediaserver/public.key.sample ../mediaserver/public.key
 	cp -n ../mediaserver/license.json.sample ../mediaserver/license.json
 	cp -n ../mediaserver/media-server.ini.sample ../mediaserver/media-server.ini.${MS}.${MS_TYPE}

@@ -24,7 +24,7 @@ tolerations:
   operator: Exists
 EOF
 
-kubectl create  ns local-volume || true
+kubectl create ns local-volume || true
 helm repo add sig-storage-local-static-provisioner https://kubernetes-sigs.github.io/sig-storage-local-static-provisioner
 helm template --debug sig-storage-local-static-provisioner/local-static-provisioner -f local-value.yaml --namespace local-volume > local-volume-provisioner.generated.yaml
 kubectl apply -f local-volume-provisioner.generated.yaml

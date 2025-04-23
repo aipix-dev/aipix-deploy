@@ -1,6 +1,7 @@
 namespace: ${NS_MINIO}
 resources:
 - ../../apps/minio/minio-ha
+${CUSTOM_RESOURCES}
 components:
 - ../../components/middlewares/strip-prefixes-s3
 images:
