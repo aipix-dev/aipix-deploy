@@ -10,10 +10,6 @@ source ../kubernetes/k8s-onprem/sources.sh
 kubectl exec --namespace=${NS_VMS} deployment.apps/cron -- ./db_dump.sh
 
 
-### Update Traefik
-yq -i '.additionalArguments += "--entryPoints.websecure.transport.respondingTimeouts.readTimeout=120"' ../traefik/traefik-helm-values.yaml
-../kubernetes/update-traefik-certs.sh
-
 ### Update VMS
 
 # Update VGW
@@ -26,10 +22,6 @@ fi
 # Update VMS
 ../kubernetes/configure-vms.sh
 ../kubernetes/update-vms.sh
-
-kubectl -n ${NS_VMS} exec deployment.apps/cron -- ./artisan ip-access:manage analytic_video '10.0.0.0/8' || true
-kubectl -n ${NS_VMS} exec deployment.apps/cron -- ./artisan ip-access:manage analytic_video '172.16.0.0/12' || true
-kubectl -n ${NS_VMS} exec deployment.apps/cron -- ./artisan ip-access:manage analytic_video '192.168.0.0/16' || true
 
 if [ ${TYPE} != "prod" ]; then
 	CREATE_MONITORING_MYSQL_USER="CREATE USER IF NOT EXISTS 'exporter'@'%' IDENTIFIED BY 'password' WITH MAX_USER_CONNECTIONS 3;"
