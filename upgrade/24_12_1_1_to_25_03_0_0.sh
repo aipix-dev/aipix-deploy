@@ -31,6 +31,13 @@ kubectl -n ${NS_VMS} exec deployment.apps/cron -- ./artisan ip-access:manage ana
 kubectl -n ${NS_VMS} exec deployment.apps/cron -- ./artisan ip-access:manage analytic_video '172.16.0.0/12' || true
 kubectl -n ${NS_VMS} exec deployment.apps/cron -- ./artisan ip-access:manage analytic_video '192.168.0.0/16' || true
 
+if [ ${TYPE} != "prod" ]; then
+	CREATE_MONITORING_MYSQL_USER="CREATE USER IF NOT EXISTS 'exporter'@'%' IDENTIFIED BY 'password' WITH MAX_USER_CONNECTIONS 3;"
+	GRANT_PRIVILEGES="GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'exporter'@'%';FLUSH PRIVILEGES;"
+	kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysql --protocol=TCP -u root -pmysql --execute="${CREATE_MONITORING_MYSQL_USER}"
+	kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysql --protocol=TCP -u root -pmysql --execute="${GRANT_PRIVILEGES}"
+fi
+
 # Update MSE
 if [[ $(kubectl get ns | grep ${NS_MS}) ]]; then
     ../kubernetes/update-mse.sh
@@ -50,6 +57,7 @@ fi
 if [ ${MONITORING} == "yes" ]; then
     ../kubernetes/configure-monitoring.sh
     ../kubernetes/deploy-monitoring.sh
+    kubectl -n monitoring rollout restart deployment prometheus-deployment
 else
     echo "Monitoring is not installed, continue update"
 fi

@@ -1,0 +1,23 @@
+server {
+    listen 80;
+    server_name _;
+    server_tokens off;
+    root /var/www/portal-client;
+
+    location = /index.html {
+        expires -1;
+    }
+
+    location ~* \.(css|eot|gif|html|ico|jpeg|jpg|js|png|svg|ttf|webmanifest|webp|woff|woff2)$ {
+        try_files $uri $uri/ =404;
+    }
+
+    location @index {
+        expires -1;
+        try_files /index.html =404;
+    }
+
+    location / {
+        try_files $uri $uri/ @index;
+    }
+}

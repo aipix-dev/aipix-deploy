@@ -240,7 +240,20 @@ spec:
             requests:
               cpu: 5m
               memory: 25Mi
+          volumeMounts:
+          - mountPath: /etc/nginx/nginx.conf
+            name: portal-client-nginx
+            readOnly: true
+            subPath: nginx.conf
+          - mountPath: /etc/nginx/conf.d/default.conf
+            name: portal-client-nginx
+            readOnly: true
+            subPath: default.conf
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: portal-frontend-client
       restartPolicy: Always
+      volumes:
+      - name: portal-client-nginx
+        configMap:
+          name: portal-client-nginx

@@ -61,7 +61,20 @@ spec:
             requests:
               cpu: 5m
               memory: 25Mi
+          volumeMounts:
+          - mountPath: /etc/nginx/nginx.conf
+            name: vms-frontend-client-nginx
+            readOnly: true
+            subPath: nginx.conf
+          - mountPath: /etc/nginx/conf.d/default.conf
+            name: vms-frontend-client-nginx
+            readOnly: true
+            subPath: default.conf
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: frontend
       restartPolicy: Always
+      volumes:
+      - name: vms-frontend-client-nginx
+        configMap:
+          name: vms-frontend-client-nginx

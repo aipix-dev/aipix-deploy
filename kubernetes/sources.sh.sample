@@ -64,6 +64,9 @@ export INFLUX_TOKEN=2pORp9tDo40Lm32oGUKFLL8r1UuNbgUT			#define influxdb API toke
 export PORTAL=no                            				#If portal will be deployed ("yes" or "no")
 export PORTAL_STUB_DOMAIN=portal-stub.example.com                          	#define portal-stub domain name
 
+#Location parameters
+export CITY=									#define City name
+
 ###END of the VSaaS base config ###
 
 

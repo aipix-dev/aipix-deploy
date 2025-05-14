@@ -19,12 +19,12 @@ fi
 #Creating configs for orchestrator and analytics-worker
 cp -n ./sources.sh.sample ./sources.sh
 cp -n ../analytics/env.sample ../analytics/.env
-sed -i 's@//django:8000/client_api/servers/@//orchestrator/client_api/servers/@g' ../analytics/.env
-sed -i "s@://push1st-analytics:@://push1st.${NS_VMS}.svc:@g" ../analytics/.env
-sed -i "s@mysql-server-analytics@mysql-server.${NS_VMS}.svc@g" ../analytics/.env
-sed -i "s@redis-server-analytics@redis-server.${NS_VMS}.svc@g" ../analytics/.env
-sed -i 's@//vectorizator:.*/process/@//vectorizator/process/@g' ../analytics/.env
-sed -i 's@//analytics-licensing:8888@//127.0.0.1:8888@g' ../analytics/.env
+# sed -i 's@//django:8000/client_api/servers/@//orchestrator/client_api/servers/@g' ../analytics/.env
+sed -i "s@://push1st:@://push1st.${NS_VMS}.svc:@g" ../analytics/.env
+sed -i "s@mysql-server@mysql-server.${NS_VMS}.svc@g" ../analytics/.env
+sed -i "s@redis-server@redis-server.${NS_VMS}.svc@g" ../analytics/.env
+# sed -i 's@//vectorizator:.*/process/@//vectorizator/process/@g' ../analytics/.env
+# sed -i 's@//analytics-licensing:8888@//127.0.0.1:8888@g' ../analytics/.env
 sed -i 's@^MONITORING_@#MONITORING_@g' ../analytics/.env
 sed -i 's@^DEPLOYMENT_NAME@#DEPLOYMENT_NAME@g' ../analytics/.env
 

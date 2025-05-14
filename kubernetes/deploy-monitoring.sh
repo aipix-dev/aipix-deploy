@@ -25,9 +25,6 @@ cp ../monitoring/grafana-datasources-config.yaml ../kustomize/deployments/monito
 kubectl apply -k ../kustomize/deployments/monitoring1
 
 sleep 5
-# PROMETHEUS_IP=$(kubectl get service/prometheus-service -n monitoring -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-# GRAFANA_IP=$(kubectl get service/grafana -n monitoring -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-# INFLUX_IP=$(kubectl get service/vsaas-influxdb2 -n monitoring -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 PROMETHEUS_PORT=$(kubectl get service/prometheus-service -n monitoring -o jsonpath='{.spec.ports[0].nodePort}')
 GRAFANA_PORT=$(kubectl get service/grafana -n monitoring -o jsonpath='{.spec.ports[0].nodePort}')
 INFLUX_PORT=$(kubectl get service/vsaas-influxdb2 -n monitoring -o jsonpath='{.spec.ports[0].nodePort}')

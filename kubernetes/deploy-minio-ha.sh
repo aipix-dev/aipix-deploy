@@ -35,9 +35,6 @@ done
 export MINIO_IP1=$(kubectl -n ${NS_MINIO} get service/minio-1 -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')
 export MINIO_IP2=$(kubectl -n ${NS_MINIO} get service/minio-2 -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
-#MINIO_IP=${K8S_API_ENDPOINT}
-# MINIO_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-
 mc alias set minio-1 http://${MINIO_IP1}:9000 ${MINIO_USR} ${MINIO_PSW}
 mc alias set minio-2 http://${MINIO_IP2}:9000 ${MINIO_USR} ${MINIO_PSW}
 

@@ -58,7 +58,8 @@ resources:
 - influxdb.yaml
 EOF
 
-cp -n ../monitoring/prometheus-config-map.yaml.sample ../monitoring/prometheus-config-map.yaml
+envsubst < ../monitoring/prometheus-config-map.yaml.sample > ../monitoring/prometheus-config-map.yaml
+# cp -n ../monitoring/prometheus-config-map.yaml.sample ../monitoring/prometheus-config-map.yaml
 cp ../monitoring/prometheus-config-map.yaml ../kustomize/deployments/monitoring1/
 envsubst < ../monitoring/grafana-datasources-config.yaml.sample > ../monitoring/grafana-datasources-config.yaml
 cp ../monitoring/grafana-datasources-config.yaml ../kustomize/deployments/monitoring1/

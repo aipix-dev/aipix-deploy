@@ -9,16 +9,13 @@ source ./sources.sh
 kubectl delete secret download-aipix-ai --namespace=${NS_VMS} || true
 
 # Delete VMS configs
-kubectl delete secret vms-nginx-cert --namespace=${NS_VMS} || true   #delete in 25.03
 kubectl delete secret vms-backend-oauth --namespace=${NS_VMS} || true
-kubectl delete configmap vms-nginx-conf --namespace=${NS_VMS} || true  #delete in 25.03
-kubectl delete configmap vms-nginx-base-conf --namespace=${NS_VMS} || true   #delete in 25.03
-kubectl delete configmap vms-backend-nginx-conf --namespace=${NS_VMS} || true  #delete in 25.03
-kubectl delete configmap vms-backend-nginx-server-conf --namespace=${NS_VMS} || true  #delete in 25.03
 kubectl delete configmap vms-backend-env --namespace=${NS_VMS} || true
 kubectl delete configmap vms-fcm-json --namespace=${NS_VMS} || true
 kubectl delete configmap vms-voip-p8 --namespace=${NS_VMS} || true
 kubectl delete configmap vms-frontend-env --namespace=${NS_VMS} || true
+kubectl delete configmap vms-frontend-admin-nginx --namespace=${NS_VMS} || true
+kubectl delete configmap vms-frontend-client-nginx --namespace=${NS_VMS} || true
 kubectl delete configmap push1st-server --namespace=${NS_VMS} || true
 kubectl delete configmap push1st-app --namespace=${NS_VMS} || true
 kubectl delete configmap push1st-devices --namespace=${NS_VMS} || true
@@ -26,18 +23,15 @@ kubectl delete configmap push1st-devices --namespace=${NS_VMS} || true
 if [ ${TYPE} != "prod" ]; then
 	kubectl delete configmap mysql-server-env --namespace=${NS_VMS} || true
 	kubectl delete configmap mysql-cnf --namespace=${NS_VMS} || true
-# else
-# 	kubectl delete configmap overrides-php-ini --namespace=${NS_VMS} || true
-# 	kubectl delete configmap overrides-php-pool-www-conf --namespace=${NS_VMS} || true
 fi
 
 # Delete CONTROLLER configmsps
 kubectl delete configmap controller-env --namespace=${NS_VMS} || true
-kubectl delete configmap controller-nginx-conf --namespace=${NS_VMS} || true	#delete in 25.03
-kubectl delete configmap controller-nginx-server-conf --namespace=${NS_VMS} || true		#delete in 25.03
 
 # Delete PORTAL configmsps
 if [ ${PORTAL} == "yes" ]; then
+	kubectl delete configmap portal-landing-nginx --namespace=${NS_VMS} || true
+	kubectl delete configmap portal-client-nginx --namespace=${NS_VMS} || true
 	kubectl delete configmap vms-portal-backend-env --namespace=${NS_VMS} || true
 	kubectl delete configmap vms-portal-stub-env --namespace=${NS_VMS} || true
 fi
@@ -49,18 +43,16 @@ kubectl create secret docker-registry download-aipix-ai --namespace=${NS_VMS} \
 														--docker-password=${DOCKER_PASSWORD}
 
 # Create VMS configmsps
-# kubectl create secret tls vms-nginx-cert --namespace=${NS_VMS} \
-#	--cert=../nginx/ssl/tls.crt \
-#	--key=../nginx/ssl/tls.key
-
-# kubectl create configmap vms-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/nginx.conf
-# kubectl create configmap vms-nginx-base-conf --namespace=${NS_VMS} --from-file=../nginx/nginx-base.conf
-# kubectl create configmap vms-backend-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/vms-backend-nginx.conf
-# kubectl create configmap vms-backend-nginx-server-conf --namespace=${NS_VMS} --from-file=../nginx/vms-backend-nginx-server.conf
 kubectl create configmap vms-backend-env --namespace=${NS_VMS} --from-env-file=../vms-backend/environments/.env
 kubectl create configmap vms-fcm-json --namespace=${NS_VMS} --from-file=../vms-backend/certificates/fcm.json
 kubectl create configmap vms-voip-p8 --namespace=${NS_VMS} --from-file=../vms-backend/certificates/voip.p8
 kubectl create configmap vms-frontend-env --namespace=${NS_VMS} --from-env-file=../vms-frontend/admin.env
+kubectl create configmap vms-frontend-admin-nginx --namespace=${NS_VMS} \
+        --from-file=nginx.conf=../vms-frontend/nginx-base-admin.conf \
+        --from-file=default.conf=../vms-frontend/nginx-server-admin.conf
+kubectl create configmap vms-frontend-client-nginx --namespace=${NS_VMS} \
+        --from-file=nginx.conf=../vms-frontend/nginx-base-client.conf \
+        --from-file=default.conf=../vms-frontend/nginx-server-client.conf
 kubectl create configmap push1st-server --namespace=${NS_VMS} --from-file=server.yml=../push1st/server.yml
 kubectl create configmap push1st-app --namespace=${NS_VMS} --from-file=../push1st/app.yml
 kubectl create configmap push1st-devices --namespace=${NS_VMS} --from-file=../push1st/devices.yml
@@ -83,9 +75,6 @@ kubectl create secret generic vms-backend-oauth --namespace=${NS_VMS} \
 if [ ${TYPE} != "prod" ]; then
 	kubectl create configmap mysql-server-env --namespace=${NS_VMS} --from-env-file=../mysql-server/mysql-server.env
 	kubectl create configmap mysql-cnf --namespace=${NS_VMS} --from-file=../mysql-server/my.cnf
-# else
-#	kubectl create configmap overrides-php-ini --namespace=${NS_VMS} --from-file=../vms-backend/99-overrides-php.ini
-#	kubectl create configmap overrides-php-pool-www-conf --namespace=${NS_VMS} --from-file=z-overrides-www.conf=../vms-backend/z-overrides-pool-www.conf
 fi
 
 if [ ${VMS_LIC_OFFLINE} == "yes" ]; then
@@ -95,11 +84,15 @@ fi
 
 # Create CONTROLLER configmsps
 kubectl create configmap controller-env --namespace=${NS_VMS} --from-env-file=../controller/environments/.env
-# kubectl create configmap controller-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/controller-nginx.conf
-# kubectl create configmap controller-nginx-server-conf --namespace=${NS_VMS} --from-file=../nginx/controller-nginx-server.conf
 
 # Create PORTAL configmsps
 if [ ${PORTAL} == "yes" ]; then
+	kubectl create configmap portal-landing-nginx --namespace=${NS_VMS} \
+		--from-file=nginx.conf=../portal/nginx-base-landing.conf \
+		--from-file=default.conf=../portal/nginx-server-landing.conf
+	kubectl create configmap portal-client-nginx --namespace=${NS_VMS} \
+		--from-file=nginx.conf=../portal/nginx-base-client.conf \
+		--from-file=default.conf=../portal/nginx-server-client.conf
 	kubectl create configmap vms-portal-backend-env --namespace=${NS_VMS} --from-env-file=../portal/environments/.env
 	kubectl create configmap vms-portal-stub-env --namespace=${NS_VMS} --from-env-file=../portal/environments-stub/.env
 fi

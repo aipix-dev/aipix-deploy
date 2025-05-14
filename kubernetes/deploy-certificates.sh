@@ -3,18 +3,18 @@
 DOC='''
 Use the following options to run the script
 
--i <[verions]>		install cert-manager (enter optional verion like v1.17.1)
--u <verions> 		update cert-manager deployment (enter required verion like v1.17.1)
--c <service>		provide service for which certificate shold be deployed;
-available services:
- 	vms			for vms service
- 	portal-stub 		for portal-stub service
- 	minio-console		for minio console service (used in single node installation)
- 	minio-console-1		for primary minio console service (used in HA/production installation)
- 	minio-console-2 	for secondary minio console service (used in HA/production installation)
-	orchestrator		for analytics orchestrator service
-	traefik-dashboard 	for traefik dashboard service
--h 			display this help
+-i <[versions]>		install cert-manager (enter optional version like v1.17.1);
+-u <versions> 		update cert-manager deployment (enter required version like v1.17.1);
+-c <service>		provide service name for which certificate should be deployed;
+					available services:
+						vms					for vms service;
+						portal-stub 		for portal-stub service;
+						minio-console		for minio console service (used in single node installation);
+						minio-console-1		for primary minio console service (used in HA/production installation);
+						minio-console-2 	for secondary minio console service (used in HA/production installation);
+						orchestrator		for analytics orchestrator service;
+						traefik-dashboard 	for traefik dashboard service;
+-h 					display this help;
 
 For example: 
 1) to install cert-manager run 
@@ -23,7 +23,7 @@ For example:
 2) to upgrade cert-manager run 
 ./deploy-certificates.sh -u v1.17.1
 
-3) to create certificate for vms sercice run 
+3) to create certificate for vms service run 
 ./deploy-certificates.sh -c vms
 
 '''

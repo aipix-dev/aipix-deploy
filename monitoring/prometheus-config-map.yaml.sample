@@ -30,6 +30,13 @@ data:
         - targets:
           - "alertmanager.monitoring.svc:9093"
     scrape_configs:
+      - job_name: 'mysqld-exporter'
+        scrape_interval: 1m
+        static_configs:
+          - targets: ['mysqld-exporter.${NS_VMS}.svc.cluster.local:9104']
+      - job_name: 'redis-exporter'
+        static_configs:
+          - targets: ['redis-exporter.${NS_VMS}.svc.cluster.local:9121']
       - job_name: 'node-exporter'
         kubernetes_sd_configs:
           - role: endpoints

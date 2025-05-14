@@ -4,6 +4,7 @@
 
 job:
   image: download.aipix.ai:8443/robot-tests:1.0.0
+  args: ./run-tests.sh
   resources:
     requests:
       cpu: "150m"

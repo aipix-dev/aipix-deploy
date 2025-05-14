@@ -20,3 +20,25 @@ spec:
     app.kubernetes.io/component: message-broker
     app.kubernetes.io/part-of: vms
     global-app-name: vsaas
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: redis-server
+    app.kubernetes.io/component: message-broker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: redis-exporter
+  namespace: vms
+spec:
+  ports:
+    - name: redis-exporter
+      port: 9121
+      targetPort: 9121
+  selector:
+    app.kubernetes.io/name: redis-server
+    app.kubernetes.io/component: message-broker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas

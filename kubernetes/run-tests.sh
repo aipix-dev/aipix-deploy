@@ -22,7 +22,7 @@ kubectl create secret docker-registry download-aipix-ai --namespace=${TEST_NS} \
 kubectl delete configmap robot-tests --namespace=${TEST_NS} || true
 kubectl delete configmap robot-tests-env --namespace=${TEST_NS} || true
 # kubectl create configmap robot-tests --namespace=${TEST_NS} --from-file=../tests/variables.yaml
-kubectl create configmap robot-tests-env --namespace=${TEST_NS} --from-env-file==../tests/.env
+kubectl create configmap robot-tests-env --namespace=${TEST_NS} --from-env-file=../tests/.env
 
 helm uninstall --namespace=${TEST_NS} rtsp-server || true
 helm uninstall --namespace=${TEST_NS} robot-tests || true

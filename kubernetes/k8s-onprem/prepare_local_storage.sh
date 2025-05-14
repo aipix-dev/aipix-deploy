@@ -35,7 +35,7 @@ else
 	for i in $(seq ${n1} ${n2}); do
 		sudo mkdir -p /var/opt/vol${i} /mnt/disks/disk_vol${i}
 		sudo mount --bind /var/opt/vol${i} /mnt/disks/disk_vol${i}
-		echo /var/opt/vol${i} /mnt/disks/disk_vol${i} none bind 0 0 | sudo tee -a /etc/fstab
+		echo "/var/opt/vol${i} /mnt/disks/disk_vol${i} none bind 0 0" | sudo tee -a /etc/fstab
 	done
 fi
 
