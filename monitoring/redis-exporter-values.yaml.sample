@@ -1,0 +1,1 @@
+redisAddress: redis://redis-server.${NS_VMS}.svc:6379

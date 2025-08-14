@@ -19,32 +19,40 @@ fi
 #Creating configs for orchestrator and analytics-worker
 cp -n ./sources.sh.sample ./sources.sh
 cp -n ../analytics/env.sample ../analytics/.env
-# sed -i 's@//django:8000/client_api/servers/@//orchestrator/client_api/servers/@g' ../analytics/.env
 sed -i "s@://push1st:@://push1st.${NS_VMS}.svc:@g" ../analytics/.env
 sed -i "s@mysql-server-analytics@mysql-server.${NS_VMS}.svc@g" ../analytics/.env
 sed -i "s@redis-server-analytics@redis-server.${NS_VMS}.svc@g" ../analytics/.env
-# sed -i 's@//vectorizator:.*/process/@//vectorizator/process/@g' ../analytics/.env
-# sed -i 's@//analytics-licensing:8888@//127.0.0.1:8888@g' ../analytics/.env
 sed -i 's@^MONITORING_@#MONITORING_@g' ../analytics/.env
 sed -i 's@^DEPLOYMENT_NAME@#DEPLOYMENT_NAME@g' ../analytics/.env
+sed -i "s@^BACKEND_SERVICE_HOST.*@BACKEND_SERVICE_HOST = \"backend.${NS_VMS}.svc\"@g" ../analytics/.env
 
 cp -n ../analytics/licensing.yaml.sample ../analytics/licensing.yaml
 sed -i "s@host:.*mysql-server.*@host: mysql-server.${NS_VMS}.svc@g" ../analytics/licensing.yaml
 sed -i "s@://push1st.*:@://push1st.${NS_VMS}.svc:@g" ../analytics/licensing.yaml
 cp -n ../analytics/license.json.sample ../analytics/license.json
-cp -n ../analytics/analytics-worker.conf.sample ../analytics/analytics-worker.conf
-sed -i "s@://push1st.*:@://push1st.${NS_VMS}.svc:@g" ../analytics/analytics-worker.conf
-sed -i "s@^PUSH_ERRORS_@#PUSH_ERRORS_@g" ../analytics/analytics-worker.conf
-sed -i "s@MINIO_URL=.*@MINIO_URL=minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../analytics/analytics-worker.conf
-sed -i "s@MINIO_ACCESS_KEY=.*@MINIO_ACCESS_KEY=${MINIO_ANALYTICS_ACCESS_KEY}@g" ../analytics/analytics-worker.conf
-sed -i "s@MINIO_SECRET_KEY=.*@MINIO_SECRET_KEY=${MINIO_ANALYTICS_SECRET_KEY}@g" ../analytics/analytics-worker.conf
-sed -i "s@MINIO_BUCKET_NAME=.*@MINIO_BUCKET_NAME=${MINIO_ANALYTICS_BUCKET_NAME}@g" ../analytics/analytics-worker.conf
+
+# cp -n ../analytics/analytics-worker.conf.sample ../analytics/analytics-worker.conf   --- worker < 25.06.0.0
+# sed -i "s@://push1st.*:@://push1st.${NS_VMS}.svc:@g" ../analytics/analytics-worker.conf   --- worker < 25.06.0.0
+# sed -i "s@^PUSH_ERRORS_@#PUSH_ERRORS_@g" ../analytics/analytics-worker.conf   --- worker < 25.06.0.0
+# sed -i "s@MINIO_URL=.*@MINIO_URL=minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../analytics/analytics-worker.conf   --- worker < 25.06.0.0
+# sed -i "s@MINIO_ACCESS_KEY=.*@MINIO_ACCESS_KEY=${MINIO_ANALYTICS_ACCESS_KEY}@g" ../analytics/analytics-worker.conf   --- worker < 25.06.0.0
+# sed -i "s@MINIO_SECRET_KEY=.*@MINIO_SECRET_KEY=${MINIO_ANALYTICS_SECRET_KEY}@g" ../analytics/analytics-worker.conf   --- worker < 25.06.0.0
+# sed -i "s@MINIO_BUCKET_NAME=.*@MINIO_BUCKET_NAME=${MINIO_ANALYTICS_BUCKET_NAME}@g" ../analytics/analytics-worker.conf   --- worker < 25.06.0.0
+
+cp -n ../analytics/analytics-worker-env.sample ../analytics/analytics-worker-env
+sed -i "s@://push1st.*:@://push1st.${NS_VMS}.svc:@g" ../analytics/analytics-worker-env
+sed -i "s@^PUSH_ERRORS_MONITORING_ENDPOINT@#PUSH_ERRORS_MONITORING_ENDPOINT@g" ../analytics/analytics-worker-env
+sed -i "s@^PUSH_ERRORS_VMS_ENDPOINT=.*@PUSH_ERRORS_VMS_ENDPOINT=http://backend.${NS_VMS}.svc/api/v1/ovms/callback@g" ../analytics/analytics-worker-env
+sed -i "s@MINIO_URL=.*@MINIO_URL=http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../analytics/analytics-worker-env
+sed -i "s@MINIO_ACCESS_KEY=.*@MINIO_ACCESS_KEY=${MINIO_ANALYTICS_ACCESS_KEY}@g" ../analytics/analytics-worker-env
+sed -i "s@MINIO_SECRET_KEY=.*@MINIO_SECRET_KEY=${MINIO_ANALYTICS_SECRET_KEY}@g" ../analytics/analytics-worker-env
+sed -i "s@MINIO_BUCKET_NAME=.*@MINIO_BUCKET_NAME=${MINIO_ANALYTICS_BUCKET_NAME}@g" ../analytics/analytics-worker-env
 
 if [ ${MONITORING} == "yes" ]; then
 	sed -i 's@^#MONITORING_@MONITORING_@g' ../analytics/.env
 	sed -i "s@.DEPLOYMENT_NAME.*@DEPLOYMENT_NAME = ${NS_A}@g" ../analytics/.env
-	sed -i "s@^#PUSH_ERRORS_@PUSH_ERRORS_@g" ../analytics/analytics-worker.conf
-	# sed -i "s@^#SYS_LOG_@SYS_LOG_@g" ../analytics/analytics-worker.conf
+	# sed -i "s@^#PUSH_ERRORS_@PUSH_ERRORS_@g" ../analytics/analytics-worker.conf   --- worker < 25.06.0.0
+	sed -i "s@^#PUSH_ERRORS_MONITORING_ENDPOINT@PUSH_ERRORS_MONITORING_ENDPOINT@g" ../analytics/analytics-worker-env
 	envsubst < ../analytics/metrics-pusher.env.sample > ../analytics/metrics-pusher.env
 	envsubst < ../analytics/telegraf.conf.sample > ../analytics/telegraf.conf
 fi

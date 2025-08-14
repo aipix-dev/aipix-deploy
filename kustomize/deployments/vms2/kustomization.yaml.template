@@ -1,6 +1,5 @@
 namespace: ${NS_VMS}
 resources:
-#- ../../apps/vms/nginx
 - ../../apps/vms/backend
 - ../../apps/vms/beanstalkd
 - ../../apps/vms/redis
@@ -27,28 +26,28 @@ ${ADD_COMPONENT3}
 images:
 - name: download.aipix.ai:8443/vms-backend/release
   newName: download.aipix.ai:8443/vms-backend/release
-  newTag: 24.12.1.1
+  newTag: 25.06.0.0
 - name: download.aipix.ai:8443/vms-frontend-admin/release
   newName: download.aipix.ai:8443/vms-frontend-admin/release
-  newTag: 24.12.1.1
+  newTag: 25.06.0.0
 - name: download.aipix.ai:8443/vms-frontend-client/release
   newName: download.aipix.ai:8443/vms-frontend-client/release
-  newTag: 24.12.1.1
+  newTag: 25.06.0.0
 - name: download.aipix.ai:8443/controller/release
   newName: download.aipix.ai:8443/controller/release
-  newTag: 24.12.1.0
+  newTag: 25.06.0.0
 - name: download.aipix.ai:8443/vms-portal-backend/release
   newName: download.aipix.ai:8443/vms-portal-backend/release
-  newTag: 24.12.1.0
+  newTag: 25.06.0.0
 - name: download.aipix.ai:8443/vms-portal-frontend-client/release
   newName: download.aipix.ai:8443/vms-portal-frontend-client/release
-  newTag: 24.12.1.0
+  newTag: 25.06.0.0
 - name: download.aipix.ai:8443/vms-portal-stub/release
   newName: download.aipix.ai:8443/vms-portal-stub/release
   newTag: latest
 - name: download.aipix.ai:8443/vms-portal-landing/release
   newName: download.aipix.ai:8443/vms-portal-landing/release
-  newTag: 24.12.1.0
+  newTag: 25.06.0.0
 - name: download.aipix.ai:8443/beanstalkd
   newName: download.aipix.ai:8443/beanstalkd
   newTag: "1.13"

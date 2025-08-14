@@ -14,7 +14,7 @@ fi
 
 export CONTROLLER_ONVIF_EXTERNAL_HOST=$(kubectl -n ${TRAEFIK_NAMESPACE} get svc traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')          #Get ip addres from traefik service external IP
 
-#Creating configs files for vms
+#Creating configs files for backend
 cp -n ./sources.sh.sample ./sources.sh
 cp -n ../vms-backend/environments/env.sample ../vms-backend/environments/.env
 cp -n ../vms-backend/certificates/fcm.json.sample ../vms-backend/certificates/fcm.json
@@ -81,11 +81,15 @@ else
 	sed -E -i "s@^ *#? *S3_BACKUP_PATH=.*@S3_BACKUP_PATH=database_backups@g" ../vms-backend/environments/.env
 fi
 
+#Creating configs files for controller
 cp -n ../controller/environments/env.sample ../controller/environments/.env
 sed -i "s@CONTROL_PLAIN_HLS_REDIRECT_ENDPOINT=.*@CONTROL_PLAIN_HLS_REDIRECT_ENDPOINT=${VMS_DOMAIN}/controller-hls@g" ../controller/environments/.env
+sed -i "s@CONTROL_PLAIN_HLS_REDIRECT_ENDPOINT_INTERNAL=.*@CONTROL_PLAIN_HLS_REDIRECT_ENDPOINT_INTERNAL=controller-control-plane-hls.${NS_VMS}.svc:8888@g" ../controller/environments/.env
 sed -i "s@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT=.*@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT=${VMS_DOMAIN}:5554@g" ../controller/environments/.env
 sed -i "s@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT_INTERNAL=.*@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT_INTERNAL=controller-control-plane-rtsp.${NS_VMS}.svc:5554@g" ../controller/environments/.env
 sed -i "s@ONVIF_EXTERNAL_HOST=.*@ONVIF_EXTERNAL_HOST=http://${CONTROLLER_ONVIF_EXTERNAL_HOST}:8888@g" ../controller/environments/.env
+
+#Creating configs files for frontend
 cp -n ../vms-frontend/admin.env.sample ../vms-frontend/admin.env
 cp -n ../vms-frontend/nginx-base-admin.conf.sample ../vms-frontend/nginx-base-admin.conf
 cp -n ../vms-frontend/nginx-server-admin.conf.sample ../vms-frontend/nginx-server-admin.conf
@@ -124,6 +128,7 @@ fi
 
 cp -n ../vms-backend/license/license.json.sample ../vms-backend/license/license.json
 
+#Creating configs files for portal
 if [ ${PORTAL} == "yes" ]; then
 	cp -n ../portal/nginx-base-client.conf.sample ../portal/nginx-base-client.conf
 	cp -n ../portal/nginx-server-client.conf.sample ../portal/nginx-server-client.conf

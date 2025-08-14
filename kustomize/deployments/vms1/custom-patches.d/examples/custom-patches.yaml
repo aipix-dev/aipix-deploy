@@ -16,3 +16,14 @@
     kind: Deployment
     name: (backend|controller-api)
   path: ./custom-patches.d/patch-image-pull-policy-init.yaml
+
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: frontend-admin
+  patch: |-
+    - op: add
+      path: /spec/routes/0/middlewares/-
+      value:
+        name: admin-white-list

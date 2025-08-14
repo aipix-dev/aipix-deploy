@@ -128,6 +128,7 @@ echo "Manifests were successfully aplied"
 for i in $(kubectl get deployments -n ${NS_VMS} | awk 'NR>1 { print $1 }'); do kubectl rollout restart deployment.apps/$i -n ${NS_VMS}; done
 kubectl -n ${NS_VMS} rollout status deployment backend >/dev/null
 kubectl -n ${NS_VMS} rollout status deployment controller-api >/dev/null
+kubectl -n ${NS_VMS} rollout status deployment redis-server >/dev/null
 if [ ${TYPE} != "prod" ]; then
 	kubectl -n ${NS_VMS} rollout status deployment mysql-server >/dev/null
 fi

@@ -1,52 +1,51 @@
 CREATE DATABASE IF NOT EXISTS orchestrator;
 
 CREATE TABLE IF NOT EXISTS orchestrator.events(
-message String,
-received_at DateTime DEFAULT now(),
-REC_DATE Date DEFAULT toDate(now())
-) ENGINE = MergeTree()
-PARTITION BY REC_DATE ORDER BY received_at
-TTL received_at + INTERVAL 30 DAY DELETE
+    message String,
+    received_at DateTime DEFAULT now(),
+    REC_DATE Date DEFAULT toDate(now())
+)
+ENGINE = MergeTree()
+PARTITION BY REC_DATE
+ORDER BY received_at
 SETTINGS index_granularity = 8192;
 
-CREATE TABLE IF NOT EXISTS orchestrator.buffer_events AS orchestrator.events
-    ENGINE = Buffer(orchestrator, events, 16, 2, 30, 10, 1000000, 10, 100000000);
-
 CREATE TABLE IF NOT EXISTS orchestrator.analytic_case_events (
-        `inner_data` String,
-        `analytic_type` String,
-        `analytic_case_uuid` String,
-        `analytic_case_camera_uuid` String,
-        `stream_uuid` String,
-        `crop` Array(String),
-        `event_frame_url` Nullable(String),
-        `rect` Array(Array(UInt32)),
-        `container_code` Nested(
-            code String,
-            similarity Float32
-        ),
-        `container_dims_code` Nested(
-            code String,
-            similarity Float32
-        ),
-        `score` Array(Float64),
-        `event_type` String,
-        `is_recognized` UInt8,
-        `license_plate` String,
-        `resource_license_plates` Array(String),
-        `matches` Nested(
-            resource_uuid String,
-            similarity Float32
-        ),
-        `received_at` DateTime,
-        `created_at` DateTime DEFAULT `received_at`,
-        `received_date` Date,
-        `uuid` String
-    )
-    ENGINE = MergeTree()
-    PARTITION BY received_date
-    ORDER BY (analytic_case_uuid, received_at)
-    TTL received_at + INTERVAL 30 DAY DELETE;
+    `inner_data` String,
+    `analytic_type` String,
+    `analytic_case_uuid` String,
+    `analytic_case_camera_uuid` String,
+    `stream_uuid` String,
+    `crop` Array(String),
+    `event_frame_url` Nullable(String),
+    `rect` Array(Array(UInt32)),
+    `age`  Array(Float32),
+    `fence_name`  Array(String),
+    `container_code` Nested(
+        code String,
+        similarity Float32
+    ),
+    `container_dims_code` Nested(
+        code String,
+        similarity Float32
+    ),
+    `score` Array(Float64),
+    `event_type` String,
+    `is_recognized` UInt8,
+    `license_plate` String,
+    `resource_license_plates` Array(String),
+    `matches` Nested(
+        resource_uuid String,
+        similarity Float32
+    ),
+    `received_at` DateTime,
+    `created_at` DateTime DEFAULT `received_at`,
+    `received_date` Date,
+    `uuid` String
+)
+ENGINE = MergeTree()
+PARTITION BY received_date
+ORDER BY (analytic_case_camera_uuid, analytic_case_uuid, received_at);
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS orchestrator.mv_analytic_case_events
 TO orchestrator.analytic_case_events
@@ -60,6 +59,8 @@ SELECT
     JSONExtract(inner_data, 'crop', 'Array(String)') AS crop,
     JSONExtractString(inner_data, 'eventFrameUrl') AS event_frame_url,
     JSONExtract(inner_data, 'rect', 'Array(Array(UInt32))') AS rect,
+    JSONExtract(inner_data, 'age', 'Array(Float32)') AS age,
+    JSONExtract(inner_data, 'fenceName', 'Array(String)') AS fence_name,
     arrayMap(x -> (x.1), JSONExtract(inner_data, 'containerCode', 'Nested(code String, similarity Float32)')) as `container_code.code`,
     arrayMap(x -> (x.2), JSONExtract(inner_data, 'containerCode', 'Nested(code String, similarity Float32)')) as `container_code.similarity`,
     arrayMap(x -> (x.1), JSONExtract(inner_data, 'dimsCode', 'Nested(code String, similarity Float32)')) as `container_dims_code.code`,
@@ -76,8 +77,9 @@ SELECT
     REC_DATE AS received_date,
     toString( generateUUIDv4() ) as uuid
 FROM orchestrator.events
-WHERE JSONExtractString(message, 'channel') = 'events';
-
+WHERE
+    JSONExtractString(message, 'channel') = 'events'
+    AND (has(JSONExtract(inner_data, 'fenceSide', 'Array(String)'), 'left') OR NOT JSONHas(inner_data, 'fenceSide'));
 
 CREATE TABLE IF NOT EXISTS orchestrator.visitor_countings (
     `analytic_type` String,
@@ -95,10 +97,10 @@ CREATE TABLE IF NOT EXISTS orchestrator.visitor_countings (
     `received_at` DateTime,
     `created_at` DateTime DEFAULT `received_at`,
     `received_date` Date
-) ENGINE = MergeTree()
-    PARTITION BY received_date
-    ORDER BY (analytic_case_uuid, received_at)
-    TTL received_at + INTERVAL 30 DAY DELETE;
+)
+ENGINE = MergeTree()
+PARTITION BY received_date
+ORDER BY (analytic_case_uuid, received_at);
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS orchestrator.mv_visitor_countings
 TO orchestrator.visitor_countings
@@ -132,4 +134,4 @@ FROM
     JSONExtract(inner_data, 'fenceSide', 'Array(String)') as fence_side,
     JSONExtract(inner_data, 'objId', 'Array(UInt32)') as object_id
 WHERE
-    event_type = 'visitors-counting'
+    event_type = 'visitors-counting';

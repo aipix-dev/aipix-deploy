@@ -1,0 +1,22 @@
+WORKER_UID=
+REGISTRATION_ENDPOINT=http://orchestrator/api/worker_registration/
+UPDATE_PARAMS_ENDPOINT=http://orchestrator/api/case_types/
+WEBSOCKET_ENDPOINT=ws://push1st:6003/ws/app/app-key
+EVENTS_CHANNEL=raw-events
+STATS_CHANNEL=stats
+STATS_PUSH_PERIOD=3
+STATS_PUSH_TIMEOUT=15
+WS_MESSAGE_SIZE=65400
+API_PORT=
+REGIONS=
+#REGION_KEY=vsaas.analytics/zone
+
+## Monitoring
+PUSH_ERRORS_MONITORING_ENDPOINT=http://metrics-pusher:8080/telegraf
+PUSH_ERRORS_VMS_ENDPOINT=http://backend/api/v1/ovms/callback
+
+## MinIO configuration:
+MINIO_URL=
+MINIO_ACCESS_KEY=
+MINIO_SECRET_KEY=
+MINIO_BUCKET_NAME=

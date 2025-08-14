@@ -8,81 +8,58 @@ source ./sources.sh
 BRAND=aipix
 HELM_REPO="https://download.aipix.ai/repository/charts/"
 
-helm repo rm "${BRAND}" || true
-helm repo add "${BRAND}" "${HELM_REPO}" --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}"
-helm repo update
-
-git -C ../kustomize/apps/monitoring clone https://github.com/techiescamp/kubernetes-prometheus.git || true
-git -C ../kustomize/apps/monitoring clone https://github.com/devopscube/kube-state-metrics-configs.git || true
-git -C ../kustomize/apps/monitoring clone https://github.com/bibinwilson/kubernetes-node-exporter.git || true
-git -C ../kustomize/apps/monitoring clone https://github.com/bibinwilson/kubernetes-grafana.git || true
+# Add helm repos
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo add influxdata https://helm.influxdata.com/
 helm repo add fluent https://fluent.github.io/helm-charts
-helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 
-mkdir -p ../kustomize/apps/monitoring/kubernetes-influxdb
-envsubst < ../monitoring/influxdb-values.yaml.sample > ../monitoring/influxdb-values.yaml
-helm template vsaas --debug influxdata/influxdb2 -f ../monitoring/influxdb-values.yaml > ../kustomize/apps/monitoring/kubernetes-influxdb/influxdb.yaml
+## Add aipix helm repo 
+helm repo rm "${BRAND}" || true
+helm repo add "${BRAND}" "${HELM_REPO}" --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}"
 
-cat << EOF > ../kustomize/apps/monitoring/kubernetes-prometheus/kustomization.yaml
-resources:
-- clusterRole.yaml
-- prometheus-deployment.yaml
-- prometheus-service.yaml
-EOF
 
-cat << EOF > ../kustomize/apps/monitoring/kube-state-metrics-configs/kustomization.yaml
-resources:
-- cluster-role.yaml
-- cluster-role-binding.yaml
-- service-account.yaml
-- deployment.yaml
-- service.yaml
-EOF
-
-cat << EOF > ../kustomize/apps/monitoring/kubernetes-node-exporter/kustomization.yaml
-resources:
-- daemonset.yaml
-- service.yaml
-EOF
-
-cat << EOF > ../kustomize/apps/monitoring/kubernetes-grafana/kustomization.yaml
-resources:
-- deployment.yaml
-- service.yaml
-EOF
-
-cat << EOF > ../kustomize/apps/monitoring/kubernetes-influxdb/kustomization.yaml
-resources:
-- influxdb.yaml
-EOF
-
-envsubst < ../monitoring/prometheus-config-map.yaml.sample > ../monitoring/prometheus-config-map.yaml
-# cp -n ../monitoring/prometheus-config-map.yaml.sample ../monitoring/prometheus-config-map.yaml
-cp ../monitoring/prometheus-config-map.yaml ../kustomize/deployments/monitoring1/
-envsubst < ../monitoring/grafana-datasources-config.yaml.sample > ../monitoring/grafana-datasources-config.yaml
-cp ../monitoring/grafana-datasources-config.yaml ../kustomize/deployments/monitoring1/
-cp -n ../monitoring/grafana-dashboards-config.yaml.sample ../monitoring/grafana-dashboards-config.yaml
-
-# Configure logging
-## Configure fluent-bit
-cp -n ../monitoring/fluentbit-values.yaml.sample ../monitoring/fluentbit-values.yaml
-helm -n monitoring template --debug fluent-bit fluent/fluent-bit --set testFramework.enabled=false -f ../monitoring/fluentbit-values.yaml --version 0.48.9 > ../kustomize/deployments/monitoring1/fluent-bit.yaml
-cp ../monitoring/syslog-service.yaml ../kustomize/deployments/monitoring1/
-
-## Configure loki
+# Configure Grafana and Loki deployment
+envsubst < ../monitoring/grafana-values.yaml.sample > ../monitoring/grafana-values.yaml
 if [ ${TYPE} == "prod" ]; then
 	export S3_PORT_INTERNAL=""
 else
 	export S3_PORT_INTERNAL=":9000"
 fi
-envsubst \
-	< ../monitoring/loki-values.yaml.sample \
-	> ../monitoring/loki-values.yaml
+envsubst < ../monitoring/loki-values.yaml.sample > ../monitoring/loki-values.yaml
 
-helm -n monitoring template --debug loki grafana/loki -f ../monitoring/loki-values.yaml --version 6.28.0 > ../kustomize/deployments/monitoring1/loki.yaml
+## Copy grafana dashboards to S3
+mc cp --recursive ../monitoring/grafana-dashboards/ local/${MINIO_GRAFANA_BUCKET_NAME}/ || echo -e "\033[31mUnable to copy grafana dashboards to S3\033[0m"
 
+# Configure logging
+## Configure fluent-bit
+cp -n ../monitoring/fluentbit-values.yaml.sample ../monitoring/fluentbit-values.yaml
+# envsubst < ../monitoring/fluentbit-values.yaml.sample > ../monitoring/fluentbit-values.yaml
+
+# Configure InfluxDB deployment
+envsubst < ../monitoring/influxdb-values.yaml.sample > ../monitoring/influxdb-values.yaml
+
+# Configure Prometheus deployment
+## Configure Prometheus
+envsubst < ../monitoring/prometheus-values.yaml.sample > ../monitoring/prometheus-values.yaml.tmp
+cp -n ../monitoring/prometheus-values.yaml.tmp ../monitoring/prometheus-values.yaml
+rm ../monitoring/prometheus-values.yaml.tmp 
+
+## Configure mysql-exporter
+envsubst < ../monitoring/mysql-exporter-values.yaml.sample > ../monitoring/mysql-exporter-values.yaml
+
+## Configure node-exporter
+envsubst < ../monitoring/node-exporter-values.yaml.sample > ../monitoring/node-exporter-values.yaml
+
+## Configure redis-exporter
+envsubst < ../monitoring/redis-exporter-values.yaml.sample > ../monitoring/redis-exporter-values.yaml
+
+## Configure kube-state-metrics
+envsubst < ../monitoring/kube-state-metrics-values.yaml.sample > ../monitoring/kube-state-metrics-values.yaml
+
+# Configure vsaas-media-logger
+envsubst < ../monitoring/vsaas-media-logger.yaml.sample > ../monitoring/vsaas-media-logger.yaml
 echo """
 
 Monitoring configuration script completed successfuly!

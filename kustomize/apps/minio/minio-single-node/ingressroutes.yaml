@@ -16,6 +16,7 @@ spec:
     middlewares:
     - name: strip-prefix-s3
     - name: add-host-header
+    - name: access-control-expose-headers
     services:
     - kind: Service
       name: minio

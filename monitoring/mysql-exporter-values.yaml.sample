@@ -1,0 +1,12 @@
+# mysql connection params which build the my.cnf config
+mysql:
+  db: ""
+  host: "mysql-server.${NS_VMS}.svc"
+  pass: "password"
+  port: 3306
+  protocol: ""
+  user: "exporter"
+
+collectors:
+  info_schema.tables: true
+  info_schema.tables.databases: '*'

@@ -16,7 +16,7 @@ export NS_MINIO=minio-single                        	#k8s namespace for minio s3
 export RWO_STORAGE=local-storage                    	# storage classname for ReadWriteOnce
                                                     	# for GKE use standard-rwo
 export RWX_STORAGE=openebs-kernel-nfs               	# storage classname for ReadWriteMany
-                                                    	# for GKE use  standard-rwx
+                                                    	# for GKE use standard-rwx
 
 export ANALYTICS=no 				                #If analytics will be deployed ("yes" or "no")
 export TYPE=single                                              ##Installations options
@@ -49,9 +49,12 @@ export MINIO_PORTAL_SECRET_KEY_PRIV=pA6d6RsmTVfvJ066q4U1VeJOGnEdyf4YHPKD0gsT    
 export MINIO_ANALYTICS_BUCKET_NAME=analytics-store                                   #minio bucket name for analytics
 export MINIO_ANALYTICS_ACCESS_KEY=Y4RJU1RNFGK48LGO9I2S                               #define minio access key for analytics bucket (use letters and numbers only)
 export MINIO_ANALYTICS_SECRET_KEY=qV6drWCmTV0vJ0Q2q921VeJOGnEcyfYYHPKD0k7R           #define minio secret key for analytics bucket (use letters and numbers only)
-export MINIO_LOGS_BUCKET_NAME=logs                                                          # define backet name for logs
+export MINIO_LOGS_BUCKET_NAME=logs                                                          # define bucket name for logs
 export MINIO_LOGS_ACCESS_KEY=TW2N577S01BDXSSRCJB2                                           # define minio access key for logs bucket
 export MINIO_LOGS_SECRET_KEY=uTgCH2La9fH749uE5v2RqpaCOsxfRUmGLktyN2dn                       # define minio secret key for logs bucket
+export MINIO_GRAFANA_BUCKET_NAME=grafana-dashboards                                            # define bucket for grafana dashboards
+export MINIO_GRAFANA_ACCESS_KEY=YGSTBZ1FKPPRJCOV8X3L                                           # define minio access key for grafana-dashboards bucket
+export MINIO_GRAFANA_SECRET_KEY=ka2LGfUfYOy0ACBxQvqxbvjpn18KZ5w6XMbM1zAL                       # define minio secret key for grafana-dashboards bucket
 
 #Monitoring parameters
 export MONITORING=no			                          	#If monitoring will be deployed ("yes" or "no")

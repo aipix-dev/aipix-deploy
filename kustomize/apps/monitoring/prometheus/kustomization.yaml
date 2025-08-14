@@ -1,0 +1,6 @@
+resources:
+- prometheus.yaml
+- prometheus-mysql-exporter.yaml
+- prometheus-node-exporter.yaml
+- prometheus-redis-exporter.yaml
+- kube-state-metrics.yaml

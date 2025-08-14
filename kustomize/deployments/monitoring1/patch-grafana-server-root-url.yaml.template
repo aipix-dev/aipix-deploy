@@ -1,7 +1,0 @@
-- op: add
-  path: /spec/template/spec/containers/0/env
-  value:
-    - name: GF_SERVER_ROOT_URL
-      value: https://${VMS_DOMAIN}/monitoring
-    - name: GF_SERVER_SERVE_FROM_SUB_PATH
-      value: "true"

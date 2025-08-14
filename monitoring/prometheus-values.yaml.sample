@@ -1,0 +1,65 @@
+## Monitors ConfigMap changes and POSTs to a URL
+## Ref: https://github.com/prometheus-operator/prometheus-operator/tree/main/cmd/prometheus-config-reloader
+##
+configmapReload:
+  prometheus:
+    enabled: true
+server:
+  global:
+    scrape_interval: 5s
+    scrape_timeout: 4s
+    evaluation_interval: 5s
+  persistentVolume:
+    size: 10Gi
+    storageClass: "${RWO_STORAGE}"
+  service:
+    servicePort: 8080
+
+alertmanager:
+  enabled: false
+
+kube-state-metrics:
+  enabled: false
+
+prometheus-node-exporter:
+  enabled: false
+
+prometheus-pushgateway:
+  enabled: false
+
+# adds additional scrape configs to prometheus.yml
+# must be a string so you have to add a | after extraScrapeConfigs:
+# example adds prometheus-blackbox-exporter scrape config  
+extraScrapeConfigs: |
+  - job_name: 'mysqld-exporter'
+    scrape_interval: 1m
+    static_configs:
+      - targets: ['mysql-exporter-prometheus-mysql-exporter.monitoring.svc:9104']
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['redis-exporter-prometheus-redis-exporter.monitoring.svc:9121']
+  - job_name: 'node-exporter'
+    kubernetes_sd_configs:
+      - role: endpoints
+    relabel_configs:
+    - source_labels: [__meta_kubernetes_endpoints_name]
+      regex: 'node-exporter-prometheus-node-exporter'
+      action: keep
+    - source_labels: [__meta_kubernetes_pod_node_name]
+      action: replace
+      target_label: instance
+  - job_name: 'kube-state-metrics'
+    static_configs:
+      - targets: ['kube-state-metrics.monitoring.svc:8080']
+  - job_name: 'minio-job'
+    bearer_token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwcm9tZXRoZXVzIiwic3ViIjoibmF2ZWtzb2Z0IiwiZXhwIjo0ODUwMzk2OTA3fQ.WWCLGWb-usnTqR5aWGDwRpSlgl0VfDvthSSWYxhf3X1UNXCRWoGIZz386Q3KIShzAHipamIoFyf5oR9YCebobg
+    metrics_path: /minio/v2/metrics/cluster
+    scheme: http
+    static_configs:
+      - targets: ['minio.${NS_MINIO}.svc:9000']
+  - job_name: 'minio-job-bucket'
+    bearer_token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwcm9tZXRoZXVzIiwic3ViIjoibmF2ZWtzb2Z0IiwiZXhwIjo0ODUwNTIwMjkyfQ.acVDRmB-kLSFCkzIIZAinzTRguHYYKZeM0ebwHHKfSDhjq3xYb4YaNwfHrJKoI4E3z5fTGD7sal4QwF5nxdn-w
+    metrics_path: /minio/v2/metrics/bucket
+    scheme: http
+    static_configs:
+      - targets: ['minio.${NS_MINIO}.svc:9000']

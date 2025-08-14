@@ -1,0 +1,100 @@
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: prometheus
+        type: prometheus
+        access: proxy
+        orgId: 1
+        url: http://prometheus-server.monitoring.svc:8080
+        editable: true
+        version: 1
+      - name: influxdb
+        type: influxdb
+        access: proxy
+        url: http://influxdb-influxdb2.monitoring.svc
+        editable: true
+        jsonData:
+          dbName: telegraf
+          httpMode: GET
+          httpHeaderName1: Authorization
+        secureJsonData:
+          httpHeaderValue1: "Token ${INFLUX_TOKEN}"
+      - name: loki
+        type: loki
+        access: proxy
+        orgId: 1
+        url: http://loki.monitoring.svc:3100
+        basicAuth: false
+        version: 1
+        isDefault: false
+        editable: true
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: 'dashboards'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        allowUiUpdates: true
+        updateIntervalSeconds: 30
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards
+          foldersFromFilesStructure: true
+
+grafana.ini:
+  server:
+    root_url: https://${VMS_DOMAIN}/monitoring
+    serve_from_sub_path: true
+
+extraInitContainers:
+  - name: download-dashboards
+    image: quay.io/minio/minio:latest
+    command: ["/bin/sh", "-c"]
+    args:
+      - |
+        mkdir -p /var/lib/grafana/dashboards &&
+        mc alias set local http://minio.${NS_MINIO}.svc:9000 ${MINIO_GRAFANA_ACCESS_KEY} ${MINIO_GRAFANA_SECRET_KEY} &&
+        mc cp --recursive local/${MINIO_GRAFANA_BUCKET_NAME}/ /var/lib/grafana/dashboards
+        chown 472:472 /var/lib/grafana/dashboards
+    volumeMounts:
+      - name: storage
+        mountPath: /var/lib/grafana
+
+persistence:
+  type: pvc
+  enabled: true
+  storageClassName: ${RWO_STORAGE}
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+
+initChownData:
+  ## If false, data ownership will not be reset at startup
+  ## This allows the grafana-server to be run with an arbitrary user
+  ##
+  enabled: false
+
+# Administrator credentials when not using an existing secret (see below)
+adminUser: admin
+adminPassword: admin
+
+service:
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3000"
+
+testFramework:
+  enabled: false
+
+resources:
+  limits:
+    memory: "1Gi"
+    cpu: "1000m"
+  requests:
+    memory: 500M
+    cpu: "500m"

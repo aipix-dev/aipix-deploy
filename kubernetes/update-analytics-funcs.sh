@@ -17,7 +17,9 @@ update_secrets () {
 update_analytics-worker () {
     set -e
     kubectl delete configmap analytics-worker-cm --namespace=${NS_A} || true
-    kubectl create configmap analytics-worker-cm --namespace=${NS_A} --from-file=.env=../analytics/analytics-worker.conf
+	kubectl delete configmap analytics-worker-env --namespace=${NS_A} || true
+    kubectl create configmap analytics-worker-env --namespace=${NS_A} --from-env-file=../analytics/analytics-worker-env
+    # kubectl create configmap analytics-worker-cm --namespace=${NS_A} --from-file=.env=../analytics/analytics-worker.conf   --- worker < 25.06.0.0
     TargetReplicas=$(kubectl get deployment analytics-worker --namespace=${NS_A} -o jsonpath='{.status.replicas}')
     kubectl -n ${NS_A} rollout restart deployment analytics-worker
     # Waiting for starting containers
@@ -85,6 +87,20 @@ update_clickhouse () {
 	kubectl create configmap clickhouse-timezone --namespace=${NS_A} --from-file=../clickhouse/timezone.xml
 	kubectl create configmap clickhouse-disable-logs --namespace=${NS_A} --from-file=../clickhouse/disable_logs.xml
 	kubectl -n ${NS_A} rollout restart deployment clickhouse-server
+	# Waiting for starting container
+    while true
+    do
+        if ([[ ${TYPE} == "prod" ]] || [[ $(kubectl get deployment clickhouse-server -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge 1 ]])
+        then break
+        fi
+        echo "Waiting for starting clickhouse-server container if presents (max 5 minutes) ..."
+        sleep 10
+    done
+    sleep 10
+	if [[ $(kubectl -n ${NS_A} exec deployments/clickhouse-server -- clickhouse-client -q "SELECT name FROM system.columns WHERE database = 'orchestrator' AND table = 'analytic_case_events' AND name = 'age';") != "age" ]]; then 
+		echo -e "\e[1;32mRun upgrade clickhouse scheme script\e[0m"
+		../analytics/upgrade-clickhouse-scheme.sh
+	fi
 }
 
 update_metrics-pusher () {

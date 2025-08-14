@@ -4263,7 +4263,7 @@
         "options": [],
         "query": "label_values(mysql_up, instance)",
         "refresh": 1,
-        "regex": "/mysqld-.*/",
+        "regex": "/mysql-.*/",
         "type": "query"
       }
     ]

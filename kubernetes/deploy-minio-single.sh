@@ -146,7 +146,7 @@ create_minio_bucket -m local -b ${MINIO_PORTAL_BUCKET_NAME} -a ${MINIO_PORTAL_AC
 create_minio_bucket -m local -b ${MINIO_PORTAL_BUCKET_NAME_PRIV} -a ${MINIO_PORTAL_ACCESS_KEY_PRIV} -s ${MINIO_PORTAL_SECRET_KEY_PRIV}
 create_minio_bucket -m local -b ${MINIO_ANALYTICS_BUCKET_NAME} -a ${MINIO_ANALYTICS_ACCESS_KEY} -s ${MINIO_ANALYTICS_SECRET_KEY} -p -e 14
 create_minio_bucket -m local -b ${MINIO_LOGS_BUCKET_NAME} -a ${MINIO_LOGS_ACCESS_KEY} -s ${MINIO_LOGS_SECRET_KEY} -e 3
-
+create_minio_bucket -m local -b ${MINIO_GRAFANA_BUCKET_NAME} -a ${MINIO_GRAFANA_ACCESS_KEY} -s ${MINIO_GRAFANA_SECRET_KEY} -p
 
 echo """
 Minio-single deployment script completed successfuly!

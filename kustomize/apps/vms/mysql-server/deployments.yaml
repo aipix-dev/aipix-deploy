@@ -74,19 +74,6 @@ spec:
             requests:
               cpu: 40m
               memory: 700Mi
-        - name: mysqld-exporter
-          args:
-            - --collect.info_schema.tables
-            - --collect.info_schema.tables.databases=*
-          env:
-            - name: DATA_SOURCE_NAME
-              value: exporter:password@(localhost:3306)/
-          image: prom/mysqld-exporter:v0.14.0
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 9104
-              name: mysqld-exporter
-              protocol: TCP
       hostname: mysql-server
       restartPolicy: Always
       volumes:

@@ -80,7 +80,8 @@ if [ -f ../controller/environments/.env ]; then print_new_config_lines ../contro
 if [ -f ../portal/environments/.env ]; then print_new_config_lines ../portal/environments/.env ../portal/environments/env.sample; fi
 if [ -f ../portal/environments-stub/.env ]; then print_new_config_lines ../portal/environments-stub/.env ../portal/environments-stub/env.sample; fi
 if [ -f ../analytics/.env ]; then print_new_config_lines ../analytics/.env ../analytics/env.sample; fi
-if [ -f ../analytics/analytics-worker.conf ]; then print_new_config_lines ../analytics/analytics-worker.conf ../analytics/analytics-worker.conf.sample; fi
+# if [ -f ../analytics/analytics-worker.conf ]; then print_new_config_lines ../analytics/analytics-worker.conf ../analytics/analytics-worker.conf.sample; fi
+if [ -f ../analytics/analytics-worker-env ]; then print_new_config_lines ../analytics/analytics-worker-env ../analytics/analytics-worker-env.sample; fi
 if [ -f ../analytics/metrics-pusher.env ]; then print_new_config_lines ../analytics/metrics-pusher.env ../analytics/metrics-pusher.env.sample; fi
 
 echo """

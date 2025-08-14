@@ -2,7 +2,7 @@
     group: ""
     version: v1
     kind: Service
-    name: (prometheus-service|grafana|.*influxdb2)
+    name: (prometheus-server|grafana|.*influxdb2)
   path: ./custom-patches.d/patch-service.yaml
 - target:
     group: apps
@@ -16,3 +16,9 @@
     kind: Deployment
     name: (grafana|prometheus-deployment)
   path: ./custom-patches.d/patch-image-pull-policy-init.yaml
+- target:
+    group: apps
+    version: v1
+    kind: StatefulSet
+    name: (loki-chunks-cache)
+  path: ./custom-patches.d/patch-loki-chunks-cache-resources.yaml

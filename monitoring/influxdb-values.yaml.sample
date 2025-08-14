@@ -8,3 +8,7 @@ adminUser:
   password: "${INFLUX_PSW}"
   token: "${INFLUX_TOKEN}"
 
+persistence:
+  enabled: true
+  storageClass: "${RWO_STORAGE}"
+  

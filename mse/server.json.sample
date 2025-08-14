@@ -62,25 +62,44 @@
       "onvif:delete"
     ]
   },
-  "#storage": {
-    "driver": "local",
-    "volume": {
-      "name": "vstorage",
-      "option": "disable-root-write;",
-      "bucket": {
-        "/storage": {
-          "capacity": 99999
-        }
-      }
+  "storage": {
+    "localfs": {
+      "max-io-events": 4096
     }
   },
   "license": "<url or path to license files>",
   "secret": "I9REYLxj*YCG44hvEKjXP(b5TCh)xmFxZPN+Dxuwfw2*tkRxnLQH6nuPMv#99@8e",
-  "max-io-events": 1024,
   "max-fd-limit": 4096,
+  "#coroutine": {
+    "once": 8,
+    "periodic": 4
+  },
   "hostname": "example.com",
   "log": {
-    "verbose": 7,
-    "out": "stdout|syslog.user"
+    "#stdout": {
+      "tag": "media-server",
+      "verbose": 5,
+      "pattern": "[%AppId] [%Timestamp] [%Verbose] %Message"
+    },
+    "file": {
+      "tag": "media-server",
+      "verbose": 4,
+      "pattern": "[%Timestamp] [%AppId] [%Verbose] %Message",
+      "path": "/var/log/vsaas/media-server.log",
+      "rotate": 20000000,
+      "number": 5
+    },
+    "#remote": {
+      "tag": "media-server",
+      "verbose": 3,
+      "pattern": "{\"tag\":\"%Tag\",\"verbose\":\"%Verbose\",\"timestamp\":\"%Timestamp\",\"app_id\":\"%AppId\",\"message\":\"%EscMessage\"}",
+      "url": "udp://company.com:8109"
+    },
+    "#syslog": {
+      "tag": "media-server",
+      "verbose": 5,
+      "pattern": "[%Timestamp] [%AppId] [%Verbose] %Message",
+      "facility": "user"
+    }
   }
 }

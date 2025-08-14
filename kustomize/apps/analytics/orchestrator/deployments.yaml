@@ -137,6 +137,27 @@ spec:
               mountPath: /opt/analytics-orchestrator-server/.env
               subPath: .env
               readOnly: true
+        - name: cron
+          args:
+            - scripts/cron.sh
+          image: download.aipix.ai:8443/analytics-orchestrator-server/release:latest
+          imagePullPolicy: Always
+          env:
+            - name: TARANTOOL_PORT
+              value: "3301"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: analytics-env
+              mountPath: /opt/analytics-orchestrator-server/.env
+              subPath: .env
+              readOnly: true
         - name: analytics-licensing
           args:
             - /bin/sh

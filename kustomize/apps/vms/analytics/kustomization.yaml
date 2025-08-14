@@ -1,3 +1,4 @@
 resources:
 - analytics-events.yaml
 - analytics-statistics.yaml
+- queue-analytics-events.yaml

@@ -1,0 +1,15 @@
+- op: replace
+  path: /spec/template/spec/containers/0/resources/requests/memory
+  value: 5Gi
+- op: replace
+  path: /spec/template/spec/containers/0/resources/limits/memory
+  value: 5Gi
+- op: replace
+  path: /spec/template/spec/containers/0/args
+  value:
+    - -m 5120
+    - --extended=modern,track_sizes
+    - -I 5m
+    - -c 16384
+    - -v
+    - -u 11211

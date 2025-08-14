@@ -26,7 +26,8 @@ kubectl create configmap clickhouse-timezone --namespace=${NS_A} --from-file=../
 kubectl create configmap clickhouse-disable-logs --namespace=${NS_A} --from-file=../clickhouse/disable_logs.xml
 kubectl create configmap push1st-orchestrator --namespace=${NS_VMS} --from-file=../push1st/orchestrator.yml --dry-run=client -o yaml | \
 	sed -e "s@http://django:8000/api/events/@http://orchestrator.${NS_A}.svc/api/events/@g" | kubectl apply -f-
-kubectl create configmap analytics-worker-cm --namespace=${NS_A} --from-file=.env=../analytics/analytics-worker.conf
+# kubectl create configmap analytics-worker-cm --namespace=${NS_A} --from-file=.env=../analytics/analytics-worker.conf   --- worker < 25.06.0.0
+kubectl create configmap analytics-worker-env --namespace=${NS_A} --from-env-file=../analytics/analytics-worker-env
 
 if [ ${MONITORING} == "yes" ]; then
 	kubectl create configmap metrics-pusher-env --namespace=${NS_A} --from-env-file=../analytics/metrics-pusher.env
@@ -60,8 +61,8 @@ if [ ${TYPE} != "prod" ]; then
 else
 	IFS="=" read name DB_HOST <<< $(cat ../analytics/.env | grep DB_HOST)
 	IFS="=" read name DB_PORT <<< $(cat ../analytics/.env | grep -i DB_PORT)
-	DB_PORT=$(echo $DB_PORT | tr -d "'\"")
-	DB_HOST=$(echo $DB_HOST | tr -d "'\"")
+	DB_PORT=$(echo $DB_PORT | tr -d "'\'")
+	DB_HOST=$(echo $DB_HOST | tr -d "'\'")
 	kubectl exec -n ${NS_VMS} deployment.apps/backend -- mysql --protocol=TCP -u root -pmysql -P ${DB_PORT} -h ${DB_HOST} --execute="${CREATE_DATABASE}"
 	kubectl exec -n ${NS_VMS} deployment.apps/backend -- mysql --protocol=TCP -u root -pmysql -P ${DB_PORT} -h ${DB_HOST} --execute="${CREATE_USER}"
 	kubectl exec -n ${NS_VMS} deployment.apps/backend -- mysql --protocol=TCP -u root -pmysql -P ${DB_PORT} -h ${DB_HOST} --execute="${GRANT_PRIVILEGES}"

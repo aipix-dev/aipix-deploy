@@ -92,6 +92,22 @@ data:
   DB_HOST: mysql-server
   DB_PORT: "3306"
 EOF
+
+cat << EOF > admin-white-list.yaml
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  name: admin-white-list
+  namespace: vsaas-vms
+spec:
+  ipWhiteList:
+    sourceRange:
+      - 1.1.1.1
+      - 2.2.2.0/24
+EOF
 ```
 
 For more information about kustomization read the folloqwing doc:

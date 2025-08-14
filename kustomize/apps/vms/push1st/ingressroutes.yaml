@@ -12,7 +12,7 @@ spec:
   - websecure
   routes:
   - kind: Rule
-    match: Host (`example.com`) && PathPrefix(`/pusher`)
+    match: Host (`example.com`) && ( PathPrefix(`/pusher`) || PathPrefix(`/ws`) )
     middlewares:
     - name: upgrade-insecure-requests
     services:

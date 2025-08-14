@@ -39,23 +39,8 @@ spec:
                   app.kubernetes.io/part-of: controller
                   global-app-name: vsaas
               topologyKey: kubernetes.io/hostname
-      # initContainers:
-      #   - name: init-controller
-      #     command: ["/bin/sh", "-c"]
-      #     args:
-      #       - cp -Rp /var/www/api/public/* /mnt/public/
-      #     image: download.aipix.ai:8443/controller/release:latest
-      #     imagePullPolicy: Always
-      #     volumeMounts:
-      #       - name: public
-      #         mountPath: /mnt/public
       containers:
         - name: controller-api
-          # args:
-          #   - /usr/sbin/php-fpm8.1 
-          #   - --nodaemonize 
-          #   - --fpm-config 
-          #   - /etc/php/8.1/fpm/php-fpm.conf
           args:
             - php 
             - artisan
@@ -78,41 +63,10 @@ spec:
           volumeMounts:
             - name: run-php
               mountPath: /var/run/php/
-            # - name: public
-            #   mountPath: /var/www/api/public/
           resources:
             requests:
               cpu: 5m
               memory: 120Mi
-        # - name: nginx
-        #   image: nginx:1.27.4
-        #   lifecycle:
-        #     preStop:
-        #       exec:
-        #         command:
-        #         - /bin/sleep
-        #         - "2"
-        #   ports:
-        #     - containerPort: 80
-        #       name: http
-        #       protocol: TCP
-        #   volumeMounts:
-        #     - name: controller-nginx-conf
-        #       readOnly: true
-        #       mountPath: /etc/nginx/nginx.conf
-        #       subPath: controller-nginx.conf
-        #     - name: controller-nginx-server-conf
-        #       readOnly: true
-        #       mountPath: /etc/nginx/conf.d/default.conf
-        #       subPath: controller-nginx-server.conf
-        #     - name: run-php
-        #       mountPath: /var/run/php/
-        #     - name: public
-        #       mountPath: /var/www/api/public/
-        #   resources:
-        #     requests:
-        #       cpu: 5m
-        #       memory: 35Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: controller-api
@@ -120,14 +74,6 @@ spec:
       volumes:
         - name: run-php
           emptyDir: {}
-        # - name: public
-        #   emptyDir: {}
-        # - name: controller-nginx-conf
-        #   configMap:
-        #     name: controller-nginx-conf
-        # - name: controller-nginx-server-conf
-        #   configMap:
-        #     name: controller-nginx-server-conf
 
 ---
 apiVersion: apps/v1
@@ -530,4 +476,209 @@ spec:
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: controller-queue-ms
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: controller-set-configs
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: controller
+    global-app-name: vsaas
+  name: controller-set-configs
+  namespace: controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: controller-set-configs
+      app.kubernetes.io/component: worker
+      app.kubernetes.io/part-of: controller
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: controller-set-configs
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: controller
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: controller-set-configs
+                  app.kubernetes.io/component: worker
+                  app.kubernetes.io/part-of: controller
+                  global-app-name: vsaas
+              topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+      containers:
+        - name: controller-set-configs
+          args:
+            - php
+            - artisan
+            - queue:work
+            - --queue=set_configs
+            - --sleep=3
+          envFrom:
+            - configMapRef:
+                name: controller-env
+          image: download.aipix.ai:8443/controller/release:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 5m
+              memory: 150Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: controller-set-configs
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: controller-queue-mse-archive-ranges
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: controller
+    global-app-name: vsaas
+  name: controller-queue-mse-archive-ranges
+  namespace: vsaas-vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: controller-queue-mse-archive-ranges
+      app.kubernetes.io/component: worker
+      app.kubernetes.io/part-of: controller
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: controller-queue-mse-archive-ranges
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: controller
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: controller-queue-mse-archive-ranges
+                  app.kubernetes.io/component: worker
+                  app.kubernetes.io/part-of: controller
+                  global-app-name: vsaas
+              topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+      containers:
+        - name: controller-queue-mse-archive-ranges
+          args:
+            - php
+            - /var/www/api/artisan 
+            - queue:work
+            - --queue=cron_mse_archive_ranges
+            - --sleep=3
+            - --tries=0
+            - --memory=5000
+          envFrom:
+            - configMapRef:
+                name: controller-env
+          image: download.aipix.ai:8443/controller/release:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 80m
+              memory: 400Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: controller-queue-mse-archive-ranges
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: controller-queue-mse-stream-info
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: controller
+    global-app-name: vsaas
+  name: controller-queue-mse-stream-info
+  namespace: vsaas-vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: controller-queue-mse-stream-info
+      app.kubernetes.io/component: worker
+      app.kubernetes.io/part-of: controller
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: controller-queue-mse-stream-info
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: controller
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: controller-queue-mse-stream-info
+                  app.kubernetes.io/component: worker
+                  app.kubernetes.io/part-of: controller
+                  global-app-name: vsaas
+              topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+      containers:
+        - name: controller-queue-mse-stream-info
+          args:
+            - php
+            - /var/www/api/artisan 
+            - queue:work
+            - --queue=cron_mse_stream_info
+            - --sleep=3
+            - --tries=0
+            - --memory=5000
+          envFrom:
+            - configMapRef:
+                name: controller-env
+          image: download.aipix.ai:8443/controller/release:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 80m
+              memory: 400Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: controller-queue-mse-stream-info
       restartPolicy: Always

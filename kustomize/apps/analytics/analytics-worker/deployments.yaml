@@ -37,99 +37,41 @@ spec:
                 values:
                 - "true"
       containers:
-        - name: worker
+        - name: analytics-worker
           env:
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            - name: POD_NAMESPACE
+            - name: POD_IP
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.namespace
-          command: ["python"]
-          args: ["-m", "app.main"]
+                  fieldPath: status.podIP
+            - name: DEPLOYMENT_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['app.kubernetes.io/name']
+            - name: POD_CPU_REQUESTS
+              valueFrom:
+                resourceFieldRef:
+                  containerName: analytics-worker
+                  resource: requests.cpu
+            - name: POD_MEM_REQUESTS
+              valueFrom:
+                resourceFieldRef:
+                  containerName: analytics-worker
+                  resource: requests.memory
+          envFrom:
+          - configMapRef:
+              name: analytics-worker-env
           image: download.aipix.ai:8443/analytics-worker/release:latest
           imagePullPolicy: Always
-          volumeMounts:
-            - name: env-file
-              mountPath: /analytics-worker/.env
-              subPath: .env
-              readOnly: true
-          resources:
-            requests:
-              cpu: "200m"
-              memory: 200Mi
-        - name: celery
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          command: ["celery"]
-          args:
-            - -A
-            - app.main
-            - worker
-            - --loglevel=INFO
-            - --max-tasks-per-child=1
-          image: download.aipix.ai:8443/analytics-worker/release:latest
-          imagePullPolicy: Always
-          volumeMounts:
-            - name: env-file
-              mountPath: /analytics-worker/.env
-              subPath: .env
-              readOnly: true
           resources:
             requests:
               cpu: "8"
-              memory: 6Gi
-        - name: redis-server
-          image: redis:alpine
-          imagePullPolicy: Always
-          resources:
-            requests:
-              cpu: "200m"
-              memory: 200Mi
-        - name: ovms
-          args: [
-                 "--config_path", "/workspace/model_config.json",
-                 "--log_level", "INFO",
-                 "--file_system_poll_wait_seconds", "5",
-                 "--grpc_workers", "1",
-                 "--sequence_cleaner_poll_wait_minutes", "0",
-                 "--port", "8080",
-                 "--rest_port", "8081"]
-          image: download.aipix.ai:8443/analytics-ovms/release:latest
-          imagePullPolicy: Always
-          ports:
-          - containerPort: 8080
-            name: grpc
-          - containerPort: 8081
-            name: rest
-          livenessProbe:
-            httpGet:
-              path: /v2/health/live
-              port: rest
-          readinessProbe:
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            httpGet:
-              path: /v2/health/ready
-              port: rest
-          resources:
-            requests:
-              cpu: "2"
               memory: 8Gi
       restartPolicy: Always
       hostname: analytics-worker
       imagePullSecrets:
         - name: download-aipix-ai
-      volumes:
-        - name: env-file
-          configMap:
-            name: analytics-worker-cm
+      

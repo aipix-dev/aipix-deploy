@@ -1,0 +1,3 @@
+image:
+  repository: "download.aipix.ai:8443/vsaas-media-logger/release"
+  tag: "24.12.1.0"
