@@ -177,8 +177,6 @@ spec:
               mountPath: /opt/analytics-licensing/license.json
               subPath: license.json
               readOnly: true
-            - name: a-license-config
-              mountPath: /opt/analytics-licensing/config/
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: orchestrator
@@ -193,6 +191,3 @@ spec:
         - name: a-license-json
           configMap:
             name: a-license-json
-        - name: a-license-config
-          persistentVolumeClaim:
-            claimName: a-license-config

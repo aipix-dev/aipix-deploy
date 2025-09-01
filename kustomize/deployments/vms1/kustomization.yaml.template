@@ -27,7 +27,7 @@ ${ADD_COMPONENT3}
 images:
 - name: download.aipix.ai:8443/vms-backend/release
   newName: download.aipix.ai:8443/vms-backend/release
-  newTag: 25.06.0.0
+  newTag: 25.06.0.1
 - name: download.aipix.ai:8443/vms-frontend-admin/release
   newName: download.aipix.ai:8443/vms-frontend-admin/release
   newTag: 25.06.0.0

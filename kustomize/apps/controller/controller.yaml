@@ -315,17 +315,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/name: controller-media-servers-callback-queue
+    app.kubernetes.io/name: controller-queue-ms-callback
     app.kubernetes.io/component: worker
     app.kubernetes.io/part-of: controller
     global-app-name: vsaas
-  name: controller-media-servers-callback-queue
+  name: controller-queue-ms-callback
   namespace: controller
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: controller-media-servers-callback-queue
+      app.kubernetes.io/name: controller-queue-ms-callback
       app.kubernetes.io/component: worker
       app.kubernetes.io/part-of: controller
       global-app-name: vsaas
@@ -334,7 +334,7 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: controller-media-servers-callback-queue
+        app.kubernetes.io/name: controller-queue-ms-callback
         app.kubernetes.io/component: worker
         app.kubernetes.io/part-of: controller
         global-app-name: vsaas
@@ -342,7 +342,7 @@ spec:
       securityContext:
         runAsUser: 33
       containers:
-        - name: controller-media-servers-callback-queue
+        - name: controller-queue-ms-callback
           args:
             - php
             - artisan 
@@ -361,7 +361,7 @@ spec:
               memory: 250Mi
       imagePullSecrets:
         - name: download-aipix-ai
-      hostname: controller-media-servers-callback-queue
+      hostname: controller-queue-ms-callback
       restartPolicy: Always
 
 ---
@@ -483,17 +483,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/name: controller-set-configs
+    app.kubernetes.io/name: controller-queue-set-configs
     app.kubernetes.io/component: worker
     app.kubernetes.io/part-of: controller
     global-app-name: vsaas
-  name: controller-set-configs
+  name: controller-queue-set-configs
   namespace: controller
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: controller-set-configs
+      app.kubernetes.io/name: controller-queue-set-configs
       app.kubernetes.io/component: worker
       app.kubernetes.io/part-of: controller
       global-app-name: vsaas
@@ -502,7 +502,7 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: controller-set-configs
+        app.kubernetes.io/name: controller-queue-set-configs
         app.kubernetes.io/component: worker
         app.kubernetes.io/part-of: controller
         global-app-name: vsaas
@@ -514,7 +514,7 @@ spec:
             podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  app.kubernetes.io/name: controller-set-configs
+                  app.kubernetes.io/name: controller-queue-set-configs
                   app.kubernetes.io/component: worker
                   app.kubernetes.io/part-of: controller
                   global-app-name: vsaas
@@ -524,7 +524,7 @@ spec:
         runAsGroup: 33
         fsGroup: 33
       containers:
-        - name: controller-set-configs
+        - name: controller-queue-set-configs
           args:
             - php
             - artisan
@@ -542,7 +542,7 @@ spec:
               memory: 150Mi
       imagePullSecrets:
         - name: download-aipix-ai
-      hostname: controller-set-configs
+      hostname: controller-queue-set-configs
       restartPolicy: Always
 
 ---

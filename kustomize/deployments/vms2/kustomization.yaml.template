@@ -26,7 +26,7 @@ ${ADD_COMPONENT3}
 images:
 - name: download.aipix.ai:8443/vms-backend/release
   newName: download.aipix.ai:8443/vms-backend/release
-  newTag: 25.06.0.0
+  newTag: 25.06.0.1
 - name: download.aipix.ai:8443/vms-frontend-admin/release
   newName: download.aipix.ai:8443/vms-frontend-admin/release
   newTag: 25.06.0.0
@@ -63,7 +63,7 @@ patches:
     version: v1
     kind: Deployment
     name: "(frontend-admin|frontend-client|backend|archive|queue|queue-calculate-cameras|reports|set-configs|queue-controller-webhooks|\
-         controller-api|controller-control-plane-hls|controller-control-plane-rtsp|controller-media-servers-callback-queue|\
+         controller-api|controller-control-plane-hls|controller-control-plane-rtsp|controller-queue-media-servers-callback|\
          controller-queue|portal-frontend-client|portal-backend|portal-landing|portal-queue|portal-stub)"
   patch: |-
     - op: replace
