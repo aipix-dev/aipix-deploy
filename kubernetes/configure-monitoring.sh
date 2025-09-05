@@ -15,22 +15,26 @@ helm repo add influxdata https://helm.influxdata.com/
 helm repo add fluent https://fluent.github.io/helm-charts
 helm repo update
 
-## Add aipix helm repo 
+## Add aipix helm repo
 helm repo rm "${BRAND}" || true
 helm repo add "${BRAND}" "${HELM_REPO}" --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}"
 
 
 # Configure Grafana and Loki deployment
-envsubst < ../monitoring/grafana-values.yaml.sample > ../monitoring/grafana-values.yaml
 if [ ${TYPE} == "prod" ]; then
 	export S3_PORT_INTERNAL=""
 else
 	export S3_PORT_INTERNAL=":9000"
 fi
+envsubst < ../monitoring/grafana-values.yaml.sample > ../monitoring/grafana-values.yaml
 envsubst < ../monitoring/loki-values.yaml.sample > ../monitoring/loki-values.yaml
 
 ## Copy grafana dashboards to S3
-mc cp --recursive ../monitoring/grafana-dashboards/ local/${MINIO_GRAFANA_BUCKET_NAME}/ || echo -e "\033[31mUnable to copy grafana dashboards to S3\033[0m"
+if kubectl -n ${NS_MINIO} get services minio-1 > /dev/null 2>&1 ; then
+    mc cp --recursive ../monitoring/grafana-dashboards/ minio-1/${MINIO_GRAFANA_BUCKET_NAME}/ || echo -e "\033[31mUnable to copy grafana dashboards to S3\033[0m"
+else
+	mc cp --recursive ../monitoring/grafana-dashboards/ local/${MINIO_GRAFANA_BUCKET_NAME}/ || echo -e "\033[31mUnable to copy grafana dashboards to S3\033[0m"
+fi
 
 # Configure logging
 ## Configure fluent-bit
@@ -44,7 +48,7 @@ envsubst < ../monitoring/influxdb-values.yaml.sample > ../monitoring/influxdb-va
 ## Configure Prometheus
 envsubst < ../monitoring/prometheus-values.yaml.sample > ../monitoring/prometheus-values.yaml.tmp
 cp -n ../monitoring/prometheus-values.yaml.tmp ../monitoring/prometheus-values.yaml
-rm ../monitoring/prometheus-values.yaml.tmp 
+rm ../monitoring/prometheus-values.yaml.tmp
 
 ## Configure mysql-exporter
 envsubst < ../monitoring/mysql-exporter-values.yaml.sample > ../monitoring/mysql-exporter-values.yaml

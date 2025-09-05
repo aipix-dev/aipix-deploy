@@ -6,13 +6,13 @@ datasources:
         type: prometheus
         access: proxy
         orgId: 1
-        url: http://prometheus-server.monitoring.svc:8080
+        url: http://prometheus-server.${NS_MONITORING}.svc:8080
         editable: true
         version: 1
       - name: influxdb
         type: influxdb
         access: proxy
-        url: http://influxdb-influxdb2.monitoring.svc
+        url: http://influxdb-influxdb2.${NS_MONITORING}.svc
         editable: true
         jsonData:
           dbName: telegraf
@@ -24,7 +24,7 @@ datasources:
         type: loki
         access: proxy
         orgId: 1
-        url: http://loki.monitoring.svc:3100
+        url: http://loki.${NS_MONITORING}.svc:3100
         basicAuth: false
         version: 1
         isDefault: false
@@ -58,7 +58,7 @@ extraInitContainers:
     args:
       - |
         mkdir -p /var/lib/grafana/dashboards &&
-        mc alias set local http://minio.${NS_MINIO}.svc:9000 ${MINIO_GRAFANA_ACCESS_KEY} ${MINIO_GRAFANA_SECRET_KEY} &&
+        mc alias set local http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL} ${MINIO_GRAFANA_ACCESS_KEY} ${MINIO_GRAFANA_SECRET_KEY} &&
         mc cp --recursive local/${MINIO_GRAFANA_BUCKET_NAME}/ /var/lib/grafana/dashboards
         chown 472:472 /var/lib/grafana/dashboards
     volumeMounts:

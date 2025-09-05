@@ -1,4 +1,4 @@
-namespace: monitoring
+namespace: ${NS_MONITORING}
 resources:
 - ../../apps/monitoring/fluent-bit
 - ../../apps/monitoring/grafana

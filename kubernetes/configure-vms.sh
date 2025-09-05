@@ -85,7 +85,8 @@ fi
 cp -n ../controller/environments/env.sample ../controller/environments/.env
 sed -i "s@CONTROL_PLAIN_HLS_REDIRECT_ENDPOINT=.*@CONTROL_PLAIN_HLS_REDIRECT_ENDPOINT=${VMS_DOMAIN}/controller-hls@g" ../controller/environments/.env
 sed -i "s@CONTROL_PLAIN_HLS_REDIRECT_ENDPOINT_INTERNAL=.*@CONTROL_PLAIN_HLS_REDIRECT_ENDPOINT_INTERNAL=controller-control-plane-hls.${NS_VMS}.svc:8888@g" ../controller/environments/.env
-sed -i "s@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT=.*@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT=${VMS_DOMAIN}:5554@g" ../controller/environments/.env
+# sed -i "s@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT=.*@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT=${VMS_DOMAIN}:5554@g" ../controller/environments/.env
+sed -i -E "s@(CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT)=(.*):(.*)@\1=${VMS_DOMAIN}:\3@g" ../controller/environments/.env
 sed -i "s@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT_INTERNAL=.*@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT_INTERNAL=controller-control-plane-rtsp.${NS_VMS}.svc:5554@g" ../controller/environments/.env
 sed -i "s@ONVIF_EXTERNAL_HOST=.*@ONVIF_EXTERNAL_HOST=http://${CONTROLLER_ONVIF_EXTERNAL_HOST}:8888@g" ../controller/environments/.env
 

@@ -62,6 +62,7 @@ export PROVISION_DASHBOARDS=yes						#If grafana dashboards will be provisioned 
 export INFLUX_USR=admin 						#define influxdb admin user
 export INFLUX_PSW=0hmSYYaRci6yJblARc6aHbHZ4YelTXTo			#define influxdb admin userpassword (use letters and numbers only)
 export INFLUX_TOKEN=2pORp9tDo40Lm32oGUKFLL8r1UuNbgUT			#define influxdb API token (use letters and numbers only)
+export NS_MONITORING=monitoring                                         #k8s namespace for monitoring
 
 #Portal parameters
 export PORTAL=no                            				#If portal will be deployed ("yes" or "no")

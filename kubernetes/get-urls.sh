@@ -6,8 +6,8 @@ cd "$scriptdir"
 source ./sources.sh
 source ./k8s-onprem/sources.sh
 
-PROMETHEUS_PORT=$(kubectl get service/prometheus-service -n monitoring -o jsonpath='{.spec.ports[0].nodePort}')
-INFLUX_PORT=$(kubectl get service/vsaas-influxdb2 -n monitoring -o jsonpath='{.spec.ports[0].nodePort}')
+PROMETHEUS_PORT=$(kubectl get service/prometheus-service --namespace=${NS_MONITORING} -o jsonpath='{.spec.ports[0].nodePort}')
+INFLUX_PORT=$(kubectl get service/vsaas-influxdb2 --namespace=${NS_MONITORING} -o jsonpath='{.spec.ports[0].nodePort}')
 
 echo """
 VMS URL for admins: https://${VMS_DOMAIN}/admin

@@ -13,7 +13,7 @@
 
 
 [[outputs.influxdb_v2]]
-  urls = ["http://influxdb-influxdb2.monitoring.svc"]
+  urls = ["http://influxdb-influxdb2.${NS_MONITORING}.svc"]
   token = "${INFLUX_TOKEN}"
   organization = "influxdata"
   bucket = "telegraf"
