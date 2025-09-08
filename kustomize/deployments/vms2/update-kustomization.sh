@@ -21,6 +21,10 @@ if [ ${PORTAL} == "yes" ]; then
 - ../../apps/vms/portal-landing"
 fi
 
+if [ ${VGW} == "yes" ]; then
+    export ADD_RESOURCE3="- ../../apps/vms/vgw"
+fi
+
 export CUSTOM_IMAGES="$(cat ./custom-images.d/*.yaml 2>/dev/null)"
 export CUSTOM_PATCHES="$(cat ./custom-patches.d/custom-patches.yaml 2>/dev/null)"
 export CUSTOM_RESOURCES="$(cat ./custom-resources.d/custom-resources.yaml 2>/dev/null)"

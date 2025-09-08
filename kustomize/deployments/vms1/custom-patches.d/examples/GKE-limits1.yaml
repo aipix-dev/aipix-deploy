@@ -3,3 +3,4 @@
   value: 500m
 - op: replace
   path: "/spec/template/spec/containers/0/resources/requests/memory"
+  value: 256Mi

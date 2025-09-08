@@ -68,6 +68,9 @@ export NS_MONITORING=monitoring                                         #k8s nam
 export PORTAL=no                            				#If portal will be deployed ("yes" or "no")
 export PORTAL_STUB_DOMAIN=portal-stub.example.com                          	#define portal-stub domain name
 
+#VGW parameters
+export VGW=no                            				#If VGW will be deployed ("yes" or "no")
+
 #Location parameters
 export CITY=									#define City name
 

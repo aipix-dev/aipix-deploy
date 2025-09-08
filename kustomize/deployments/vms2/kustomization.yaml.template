@@ -10,6 +10,7 @@ resources:
 - ../../apps/controller
 ${ADD_RESOURCE1}
 ${ADD_RESOURCE2}
+${ADD_RESOURCE3}
 ${CUSTOM_RESOURCES}
 components:
 - ../../components/single-replica

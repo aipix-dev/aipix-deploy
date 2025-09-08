@@ -2,19 +2,17 @@
     group: apps
     version: v1
     kind: Deployment
-    name: (archive|controller-control-plane-hls|controller-control-plane-rtsp|controller-media-servers-callback-queue|controller-queue|controller-schedule|cron|nginx|queue|queue-controller-webhooks|reports|schedule|set-configs)
+    name: (archive|backend|beanstalkd|controller-.*|cron|frontend-.*|portal-.*|push1st|queue.*|redis-server|reports)
   path: ./custom-patches.d/limits1.yaml
-
 - target:
     group: apps
     version: v1
     kind: Deployment
-    name: (backend|beanstalkd|controller|frontend-admin|frontend-client|mysql-server|push1st|redis-server)
+    name: (backend|controller-api|mysql-server|vgw-backend)
   path: ./custom-patches.d/limits2.yaml
-
 - target:
     group: ""
     version: v1
     kind: Service
-    name: (controller-control-plane-hls|controller-control-plane-rtsp|nginx)
+    name: (controller-control-plane-hls|controller-control-plane-rtsp)
   path: ./custom-patches.d/patch-services-type.yaml
