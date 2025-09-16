@@ -136,15 +136,22 @@ fi
 echo "Deployments were successfully restarted"
 sleep 15
 
+echo -e "\033[32mStart backend migrations\033[0m"
 kubectl -n ${NS_VMS} exec deployment.apps/backend -- ./scripts/update.sh
 kubectl -n ${NS_VMS} exec deployment.apps/backend -- chown www-data:www-data -R storage/logs
+echo -e "\033[32mEnd backend migrations\033[0m"
+
+echo -e "\033[32mStart controller migrations\033[0m"
 kubectl -n ${NS_VMS} exec deployment.apps/controller-api -- ./scripts/update.sh
+echo -e "\033[32mEnd controller migrations\033[0m"
 
 if [ ${PORTAL} == "yes" ]; then
+	echo -e "\033[32mStart portal migrations\033[0m"
 	kubectl -n ${NS_VMS} rollout status deployment portal-backend >/dev/null
 	kubectl -n ${NS_VMS} rollout status deployment portal-stub >/dev/null
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-backend -- ./scripts/update.sh
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/update.sh
+	echo -e "\033[32mStart portal migrations\033[0m"
 fi
 
 if [[ ${TYPE} == "single" ]] && [[ ${BACKEND_STORAGE_TYPE} == "s3_and_disk" ]]; then

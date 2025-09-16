@@ -16,10 +16,8 @@ update_secrets () {
 
 update_analytics-worker () {
     set -e
-    kubectl delete configmap analytics-worker-cm --namespace=${NS_A} || true
 	kubectl delete configmap analytics-worker-env --namespace=${NS_A} || true
     kubectl create configmap analytics-worker-env --namespace=${NS_A} --from-env-file=../analytics/analytics-worker-env
-    # kubectl create configmap analytics-worker-cm --namespace=${NS_A} --from-file=.env=../analytics/analytics-worker.conf   --- worker < 25.06.0.0
     TargetReplicas=$(kubectl get deployment analytics-worker --namespace=${NS_A} -o jsonpath='{.status.replicas}')
     kubectl -n ${NS_A} rollout restart deployment analytics-worker
     # Waiting for starting containers

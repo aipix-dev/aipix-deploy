@@ -11,7 +11,7 @@ components:
 images:
 - name: download.aipix.ai:8443/analytics-worker/release
   newName: download.aipix.ai:8443/analytics-worker/release
-  newTag: 25.06.0.1
+  newTag: 25.06.0.2
 - name: download.aipix.ai:8443/analytics-orchestrator-server/release
   newName: download.aipix.ai:8443/analytics-orchestrator-server/release
   newTag: 25.06.0.1

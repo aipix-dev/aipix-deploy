@@ -101,13 +101,16 @@ if [ ${PORTAL} == "yes" ]; then
 fi
 
 sleep 10
-
+echo -e "\033[32mStart backend migrations\033[0m"
 kubectl exec -n ${NS_VMS} deployment.apps/backend -- ./scripts/create_db.sh
 kubectl exec -n ${NS_VMS} deployment.apps/backend -- ./scripts/start.sh
 kubectl exec -n ${NS_VMS} deployment.apps/backend -- chown www-data:www-data -R storage/logs
+echo -e "\033[32mEnd backend migrations\033[0m"
 
+echo -e "\033[32mStart controller migrations\033[0m"
 kubectl exec -n ${NS_VMS} deployment.apps/controller-api -- ./scripts/create_db.sh
 kubectl exec -n ${NS_VMS} deployment.apps/controller-api -- ./scripts/start.sh
+echo -e "\033[32mEnd controller migrations\033[0m"
 
 if [ ${TYPE} != "prod" ]; then
 	CREATE_MONITORING_MYSQL_USER="CREATE USER IF NOT EXISTS 'exporter'@'%' IDENTIFIED BY 'password' WITH MAX_USER_CONNECTIONS 3;"
@@ -117,10 +120,12 @@ if [ ${TYPE} != "prod" ]; then
 fi
 
 if [ ${PORTAL} == "yes" ]; then
+	echo -e "\033[32mStart portal migrations\033[0m"
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-backend -- ./scripts/create_db.sh
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/create_db.sh
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-backend -- ./scripts/start.sh
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/start.sh
+	echo -e "\033[32mEnd portal migrations\033[0m"
 fi
 
 VMS_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')

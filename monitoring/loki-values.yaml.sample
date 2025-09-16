@@ -43,6 +43,9 @@ loki:
     chunk_encoding: snappy
   analytics:
     reporting_enabled: false
+  gateway:
+    nginxConfig:
+      clientMaxBodySize: 8M
 singleBinary:
 #  replicas: 1
   tolerations:
