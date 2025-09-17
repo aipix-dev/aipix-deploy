@@ -151,7 +151,7 @@ if [ ${PORTAL} == "yes" ]; then
 	kubectl -n ${NS_VMS} rollout status deployment portal-stub >/dev/null
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-backend -- ./scripts/update.sh
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/update.sh
-	echo -e "\033[32mStart portal migrations\033[0m"
+	echo -e "\033[32mEnd portal migrations\033[0m"
 fi
 
 if [[ ${TYPE} == "single" ]] && [[ ${BACKEND_STORAGE_TYPE} == "s3_and_disk" ]]; then
