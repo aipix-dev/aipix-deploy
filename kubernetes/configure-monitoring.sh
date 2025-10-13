@@ -51,7 +51,9 @@ cp -n ../monitoring/prometheus-values.yaml.tmp ../monitoring/prometheus-values.y
 rm ../monitoring/prometheus-values.yaml.tmp
 
 ## Configure mysql-exporter
-envsubst < ../monitoring/mysql-exporter-values.yaml.sample > ../monitoring/mysql-exporter-values.yaml
+envsubst < ../monitoring/mysql-exporter-values.yaml.sample > ../monitoring/mysql-exporter-values.yaml.tmp
+cp -n ../monitoring/mysql-exporter-values.yaml.tmp ../monitoring/mysql-exporter-values.yaml
+rm ../monitoring/mysql-exporter-values.yaml.tmp
 
 ## Configure node-exporter
 envsubst < ../monitoring/node-exporter-values.yaml.sample > ../monitoring/node-exporter-values.yaml

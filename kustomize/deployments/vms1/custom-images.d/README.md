@@ -2,9 +2,9 @@ Use this folder to patch your images.
 For example:
 ```
 cat << EOF >> my-images.yaml
-- name: download.aivp.io:8443/vms-backend/release
-  newName: download.aivp.io:8443/vms-backend/release
-  newTag: 24.12.1.2
+- name: download.aipix.ai:8443/vms-backend/release
+  newName: download.aipix.ai:8443/vms-backend/release
+  newTag: 25.06.1.0
 EOF
 ```
 

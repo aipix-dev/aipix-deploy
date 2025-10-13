@@ -25,6 +25,11 @@ if [ ${VGW} == "yes" ]; then
     export ADD_RESOURCE3="- ../../apps/vms/vgw"
 fi
 
+if [ ${WB} == "yes" ]; then
+    export ADD_COMPONENT4="- ../../components/middlewares/strip-prefixes-iframe"
+    export ADD_RESOURCE4="- ../../apps/integration-wb"
+fi
+
 export CUSTOM_IMAGES="$(cat ./custom-images.d/*.yaml 2>/dev/null)"
 export CUSTOM_PATCHES="$(cat ./custom-patches.d/custom-patches.yaml 2>/dev/null)"
 export CUSTOM_RESOURCES="$(cat ./custom-resources.d/custom-resources.yaml 2>/dev/null)"

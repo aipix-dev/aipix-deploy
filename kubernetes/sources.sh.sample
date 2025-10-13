@@ -71,6 +71,9 @@ export PORTAL_STUB_DOMAIN=portal-stub.example.com                          	#def
 #VGW parameters
 export VGW=no                            				#If VGW will be deployed ("yes" or "no")
 
+#WB parameters
+export WB=no                            				#If WB integration will be deployed ("yes" or "no")
+
 #Location parameters
 export CITY=									#define City name
 

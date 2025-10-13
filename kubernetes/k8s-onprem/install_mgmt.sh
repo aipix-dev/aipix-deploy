@@ -25,7 +25,7 @@ CALICO_VER=${SRC_CALICO_VER}
 sudo swapoff -a
 sudo sed -i '/^\/swap/s/^/#/' /etc/fstab
 
-sudo apt update && sudo apt install -y apt-transport-https ca-certificates curl net-tools jq mysql-client
+sudo apt update && sudo apt install -y apt-transport-https ca-certificates gnupg rsync curl net-tools jq mysql-client
 sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
 sudo chmod a+x /usr/local/bin/yq
 

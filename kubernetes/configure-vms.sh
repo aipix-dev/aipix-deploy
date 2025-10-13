@@ -163,6 +163,10 @@ if [ ${PORTAL} == "yes" ]; then
 	fi
 fi
 
+if [ ${WB} == "yes" ]; then
+	cp -n ../integration-wb/environments/env.sample ../integration-wb/environments/.env
+fi
+
 echo """
 
 VMS configuration script completed successfuly!

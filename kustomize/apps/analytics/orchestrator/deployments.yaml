@@ -36,10 +36,10 @@ spec:
           env:
             - name: TARANTOOL_PORT
               value: "3301"
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
+            # - name: DEPLOYMENT_NAME
+            #   valueFrom:
+            #     fieldRef:
+            #       fieldPath: metadata.labels['app.kubernetes.io/name']
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:
@@ -61,10 +61,10 @@ spec:
           env:
             - name: TARANTOOL_PORT
               value: "3301"
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
+            # - name: DEPLOYMENT_NAME
+            #   valueFrom:
+            #     fieldRef:
+            #       fieldPath: metadata.labels['app.kubernetes.io/name']
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:
@@ -82,10 +82,10 @@ spec:
           env:
             - name: TARANTOOL_PORT
               value: "3301"
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
+            # - name: DEPLOYMENT_NAME
+            #   valueFrom:
+            #     fieldRef:
+            #       fieldPath: metadata.labels['app.kubernetes.io/name']
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:
@@ -103,10 +103,10 @@ spec:
           env:
             - name: TARANTOOL_PORT
               value: "3301"
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
+            # - name: DEPLOYMENT_NAME
+            #   valueFrom:
+            #     fieldRef:
+            #       fieldPath: metadata.labels['app.kubernetes.io/name']
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:
@@ -124,10 +124,10 @@ spec:
           env:
             - name: TARANTOOL_PORT
               value: "3301"
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
+            # - name: DEPLOYMENT_NAME
+            #   valueFrom:
+            #     fieldRef:
+            #       fieldPath: metadata.labels['app.kubernetes.io/name']
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:
@@ -145,10 +145,10 @@ spec:
           env:
             - name: TARANTOOL_PORT
               value: "3301"
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
+            # - name: DEPLOYMENT_NAME
+            #   valueFrom:
+            #     fieldRef:
+            #       fieldPath: metadata.labels['app.kubernetes.io/name']
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:
@@ -168,6 +168,14 @@ spec:
           env:
             - name: TARANTOOL_PORT
               value: "3301"
+            # - name: DEPLOYMENT_NAME
+            #   valueFrom:
+            #     fieldRef:
+            #       fieldPath: metadata.labels['app.kubernetes.io/name']
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           volumeMounts:
             - name: a-licensing-yaml
               mountPath: /opt/analytics-licensing/config.yaml

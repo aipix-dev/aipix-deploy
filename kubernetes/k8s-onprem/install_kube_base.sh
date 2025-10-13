@@ -32,7 +32,7 @@ CALICO_VER=${SRC_CALICO_VER}
 sudo swapoff -a
 sudo sed -i '/^\/swap/s/^/#/' /etc/fstab
 
-sudo apt update -y && sudo apt install -y apt-transport-https ca-certificates curl ntp net-tools lvm2 ioping
+sudo apt update -y && sudo apt install -y apt-transport-https ca-certificates gnupg rsync curl ntp net-tools lvm2 ioping
 sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
 sudo chmod a+x /usr/local/bin/yq
 

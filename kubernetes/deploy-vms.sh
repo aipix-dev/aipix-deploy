@@ -70,6 +70,11 @@ if [ ${PORTAL} == "yes" ]; then
 	kubectl create configmap vms-portal-stub-env --namespace=${NS_VMS} --from-env-file=../portal/environments-stub/.env
 fi
 
+#Create WB configmaps
+if [ ${WB} == "yes" ]; then
+	kubectl create configmap integration-wb-env --namespace=${NS_VMS} --from-env-file=../integration-wb/environments/.env
+fi
+
 # Deploying VMS
 ../kustomize/deployments/${VMS_TEMPLATE}/update-kustomization.sh || exit 1
 kubectl apply -k ../kustomize/deployments/${VMS_TEMPLATE}
@@ -100,6 +105,17 @@ if [ ${PORTAL} == "yes" ]; then
 	done
 fi
 
+if [ ${WB} == "yes" ]; then
+	while true
+	do
+		if [[ $(kubectl get deployment integration-wb -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]
+		then break
+		fi
+		sleep 5
+		echo "Waiting for starting integration-wb container ..."
+	done
+fi
+
 sleep 10
 echo -e "\033[32mStart backend migrations\033[0m"
 kubectl exec -n ${NS_VMS} deployment.apps/backend -- ./scripts/create_db.sh
@@ -126,6 +142,13 @@ if [ ${PORTAL} == "yes" ]; then
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-backend -- ./scripts/start.sh
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/start.sh
 	echo -e "\033[32mEnd portal migrations\033[0m"
+fi
+
+if [ ${WB} == "yes" ]; then
+	echo -e "\033[32mStart WB migrations\033[0m"
+	kubectl -n ${NS_VMS} exec deployment.apps/integration-wb -- ./scripts/create_db.sh
+	kubectl -n ${NS_VMS} exec deployment.apps/integration-wb -- ./scripts/start.sh
+	echo -e "\033[32mEnd WB migrations\033[0m"
 fi
 
 VMS_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')

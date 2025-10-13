@@ -141,7 +141,7 @@ EOF
 }
 
 
-create_minio_bucket -m minio-1 -b ${MINIO_BACKEND_BUCKET_NAME} -a ${MINIO_BACKEND_ACCESS_KEY} -s ${MINIO_BACKEND_SECRET_KEY} -v -p -e 1 -d archive 
+create_minio_bucket -m minio-1 -b ${MINIO_BACKEND_BUCKET_NAME} -a ${MINIO_BACKEND_ACCESS_KEY} -s ${MINIO_BACKEND_SECRET_KEY} -v -p -e 1 -d archive
 create_minio_bucket -m minio-2 -b ${MINIO_BACKEND_BUCKET_NAME} -a ${MINIO_BACKEND_ACCESS_KEY} -s ${MINIO_BACKEND_SECRET_KEY} -v -p -e 1 -d archive
 create_minio_bucket -m minio-1 -b ${MINIO_BACKEND_BUCKET_NAME_PRIV} -a ${MINIO_BACKEND_ACCESS_KEY_PRIV} -s ${MINIO_BACKEND_SECRET_KEY_PRIV} -v -e 14 -d database_backups
 create_minio_bucket -m minio-2 -b ${MINIO_BACKEND_BUCKET_NAME_PRIV} -a ${MINIO_BACKEND_ACCESS_KEY_PRIV} -s ${MINIO_BACKEND_SECRET_KEY_PRIV} -v -e 14 -d database_backups

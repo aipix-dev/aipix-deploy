@@ -37,18 +37,6 @@ patches:
     name: analytics-worker
   path: patch-analytics-worker-tolerations.yaml
 
-#Ovms liveness and readiness probes kustomizations
-#- target:
-#    group: apps
-#    version: v1
-#    kind: Deployment
-#    name: analytics-worker
-#  patch: |-
-#    - op: remove
-#      path: /spec/template/spec/containers/3/livenessProbe
-#    - op: remove
-#      path: /spec/template/spec/containers/3/readinessProbe
-
 - target:
     group: traefik.io
     version: v1alpha1

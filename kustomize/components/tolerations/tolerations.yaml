@@ -16,3 +16,6 @@
   - effect: NoSchedule
     key: db
     operator: Exists
+  - effect: NoSchedule
+    key: vgw
+    operator: Exists

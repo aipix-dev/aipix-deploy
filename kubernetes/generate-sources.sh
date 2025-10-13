@@ -33,9 +33,11 @@ if [[ ${UPD_PASS} == "force" ]]; then
 	MINIO_ANALYTICS_SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 40 | head -n 1 | xargs echo -n)
 	MINIO_LOGS_ACCESS_KEY=$(cat /dev/urandom | tr -dc 'A-Z0-9' | fold -w 20 | head -n 1 | xargs echo -n)
 	MINIO_LOGS_SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 40 | head -n 1 | xargs echo -n)
+    MINIO_GRAFANA_ACCESS_KEY=$(cat /dev/urandom | tr -dc 'A-Z0-9' | fold -w 20 | head -n 1 | xargs echo -n)
+    MINIO_GRAFANA_SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 40 | head -n 1 | xargs echo -n)
 	INFLUX_PSW=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1 | xargs echo -n)
 	INFLUX_TOKEN=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1 | xargs echo -n)
-	 sed -E -i "s/(MINIO_PSW *= *)\S*/\1${MINIO_PSW}/g" ./sources.sh
+	sed -E -i "s/(MINIO_PSW *= *)\S*/\1${MINIO_PSW}/g" ./sources.sh
 	sed -E -i "s/(MINIO_BACKEND_ACCESS_KEY *= *)\S*/\1${MINIO_BACKEND_ACCESS_KEY}/g" ./sources.sh
 	sed -E -i "s/(MINIO_BACKEND_SECRET_KEY *= *)\S*/\1${MINIO_BACKEND_SECRET_KEY}/g" ./sources.sh
 	sed -E -i "s/(MINIO_BACKEND_ACCESS_KEY_PRIV *= *)\S*/\1${MINIO_BACKEND_ACCESS_KEY_PRIV}/g" ./sources.sh
@@ -48,6 +50,8 @@ if [[ ${UPD_PASS} == "force" ]]; then
 	sed -E -i "s/(MINIO_ANALYTICS_SECRET_KEY *= *)\S*/\1${MINIO_ANALYTICS_SECRET_KEY}/g" ./sources.sh
 	sed -E -i "s/(MINIO_LOGS_ACCESS_KEY *= *)\S*/\1${MINIO_LOGS_ACCESS_KEY}/g" ./sources.sh
 	sed -E -i "s/(MINIO_LOGS_SECRET_KEY *= *)\S*/\1${MINIO_LOGS_SECRET_KEY}/g" ./sources.sh
+    sed -E -i "s/(MINIO_GRAFANA_ACCESS_KEY *= *)\S*/\1${MINIO_GRAFANA_ACCESS_KEY}/g" ./sources.sh
+    sed -E -i "s/(MINIO_GRAFANA_SECRET_KEY *= *)\S*/\1${MINIO_GRAFANA_SECRET_KEY}/g" ./sources.sh
 	sed -E -i "s/(INFLUX_PSW *= *)\S*/\1${INFLUX_PSW}/g" ./sources.sh
 	sed -E -i "s/(INFLUX_TOKEN *= *)\S*/\1${INFLUX_TOKEN}/g" ./sources.sh
 	echo "

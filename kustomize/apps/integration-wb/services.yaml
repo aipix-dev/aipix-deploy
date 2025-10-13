@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: integration-wb
+    app.kubernetes.io/component: integration-wb
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: integration-wb
+  namespace: vsaas-vms
+spec:
+  ports:
+    - name: "http"
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: integration-wb
+    app.kubernetes.io/component: integration-wb
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: embedded-player
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: embedded-player
+  namespace: vsaas-vms
+spec:
+  ports:
+    - name: "http"
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app.kubernetes.io/name: embedded-player
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas

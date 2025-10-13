@@ -12,7 +12,7 @@ components:
 images:
 - name: download.aipix.ai:8443/vsaas-media-logger/release
   newName: download.aipix.ai:8443/vsaas-media-logger/release
-  newTag: 25.06.0.0
+  newTag: 25.06.1.0
 ${CUSTOM_IMAGES}
 
 patches:

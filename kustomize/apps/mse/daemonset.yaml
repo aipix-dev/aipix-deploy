@@ -39,7 +39,7 @@ spec:
       hostNetwork: true
       containers:
       - name: mse
-        image: download.aipix.ai:8443/vsaas-media-engine/release:latest
+        image: download.aipix.ai:8443/vsaas-media-server/release:latest
         imagePullPolicy: Always
         volumeMounts:
         - name: server-json

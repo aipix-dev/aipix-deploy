@@ -32,7 +32,6 @@ spec:
     spec:
       containers:
         - name: beanstalkd
-          # image: schickling/beanstalkd:latest
           image: download.aipix.ai:8443/beanstalkd:1.13
           imagePullPolicy: Always
           command:

@@ -36,6 +36,16 @@
     "ssl": true,
     "ip": 4
   },
+  "cview": {
+    "listen": "*:9665:/",
+    "accept": 1,
+    "path": "/opt/vsaas/services/cview",
+    "workers": 1,
+    "poll": 1024,
+    "ssl": true,
+    "routes": ["streams", "server", "cluster"],
+    "ip": 4
+  },
   "ssl": {
     "key": "/opt/ssl/key.pem",
     "cert": "/opt/ssl/cert.pem"

@@ -36,6 +36,10 @@ if [ ${PORTAL} == "yes" ]; then
 	kubectl delete configmap vms-portal-stub-env --namespace=${NS_VMS} || true
 fi
 
+if [ ${WB} == "yes" ]; then
+	kubectl delete configmap integration-wb-env --namespace=${NS_VMS} || true
+fi
+
 # Create registry secrets
 kubectl create secret docker-registry download-aipix-ai --namespace=${NS_VMS} \
 														--docker-server=https://download.aipix.ai:8443 \
@@ -97,6 +101,11 @@ if [ ${PORTAL} == "yes" ]; then
 	kubectl create configmap vms-portal-stub-env --namespace=${NS_VMS} --from-env-file=../portal/environments-stub/.env
 fi
 
+#Create WB configmaps
+if [ ${WB} == "yes" ]; then
+	kubectl create configmap integration-wb-env --namespace=${NS_VMS} --from-env-file=../integration-wb/environments/.env
+fi
+
 #Reapplying vms
 ../kustomize/deployments/${VMS_TEMPLATE}/update-kustomization.sh || exit 1
 kubectl apply -k ../kustomize/deployments/${VMS_TEMPLATE}
@@ -152,6 +161,13 @@ if [ ${PORTAL} == "yes" ]; then
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-backend -- ./scripts/update.sh
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/update.sh
 	echo -e "\033[32mEnd portal migrations\033[0m"
+fi
+
+if [ ${WB} == "yes" ]; then
+	echo -e "\033[32mStart WB migrations\033[0m"
+	kubectl -n ${NS_VMS} rollout status deployment integration-wb >/dev/null
+	kubectl -n ${NS_VMS} exec deployment.apps/integration-wb -- ./scripts/update.sh
+	echo -e "\033[32mEnd WB migrations\033[0m"
 fi
 
 if [[ ${TYPE} == "single" ]] && [[ ${BACKEND_STORAGE_TYPE} == "s3_and_disk" ]]; then

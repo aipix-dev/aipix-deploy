@@ -22,7 +22,9 @@ kubectl create secret generic mse-cert-pem --namespace=${NS_MS} --from-file=../m
 #Deploying MSE
 ../kustomize/deployments/${MSE_TEMPLATE}/update-kustomization.sh || exit 1
 kubectl apply -k ../kustomize/deployments/${MSE_TEMPLATE}
-kubectl --namespace=${NS_MS} rollout restart daemonset mse 
+kubectl -n ${NS_MS} rollout restart daemonset mse 
+
+kubectl -n ${NS_MS} rollout status daemonset mse >/dev/null
 
 echo """
 MSE update script completed successfuly!

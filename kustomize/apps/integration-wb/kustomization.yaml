@@ -1,0 +1,4 @@
+resources:
+  - ingressroutes.yaml
+  - integration-wb.yaml
+  - services.yaml
