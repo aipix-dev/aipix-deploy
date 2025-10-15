@@ -79,6 +79,15 @@ else
     echo "MSE is not installed in k8s, continue update"
 fi
 
+### Update monitoring
+if [ ${MONITORING} == "yes" ]; then
+    sed -i "s@job_name: 'minio-job'@job_name: 'minio-job-cluster'@" ../monitoring/prometheus-values.yaml
+    ../kubernetes/configure-monitoring.sh
+    ../kubernetes/deploy-monitoring.sh
+else
+    echo "Monitoring is not installed, continue update"
+fi
+
 echo """
 Upgrade script completed successfuly!
 

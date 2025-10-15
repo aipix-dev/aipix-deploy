@@ -33,7 +33,8 @@ helm -n ${NS_MONITORING} template vsaas-media-logger ${BRAND}/vsaas-media-logger
 
 ../kustomize/deployments/monitoring1/update-kustomization.sh
 kubectl apply -k ../kustomize/deployments/monitoring1
-
+kubectl -n ${NS_MONITORING} rollout restart deployment prometheus-server
+kubectl -n ${NS_MONITORING} rollout restart deployment grafana
 sleep 5
 PROMETHEUS_PORT=$(kubectl get service/prometheus-server --namespace=${NS_MONITORING} -o jsonpath='{.spec.ports[0].nodePort}')
 GRAFANA_PORT=$(kubectl get service/grafana --namespace=${NS_MONITORING} -o jsonpath='{.spec.ports[0].nodePort}')

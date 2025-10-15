@@ -1599,7 +1599,7 @@
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
-        "regex": "minio-job-bucket",
+        "regex": "minio-job-bucket.*",
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"

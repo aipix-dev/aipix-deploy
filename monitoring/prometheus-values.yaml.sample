@@ -58,7 +58,7 @@ extraScrapeConfigs: |
   - job_name: 'kube-state-metrics'
     static_configs:
       - targets: ['kube-state-metrics.${NS_MONITORING}.svc:8080']
-  - job_name: 'minio-job'
+  - job_name: 'minio-job-cluster'
     bearer_token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwcm9tZXRoZXVzIiwic3ViIjoibmF2ZWtzb2Z0IiwiZXhwIjo0ODUwMzk2OTA3fQ.WWCLGWb-usnTqR5aWGDwRpSlgl0VfDvthSSWYxhf3X1UNXCRWoGIZz386Q3KIShzAHipamIoFyf5oR9YCebobg
     metrics_path: /minio/v2/metrics/cluster
     scheme: http

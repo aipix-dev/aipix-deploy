@@ -1,4 +1,5 @@
 <clickhouse>
+    <query_views_log remove="1"/>
     <asynchronous_metric_log remove="1"/>
     <metric_log remove="1"/>
     <part_log remove="1"/>

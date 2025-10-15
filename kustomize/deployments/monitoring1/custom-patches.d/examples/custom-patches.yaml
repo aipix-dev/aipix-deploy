@@ -14,7 +14,7 @@
     group: apps
     version: v1
     kind: Deployment
-    name: (grafana|prometheus-deployment)
+    name: (grafana|prometheus-server)
   path: ./custom-patches.d/patch-image-pull-policy-init.yaml
 - target:
     group: apps
