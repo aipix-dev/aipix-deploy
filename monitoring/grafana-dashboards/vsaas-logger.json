@@ -57,7 +57,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{container=\"vsaas-logger\",namespace=\"monitoring\"}|json |~ \"(?i)${search:raw}\"",
+          "expr": "{container=\"vsaas-media-logger\",namespace=\"monitoring\"}|json |~ \"(?i)${search:raw}\"",
           "queryType": "range",
           "refId": "A"
         }

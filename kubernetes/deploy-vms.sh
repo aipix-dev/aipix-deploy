@@ -90,7 +90,7 @@ do
 	then break
 	fi
 	sleep 5
-	echo "Waiting for starting backend and controller containers ..."
+	echo "Waiting for starting mysql-server, backend and controller containers ..."
 done
 
 if [ ${PORTAL} == "yes" ]; then

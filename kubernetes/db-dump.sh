@@ -23,6 +23,10 @@ if [ ${TYPE} != "prod" ]; then
 		kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysqldump -uroot -pmysql --no-data --single-transaction --no-tablespaces portal_stub > ${BACKUP_PATH}/portal_stub-schema-backup.sql
 		kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysqldump -uroot -pmysql --single-transaction portal_stub > ${BACKUP_PATH}/portal_stub-backup.sql
 	fi
+	if [ ${WB} == "yes" ]; then
+		kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysqldump -uroot -pmysql --no-data --single-transaction --no-tablespaces wb > ${BACKUP_PATH}/wb-schema-backup.sql
+		kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysqldump -uroot -pmysql --single-transaction wb > ${BACKUP_PATH}/wb-backup.sql
+	fi
 fi
 
 echo """

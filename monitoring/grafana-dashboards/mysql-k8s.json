@@ -776,7 +776,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "aebgm8ycpz2f4e"
+            "uid": "$datasource"
           },
           "editorMode": "code",
           "exemplar": false,

@@ -1,4 +1,0 @@
-resources:
-- rolebindings.yaml
-- deployments.yaml
-- services.yaml

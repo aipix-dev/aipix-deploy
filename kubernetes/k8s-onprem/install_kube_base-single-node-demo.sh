@@ -74,7 +74,7 @@ sudo mount /dev/sdc /storage
 echo /dev/sdb /mnt/disk-sdb ext4 defaults,nofail 0 2 | sudo tee -a /etc/fstab
 echo /dev/sdc /storage ext4 defaults,nofail 0 2 | sudo tee -a /etc/fstab
 
-for i in $(seq 1 20); do
+for i in $(seq 1 7); do
 	sudo mkdir -p /mnt/disk-sdb/vol${i} /mnt/disks/disk_vol${i}
 	sudo mount --bind /mnt/disk-sdb/vol${i} /mnt/disks/disk_vol${i}
 	echo /mnt/disk-sdb/vol${i} /mnt/disks/disk_vol${i} none bind 0 0 | sudo tee -a /etc/fstab
@@ -102,9 +102,7 @@ if [ $? = 0 ]; then
 fi
 
 #Install minio client
-curl https://dl.min.io/client/mc/release/linux-amd64/mc \
-	--create-dirs \
-	-o $HOME/minio-binaries/mc
+curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o $HOME/minio-binaries/mc
 chmod +x $HOME/minio-binaries/mc
 export PATH=$PATH:$HOME/minio-binaries/
 echo 'export PATH=$PATH:$HOME/minio-binaries/' >> $HOME/.bashrc

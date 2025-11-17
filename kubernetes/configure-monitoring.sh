@@ -29,17 +29,27 @@ fi
 envsubst < ../monitoring/grafana-values.yaml.sample > ../monitoring/grafana-values.yaml
 envsubst < ../monitoring/loki-values.yaml.sample > ../monitoring/loki-values.yaml
 
-## Copy grafana dashboards to S3
+# Configure Grafana alert rules
+cp -n ../monitoring/grafana-alerts/rules/system-rules.yaml.sample ../monitoring/grafana-alerts/rules/system-rules.yaml
+cp -n ../monitoring/grafana-alerts/rules/analytics-cases-rules.yaml.sample ../monitoring/grafana-alerts/rules/analytics-cases-rules.yaml
+cp -n ../monitoring/grafana-alerts/rules/mse-rules.yaml.sample ../monitoring/grafana-alerts/rules/mse-rules.yaml
+
+# Copy grafana dashboards, alert message templates and rules to S3
 if kubectl -n ${NS_MINIO} get services minio-1 > /dev/null 2>&1 ; then
-    mc cp --recursive ../monitoring/grafana-dashboards/ minio-1/${MINIO_GRAFANA_BUCKET_NAME}/ || echo -e "\033[31mUnable to copy grafana dashboards to S3\033[0m"
+    mc cp --recursive ../monitoring/grafana-dashboards/ minio-1/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy grafana dashboards to S3\033[0m"
+    mc cp ../monitoring/grafana-alerts/rules/system-rules.yaml minio-1/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules || echo -e "\033[31mUnable to copy grafana system rules to S3\033[0m"
+    mc cp ../monitoring/grafana-alerts/rules/analytics-cases-rules.yaml minio-1/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules || echo -e "\033[31mUnable to copy analytics-cases alert rules to S3\033[0m"
+    mc cp ../monitoring/grafana-alerts/rules/mse-rules.yaml minio-1/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules || echo -e "\033[31mUnable to copy mse alert rules to S3\033[0m"
 else
-	mc cp --recursive ../monitoring/grafana-dashboards/ local/${MINIO_GRAFANA_BUCKET_NAME}/ || echo -e "\033[31mUnable to copy grafana dashboards to S3\033[0m"
+	mc cp --recursive ../monitoring/grafana-dashboards/ local/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy grafana dashboards to S3\033[0m"
+    mc cp ../monitoring/grafana-alerts/rules/system-rules.yaml local/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/system-rules.yaml || echo -e "\033[31mUnable to copy grafana system rules to S3\033[0m"
+    mc cp ../monitoring/grafana-alerts/rules/analytics-cases-rules.yaml local/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/analytics-cases-rules.yaml || echo -e "\033[31mUnable to copy analytics-cases alert rules to S3\033[0m"
+    mc cp ../monitoring/grafana-alerts/rules/mse-rules.yaml local/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/mse-rules.yaml || echo -e "\033[31mUnable to copy mse alert rule to S3\033[0m"
 fi
 
 # Configure logging
 ## Configure fluent-bit
 cp -n ../monitoring/fluentbit-values.yaml.sample ../monitoring/fluentbit-values.yaml
-# envsubst < ../monitoring/fluentbit-values.yaml.sample > ../monitoring/fluentbit-values.yaml
 
 # Configure InfluxDB deployment
 envsubst < ../monitoring/influxdb-values.yaml.sample > ../monitoring/influxdb-values.yaml

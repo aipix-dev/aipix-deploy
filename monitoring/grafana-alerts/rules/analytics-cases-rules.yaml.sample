@@ -1,0 +1,115 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name: Alerts_cases
+      folder: Alerts
+      interval: 30m
+      rules:
+        - uid: alert-016
+          title: Analytics cases status
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: 'OVMS uid: $tag_ovms_uid, Stream uid: $tag_stream_uid'
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - "null"
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: analytics_workers_jobs
+                orderByTime: ASC
+                policy: default
+                query: SELECT mean("status") FROM "analytics_workers_jobs_stats" WHERE ("deployment_name"::tag = 'vsaas-analytics') AND $timeFilter GROUP BY time($__interval), "stream_uid"::tag, "ovms_uid"::tag fill(null)
+                rawQuery: true
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - value
+                        type: field
+                      - params: []
+                        type: mean
+                tags:
+                    - key: deployment_name::tag
+                      operator: =
+                      value: vsaas-analytics
+            - refId: B
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 1
+                            - 1
+                        type: outside_range
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: f5cd5779-d583-48fa-b466-32930cfa9e7d
+          panelId: 5
+          noDataState: Alerting
+          execErrState: Error
+          for: 30m
+          annotations:
+            __dashboardUid__: f5cd5779-d583-48fa-b466-32930cfa9e7d
+            __panelId__: "5"
+            summary: Stream {{ $labels.stream_uid }} at {{ $labels.ovms_uid }} is not in running state
+          isPaused: false
+          notification_settings:
+            receiver: Telegram

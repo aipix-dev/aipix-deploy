@@ -1,0 +1,1393 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name: Alerts
+      folder: Alerts
+      interval: 1m
+      rules:
+        - uid: alert-001
+          title: Used RAM by analytic workers
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_ip
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - ip::tag
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: analytics_workers_resource_usage
+                orderByTime: ASC
+                policy: default
+                query: SELECT median("used_percent_memory") FROM "analytics_workers_resource_usage" WHERE ("deployment_name"::tag = 'vsaas-analytics') AND $timeFilter GROUP BY time($__interval), "ip"::tag fill(null)
+                rawQuery: false
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - used_percent_memory
+                        type: field
+                      - params: []
+                        type: last
+                tags:
+                    - key: deployment_name::tag
+                      operator: =
+                      value: vsaas-analytics
+            - refId: B
+              relativeTimeRange:
+                from: 10800
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 10800
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 90
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: f5cd5779-d583-48fa-b466-32930cfa9e7d
+          panelId: 3
+          noDataState: Alerting
+          execErrState: Error
+          for: 5m
+          annotations:
+            __dashboardUid__: f5cd5779-d583-48fa-b466-32930cfa9e7d
+            __panelId__: "3"
+            summary: 'Instance: {{ $labels.ip }} {{- "\t" -}} {{- "\t" -}} Usage: {{ $values.B.Value | printf "%.2f" }}%'
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-002
+          title: Used CPU by analytic workers
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_ip
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - ip::tag
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: analytics_workers_resource_usage
+                orderByTime: ASC
+                policy: default
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - cpu_loadavg_percent_1min
+                        type: field
+                      - params: []
+                        type: mean
+                tags:
+                    - key: deployment_name::tag
+                      operator: =
+                      value: vsaas-analytics
+            - refId: B
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 95
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: f5cd5779-d583-48fa-b466-32930cfa9e7d
+          panelId: 2
+          noDataState: Alerting
+          execErrState: Error
+          for: 5m
+          annotations:
+            __dashboardUid__: f5cd5779-d583-48fa-b466-32930cfa9e7d
+            __panelId__: "2"
+            summary: 'Instance: {{ $labels.ip }} {{- "\t" -}} {{- "\t" -}} Usage: {{ $values.B.Value | printf "%.2f" }}%'
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-003
+          title: Nodes status
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: prometheus
+              model:
+                datasource:
+                    type: prometheus
+                    uid: prometheus
+                disableTextWrap: false
+                editorMode: builder
+                expr: count by(node) (kube_node_status_condition{condition="Ready", status="true", job="kube-state-metrics"})
+                fullMetaSearch: false
+                includeNullMetadata: true
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: A
+                useBackend: false
+            - refId: C
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 1
+                            - 1
+                        type: outside_range
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: adrnct9
+          panelId: 58
+          noDataState: Alerting
+          execErrState: Error
+          for: 5m
+          annotations:
+            __dashboardUid__: adrnct9
+            __panelId__: "58"
+            summary: Node {{ $labels.node }} is not in 'Ready' state
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-004
+          title: Disk Space utilization
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_host, $tag_path
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - host::tag
+                      type: tag
+                    - params:
+                        - path::tag
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: disk
+                orderByTime: ASC
+                policy: default
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - used_percent
+                        type: field
+                      - params: []
+                        type: last
+                tags:
+                    - key: path::tag
+                      operator: =
+                      value: /
+                    - condition: OR
+                      key: path::tag
+                      operator: =
+                      value: /storage
+                    - condition: OR
+                      key: path::tag
+                      operator: =
+                      value: /storage2
+                    - condition: OR
+                      key: path::tag
+                      operator: =
+                      value: /var
+                    - condition: OR
+                      key: path::tag
+                      operator: =
+                      value: /opt
+                    - condition: OR
+                      key: path::tag
+                      operator: =
+                      value: /storage3
+            - refId: B
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params: []
+                      reducer:
+                        params: []
+                        type: avg
+                      type: query
+                datasource:
+                    name: Expression
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 85
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params: []
+                      reducer:
+                        params: []
+                        type: avg
+                      type: query
+                datasource:
+                    name: Expression
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: hOAcH9nnk
+          panelId: 62338
+          noDataState: Alerting
+          execErrState: Error
+          for: 15m
+          annotations:
+            __dashboardUid__: hOAcH9nnk
+            __panelId__: "62338"
+            summary: Disk {{ $labels.path }} space at {{ $labels.host }} is more than 85%
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-005
+          title: CPU Utilization
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_host
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - host::tag
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: cpu
+                orderByTime: ASC
+                policy: default
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - usage_idle
+                        type: field
+                      - params: []
+                        type: last
+                tags:
+                    - key: host::tag
+                      operator: '!~'
+                      value: /k8s-.*/
+            - refId: B
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 20
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: "000000127"
+          panelId: 28239
+          noDataState: Alerting
+          execErrState: Error
+          for: 15m
+          annotations:
+            __dashboardUid__: "000000127"
+            __panelId__: "28239"
+            summary: 'Instance: {{ $labels.ip }} {{- "\t" -}} {{- "\t" -}} Usage: {{ $values.B.Value | printf "%.2f" }}%'
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-006
+          title: Memory Utilization
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_host
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - host::tag
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: mem
+                orderByTime: ASC
+                policy: default
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - available_percent
+                        type: field
+                      - params: []
+                        type: last
+                tags:
+                    - key: host::tag
+                      operator: '!~'
+                      value: /k8s.*/
+            - refId: B
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 15
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: "000000127"
+          panelId: 12054
+          noDataState: Alerting
+          execErrState: Error
+          for: 15m
+          annotations:
+            __dashboardUid__: "000000127"
+            __panelId__: "12054"
+            summary: 'Instance: {{ $labels.ip }} {{- "\t" -}} {{- "\t" -}} Usage: {{ $values.B.Value | printf "%.2f" }}%'
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-007
+          title: Pod not Running
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: prometheus
+              model:
+                datasource:
+                    type: prometheus
+                    uid: prometheus
+                disableTextWrap: false
+                editorMode: code
+                expr: sum by(namespace, pod) (last_over_time(kube_pod_status_ready{condition!="true"}[10m]) or kube_pod_deletion_timestamp > 0)
+                fullMetaSearch: false
+                includeNullMetadata: true
+                instant: true
+                intervalMs: 30000
+                legendFormat: __auto
+                maxDataPoints: 1000
+                range: false
+                refId: A
+                useBackend: false
+            - refId: B
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: garysdevil-kube-state-metrics-v2
+          panelId: 30
+          noDataState: Alerting
+          execErrState: Error
+          for: 10m
+          annotations:
+            __dashboardUid__: garysdevil-kube-state-metrics-v2
+            __panelId__: "30"
+            summary: Pod {{ $labels.pod }} in {{ $labels.namespace }} namespace is not in 'Running' state
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-008
+          title: Free Space / (k8s)
+          condition: B
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: prometheus
+              model:
+                datasource:
+                    type: prometheus
+                    uid: prometheus
+                editorMode: code
+                expr: |
+                    sum(node_filesystem_free_bytes{mountpoint="/", node=~"^k8s.*|sip.*"}) by (node, device) / sum(node_filesystem_size_bytes{mountpoint="/", node=~"^k8s.*|sip.*"}) by (node, device) * 100
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: B
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 15
+                            - 0
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params: []
+                      reducer:
+                        params: []
+                        type: avg
+                      type: query
+                datasource:
+                    name: Expression
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: B
+                type: threshold
+          dashboardUid: rYdddlPWk
+          panelId: 156
+          noDataState: Alerting
+          execErrState: Error
+          for: 15m
+          annotations:
+            __dashboardUid__: rYdddlPWk
+            __panelId__: "156"
+            summary: 'Instance: {{ $labels.node }} {{- "\t" -}} {{- "\t" -}} Usage: {{ $values.B.Value | printf "%.2f" }}%'
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-009
+          title: Free Memory (k8s)
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 10800
+                to: 0
+              datasourceUid: prometheus
+              model:
+                datasource:
+                    type: prometheus
+                    uid: prometheus
+                editorMode: code
+                expr: "100 * (1 - (\n  sum by (node) (\n    avg_over_time(node_memory_MemFree_bytes{node=~\"^k8s.*|sip.*\"}[10m]) +\n    avg_over_time(node_memory_Cached_bytes{node=~\"^k8s.*|sip.*\"}[10m]) +\n    avg_over_time(node_memory_Buffers_bytes{node=~\"^k8s.*|sip.*\"}[10m])\n  ) \n  / \n  sum by (node) (\n    avg_over_time(node_memory_MemTotal_bytes{node=~\"^k8s.*|sip.*\"}[10m])\n  )\n))\n"
+                format: time_series
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: C
+              relativeTimeRange:
+                from: 10800
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 90
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: rYdddlPWk
+          panelId: 78
+          noDataState: Alerting
+          execErrState: Error
+          for: 5m
+          annotations:
+            __dashboardUid__: rYdddlPWk
+            __panelId__: "78"
+            summary: 'Instance: {{ $labels.node }} {{- "\t" -}} {{- "\t" -}} Usage: {{ $values.B.Value | printf "%.2f" }}%'
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-010
+          title: CPU load (k8s)
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: prometheus
+              model:
+                datasource:
+                    type: prometheus
+                    uid: prometheus
+                editorMode: code
+                expr: (1 - avg(irate(node_cpu_seconds_total{mode="idle", node=~"^k8s.*|sip.*"}[10m])) by (node)) * 100
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: C
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 85
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: rYdddlPWk
+          panelId: 3
+          noDataState: Alerting
+          execErrState: Error
+          for: 10m
+          annotations:
+            __dashboardUid__: rYdddlPWk
+            __panelId__: "3"
+            summary: 'Instance: {{ $labels.node }} {{- "\t" -}} {{- "\t" -}} Usage: {{ $values.B.Value | printf "%.2f" }}%'
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-011
+          title: Free Space /mnt/disk-sda (k8s)
+          condition: A
+          data:
+            - refId: B
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: prometheus
+              model:
+                datasource:
+                    type: prometheus
+                    uid: prometheus
+                disableTextWrap: false
+                editorMode: code
+                expr: 100 - sum(node_filesystem_free_bytes{mountpoint="/mnt/disk-sda", node=~"^k8s.*|sip.*"}) by (node, device) / sum(node_filesystem_size_bytes{mountpoint="/mnt/disk-sda", node=~"^k8s.*|sip.*"}) by (node, device) * 100
+                fullMetaSearch: false
+                includeNullMetadata: true
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: B
+                useBackend: false
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 85
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params: []
+                      reducer:
+                        params: []
+                        type: avg
+                      type: query
+                datasource:
+                    name: Expression
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: A
+                type: threshold
+          dashboardUid: rYdddlPWk
+          panelId: 156
+          noDataState: Alerting
+          execErrState: Error
+          for: 15m
+          annotations:
+            __dashboardUid__: rYdddlPWk
+            __panelId__: "156"
+            summary: 'Instance: {{ $labels.node }} {{- "\t" -}} {{- "\t" -}} Usage: {{ $values.B.Value | printf "%.2f" }}%'
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-012
+          title: Beanstalkd jobs ready (delta)
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: prometheus
+              model:
+                datasource:
+                    type: prometheus
+                    uid: prometheus
+                disableTextWrap: false
+                editorMode: builder
+                expr: delta(beanstalkd_tube_current_jobs_ready_count[$__interval])
+                fullMetaSearch: false
+                includeNullMetadata: true
+                instant: false
+                interval: ""
+                intervalMs: 15000
+                legendFormat: '{{tube}}'
+                maxDataPoints: 43200
+                range: true
+                refId: A
+                useBackend: false
+            - refId: B
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 200
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: be3pnd9u4sgsgc
+          panelId: 5
+          noDataState: NoData
+          execErrState: Error
+          for: 2m
+          annotations:
+            __dashboardUid__: be3pnd9u4sgsgc
+            __panelId__: "5"
+            summary: 'Tube: {{ $labels.tube }} {{- "\t" -}} {{- "\t" -}} Jobs: {{ $values.B.Value | printf "%.2f" }}%'
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-013
+          title: Beanstalkd jobs ready (threshold)
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: prometheus
+              model:
+                datasource:
+                    type: prometheus
+                    uid: prometheus
+                disableTextWrap: false
+                editorMode: builder
+                expr: beanstalkd_tube_current_jobs_ready_count
+                fullMetaSearch: false
+                includeNullMetadata: true
+                instant: false
+                interval: ""
+                intervalMs: 15000
+                legendFormat: '{{tube}}'
+                maxDataPoints: 43200
+                range: true
+                refId: A
+                useBackend: false
+            - refId: B
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 10000
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: be3pnd9u4sgsgc
+          panelId: 5
+          noDataState: NoData
+          execErrState: Error
+          for: 5m
+          annotations:
+            __dashboardUid__: be3pnd9u4sgsgc
+            __panelId__: "5"
+            summary: 'Tube: {{ $labels.tube }} {{- "\t" -}} {{- "\t" -}} Jobs: {{ $values.B.Value | printf "%.2f" }}%'
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-014
+          title: Keepalived service
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_host
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - host::tag
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: systemd_units
+                orderByTime: ASC
+                policy: default
+                query: SELECT last("active_code") FROM "systemd_units" WHERE ("name"::tag = 'keepalived.service') AND $timeFilter GROUP BY time($__interval), "host"::tag fill(none)
+                rawQuery: false
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - active_code
+                        type: field
+                      - params: []
+                        type: last
+                tags:
+                    - key: name::tag
+                      operator: =
+                      value: keepalived.service
+            - refId: B
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: adf8qk7
+          panelId: 1
+          noDataState: NoData
+          execErrState: Error
+          for: 5m
+          annotations:
+            __dashboardUid__: adf8qk7
+            __panelId__: "1"
+            summary: keepalived.service is in an abnormal state on host {{ $labels.host }}
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-015
+          title: Ping
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_url
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - url::tag
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: ping
+                orderByTime: ASC
+                policy: default
+                query: SELECT last("result_code") FROM "ping" WHERE $timeFilter GROUP BY time($__interval), "url"::tag fill(none)
+                rawQuery: false
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - result_code
+                        type: field
+                      - params: []
+                        type: last
+            - refId: B
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: replaceNN
+                    replaceWithValue: 0
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 2m
+          annotations:
+            summary: Ping result for {{ $labels.url }} indicates a failure
+          isPaused: false
+          notification_settings:
+            receiver: Telegram

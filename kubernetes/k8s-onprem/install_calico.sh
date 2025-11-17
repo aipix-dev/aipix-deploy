@@ -33,6 +33,17 @@ sleep 30
 
 kubectl patch Installation default --type 'json' -p '[{"op": "replace", "path": "/spec/calicoNetwork/nodeAddressAutodetectionV4", "value": {kubernetes: NodeInternalIP}}]'
 
+kubectl apply -f - <<EOF
+apiVersion: projectcalico.org/v3
+kind: BGPConfiguration
+metadata:
+  name: default
+spec:
+  logSeverityScreen: Info
+  nodeToNodeMeshEnabled: false
+  asNumber: 64512
+EOF
+
 echo "
 Calico instalation is finished succesfuly
 "

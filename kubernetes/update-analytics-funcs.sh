@@ -69,8 +69,6 @@ update_vectorizator () {
 update_push1st () {
 	set -e
 	kubectl delete configmap push1st-orchestrator --namespace=${NS_VMS} || true
-	# kubectl create configmap push1st-orchestrator --namespace=${NS_VMS} --from-file=../push1st/orchestrator.yml --dry-run=client -o yaml | \
-	# sed -e "s@http://django:8000/api/events/@http://orchestrator.${NS_A}.svc/api/events/@g" | kubectl apply -f-
 	kubectl create configmap push1st-orchestrator --namespace=${NS_VMS} --from-file=../push1st/orchestrator.yml
 	kubectl -n ${NS_VMS} rollout restart deployment push1st
 }
@@ -95,11 +93,6 @@ update_clickhouse () {
         echo "Waiting for starting clickhouse-server container if presents (max 5 minutes) ..."
         sleep 10
     done
-	sleep 10
-	if [[ $(kubectl -n ${NS_A} exec deployments/clickhouse-server -- clickhouse-client -q "SELECT name FROM system.columns WHERE database = 'orchestrator' AND table = 'analytic_case_events' AND name = 'age';") != "age" ]]; then 
-		echo -e "\e[1;32mRun upgrade clickhouse scheme script\e[0m"
-		../analytics/upgrade-clickhouse-scheme.sh
-	fi
 }
 
 update_metrics-pusher () {

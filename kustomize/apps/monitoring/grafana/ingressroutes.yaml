@@ -12,7 +12,7 @@ spec:
   - websecure
   routes:
   - kind: Rule
-    match: Host (`example.com`) && PathPrefix(`/monitoring`)
+    match: Host (`example.com`) && ( PathPrefix(`/monitoring`) || PathPrefix(`/swagger`) )
     services:
     - kind: Service
       name: grafana

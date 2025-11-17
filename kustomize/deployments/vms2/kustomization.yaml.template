@@ -29,34 +29,34 @@ ${ADD_COMPONENT4}
 images:
 - name: download.aipix.ai:8443/vms-backend/release
   newName: download.aipix.ai:8443/vms-backend/release
-  newTag: 25.06.1.0
+  newTag: 25.06.1.1
 - name: download.aipix.ai:8443/vms-frontend-admin/release
   newName: download.aipix.ai:8443/vms-frontend-admin/release
-  newTag: 25.06.1.0
+  newTag: 25.06.1.1
 - name: download.aipix.ai:8443/vms-frontend-client/release
   newName: download.aipix.ai:8443/vms-frontend-client/release
-  newTag: 25.06.1.0
+  newTag: 25.06.1.1
 - name: download.aipix.ai:8443/controller/release
   newName: download.aipix.ai:8443/controller/release
-  newTag: 25.06.1.0
+  newTag: 25.06.1.2
 - name: download.aipix.ai:8443/vms-portal-backend/release
   newName: download.aipix.ai:8443/vms-portal-backend/release
   newTag: 25.06.0.0
 - name: download.aipix.ai:8443/vms-portal-frontend-client/release
   newName: download.aipix.ai:8443/vms-portal-frontend-client/release
-  newTag: 25.06.0.0
+  newTag: 25.06.1.1
 - name: download.aipix.ai:8443/vms-portal-stub/release
   newName: download.aipix.ai:8443/vms-portal-stub/release
   newTag: latest
 - name: download.aipix.ai:8443/vms-portal-landing/release
   newName: download.aipix.ai:8443/vms-portal-landing/release
-  newTag: 25.06.0.0
+  newTag: 25.06.1.1
 - name: download.aipix.ai:8443/vms-integration-wb/release
   newName: download.aipix.ai:8443/vms-integration-wb/release
   newTag: 25.06.0.0
 - name: download.aipix.ai:8443/vms-embedded-player/release
   newName: download.aipix.ai:8443/vms-embedded-player/release
-  newTag: 25.06.1.0
+  newTag: 25.06.1.1
 - name: download.aipix.ai:8443/beanstalkd
   newName: download.aipix.ai:8443/beanstalkd
   newTag: "1.13"
@@ -80,8 +80,24 @@ patches:
       path: /spec/strategy
       value:
         rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 25%
+        type: RollingUpdate
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: "(cron|schedule|controller-schedule)"
+  patch: |-
+    - op: replace
+      path: /spec/replicas
+      value: 1
+    - op: replace
+      path: /spec/strategy
+      value:
+        rollingUpdate:
           maxSurge: 1
-          maxUnavailable: 1
+          maxUnavailable: 0
         type: RollingUpdate
 
 #Kustomizations with patch files

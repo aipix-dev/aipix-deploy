@@ -1,12 +1,6 @@
 - op: replace
-  path: /spec/template/spec/containers/1/resources
+  path: /spec/template/spec/containers/0/resources
   value:
           requests:
             cpu: 14
             memory: 6Gi
-- op: replace
-  path: /spec/template/spec/containers/3/resources
-  value:
-          requests:
-            cpu: 1
-            memory: 8Gi

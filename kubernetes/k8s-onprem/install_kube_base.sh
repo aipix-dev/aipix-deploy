@@ -26,7 +26,6 @@ K8S_VER_PATCH=${SRC_K8S_VER_PATCH}
 K8S_VER_BUILD=${SRC_K8S_VER_BUILD}
 CONTAINERD_VER=${SRC_CONTAINERD_VER}
 RUNC_VER=${SRC_RUNC_VER}
-NET_PLUGINS_VER=${SRC_NET_PLUGINS_VER}
 CALICO_VER=${SRC_CALICO_VER}
 
 sudo swapoff -a
@@ -68,39 +67,79 @@ EOF
 sudo sysctl --system
 
 #containerd --version
+echo "Starting containerd v${CONTAINERD_VER} installation"
 sudo curl -L https://github.com/containerd/containerd/releases/download/v${CONTAINERD_VER}/containerd-${CONTAINERD_VER}-linux-amd64.tar.gz -o containerd-${CONTAINERD_VER}-linux-amd64.tar.gz
 
 sudo tar Cxzvf /usr/local containerd-${CONTAINERD_VER}-linux-amd64.tar.gz
 sudo rm containerd-${CONTAINERD_VER}-linux-amd64.tar.gz
 
-sudo mkdir /etc/containerd
-sudo sh -c "containerd config default > /etc/containerd/config.toml"
+CONFIG_FILE="/etc/containerd/config.toml"
+TARGET_LINE_1="\[plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.runc.options\]"
+TARGET_LINE_2="\[plugins.'io.containerd.grpc.v1.cri'\]"
 
-sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
-sudo sed -i 's@sandbox_image =.*@sandbox_image = "registry.k8s.io/pause:3.10"@' /etc/containerd/config.toml
+sudo mkdir -p /etc/containerd/certs.d
+sudo sh -c "containerd config default > ${CONFIG_FILE}"
 
+if sudo grep  "SystemdCgroup =" $CONFIG_FILE >/dev/null 2>&1; then
+    echo "Seting existing SystemdCgroup in /etc/containerd/config.toml to true"
+    sudo sed -i 's/SystemdCgroup =.*/SystemdCgroup = true/' ${CONFIG_FILE}
+elif
+    sudo grep -q "$TARGET_LINE_1" $CONFIG_FILE >/dev/null 2>&1 ; then
+    echo "Adding SystemdCgroup in /etc/containerd/config.toml and seting to true"
+    sudo sed -i "/${TARGET_LINE_1}/a\            SystemdCgroup = true" ${CONFIG_FILE}
+else
+    echo "Error: Unable to configure SystemdCgroup in /etc/containerd/config.toml: Target line not found"
+    exit 2
+fi
+
+if sudo grep  "sandbox_image =" $CONFIG_FILE >/dev/null 2>&1; then
+    echo "Seting existing sandbox_image in /etc/containerd/config.toml to new value"
+    sudo sed -i "s/sandbox_image =.*/sandbox_image = 'registry.k8s.io\/pause:3.10'/" ${CONFIG_FILE}
+elif
+    sudo grep -q "$TARGET_LINE_2" $CONFIG_FILE >/dev/null 2>&1 ; then
+    echo "Adding sandbox_image in /etc/containerd/config.toml and seting value"
+    sudo sed -i "/${TARGET_LINE_2}/a\    sandbox_image = 'registry.k8s.io/pause:3.10'" ${CONFIG_FILE}
+else
+    echo "Error: Unable to configure sandbox_image in /etc/containerd/config.toml: Target line not found"
+    exit 2
+fi
+
+#Replace config_path in config.toml
+if sudo grep '\[plugins\."io\.containerd\.grpc\.v1\.cri"\.registry\]' ${CONFIG_FILE} >/dev/null 2>&1; then
+    sudo sed -i '/\[plugins\."io\.containerd\.grpc\.v1\.cri"\.registry\]/,/^$/s|config_path = ".*"|config_path = "/etc/containerd/certs.d"|' ${CONFIG_FILE}
+elif
+    sudo grep "\[plugins\.'io.containerd.cri.v1.images'\.registry\]" ${CONFIG_FILE} >/dev/null 2>&1; then
+    sudo sed -i "/\[plugins\.'io.containerd.cri.v1.images'\.registry\]/,/^$/s|config_path = '.*'|config_path = '/etc/containerd/certs.d'|" ${CONFIG_FILE}
+else
+    echo "Error: Unable to configure config_path in /etc/containerd/config.toml: Target line not found"
+    exit 2
+fi
+
+#Create containerd.service file
 sudo curl -L https://raw.githubusercontent.com/containerd/containerd/main/containerd.service -o /usr/lib/systemd/system/containerd.service
+sudo mkdir -p /usr/lib/systemd/system/containerd.service.d
+cat <<EOF | sudo tee /usr/lib/systemd/system/containerd.service.d/limits.conf
+[Service]
+LimitNOFILE=infinity
+EOF
 
 sudo systemctl daemon-reload
 sudo systemctl enable --now containerd
+echo "Containerd v${CONTAINERD_VER} installed"
 
 #runc --version
+echo "Starting runc v${RUNC_VER} installation"
 sudo curl -L https://github.com/opencontainers/runc/releases/download/v${RUNC_VER}/runc.amd64 -o runc.amd64
 
 sudo install -m 755 runc.amd64 /usr/local/sbin/runc
 sudo rm runc.amd64
-
-#Install network plugins
-sudo curl -L https://github.com/containernetworking/plugins/releases/download/v${NET_PLUGINS_VER}/cni-plugins-linux-amd64-v${NET_PLUGINS_VER}.tgz -o cni-plugins-linux-amd64-v${NET_PLUGINS_VER}.tgz
-sudo mkdir -p /opt/cni/bin
-sudo tar Cxzvf /opt/cni/bin cni-plugins-linux-amd64-v${NET_PLUGINS_VER}.tgz
-sudo rm cni-plugins-linux-amd64-v${NET_PLUGINS_VER}.tgz
+echo "Runc v${RUNC_VER} installed"
 
 #Install Calico control client for network plugin
-cd /usr/local/bin/
-sudo curl -L https://github.com/projectcalico/calico/releases/download/v${CALICO_VER}/calicoctl-linux-amd64 -o calicoctl
-
-sudo chmod +x calicoctl
+echo "Starting calicoctl v${CALICO_VER} installation"
+sudo curl -L https://github.com/projectcalico/calico/releases/download/v${CALICO_VER}/calicoctl-linux-amd64 -o /usr/local/bin/calicoctl
+sudo chmod +x /usr/local/bin/calicoctl
+echo "Calicoctl v${CALICO_VER} installed"
 
 #Define internal ip address
 HOST_NETWORK=$1

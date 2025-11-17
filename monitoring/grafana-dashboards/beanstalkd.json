@@ -30,7 +30,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "prometheus"
       },
       "description": "Rate of the cumulative number of delete commands for this tube",
       "fieldConfig": {
@@ -62,6 +62,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -86,38 +87,7 @@
             ]
           }
         },
-        "overrides": [
-          {
-            "__systemRef": "hideSeriesFrom",
-            "matcher": {
-              "id": "byNames",
-              "options": {
-                "mode": "exclude",
-                "names": [
-                  "controller_webhook",
-                  "controller",
-                  "vms",
-                  "media_servers_callback",
-                  "archive_generation",
-                  "default",
-                  "portal"
-                ],
-                "prefix": "All except:",
-                "readOnly": true
-              }
-            },
-            "properties": [
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": true
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 9,
@@ -146,12 +116,12 @@
           "sort": "asc"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
-            "type": "k8s-prod",
-            "uid": "k8s-prod"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -171,7 +141,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "prometheus"
       },
       "description": "Rate for the interval of the cumulative count of jobs created for the tubes in the current beanstalkd process.",
       "fieldConfig": {
@@ -203,6 +173,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -256,12 +227,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
-            "type": "k8s-prod",
-            "uid": "k8s-prod"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -281,7 +252,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "prometheus"
       },
       "description": "The number of jobs reserved by all clients for the tubes.",
       "fieldConfig": {
@@ -313,6 +284,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
+            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -366,12 +338,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
-            "type": "k8s-prod",
-            "uid": "k8s-prod"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -391,7 +363,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "prometheus"
       },
       "description": "The number of delayed jobs for tubes",
       "fieldConfig": {
@@ -423,6 +395,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -476,12 +449,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
-            "type": "k8s-prod",
-            "uid": "k8s-prod"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -501,7 +474,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "prometheus"
       },
       "description": "the number of jobs in the ready queue for the tube.",
       "fieldConfig": {
@@ -533,6 +506,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -587,12 +561,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
-            "type": "k8s-prod",
-            "uid": "k8s-prod"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -612,7 +586,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "prometheus"
       },
       "description": "The number of buried jobs for the tubes.",
       "fieldConfig": {
@@ -644,6 +618,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -697,12 +672,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
-            "type": "k8s-prod",
-            "uid": "k8s-prod"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -724,7 +699,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "prometheus"
       },
       "description": "The number of open connections that are currently watching the tubes.",
       "fieldConfig": {
@@ -756,6 +731,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -809,12 +785,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
-            "type": "k8s-prod",
-            "uid": "k8s-prod"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -834,7 +810,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "prometheus"
       },
       "description": "The number of open connections that are currently using the tubes.",
       "fieldConfig": {
@@ -869,6 +845,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -922,12 +899,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
-            "type": "k8s-prod",
-            "uid": "k8s-prod"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -947,7 +924,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "prometheus"
       },
       "description": "The number of open connections that have issued a reserve command for the tubes but not yet received a response.",
       "fieldConfig": {
@@ -979,6 +956,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -1032,12 +1010,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
-            "type": "k8s-prod",
-            "uid": "k8s-prod"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -1057,7 +1035,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "prometheus"
       },
       "description": "The number of ready jobs with priority < 1024 for the tubes",
       "fieldConfig": {
@@ -1089,6 +1067,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -1142,12 +1121,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
-            "type": "k8s-prod",
-            "uid": "k8s-prod"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -1166,7 +1145,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "prometheus"
       },
       "description": "The cumulative number of pause-tube commands for this tube.",
       "fieldConfig": {
@@ -1198,6 +1177,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -1251,12 +1231,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
-            "type": "k8s-prod",
-            "uid": "k8s-prod"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -1276,7 +1256,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "prometheus"
       },
       "description": "The number of seconds until the tubes is un-paused",
       "fieldConfig": {
@@ -1308,6 +1288,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -1361,12 +1342,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
-            "type": "k8s-prod",
-            "uid": "k8s-prod"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -1386,7 +1367,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P1809F7CD0C75ACF3"
+        "uid": "prometheus"
       },
       "description": "The number of seconds the tubes has been paused for.",
       "fieldConfig": {
@@ -1418,6 +1399,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -1471,12 +1453,12 @@
           "sort": "none"
         }
       },
-      "pluginVersion": "12.1.0",
+      "pluginVersion": "12.2.1",
       "targets": [
         {
           "datasource": {
-            "type": "k8s-prod",
-            "uid": "k8s-prod"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -1496,7 +1478,7 @@
   ],
   "preload": false,
   "refresh": "10s",
-  "schemaVersion": 41,
+  "schemaVersion": 42,
   "tags": [],
   "templating": {
     "list": []
@@ -1509,5 +1491,5 @@
   "timezone": "browser",
   "title": "Beanstalkd Dashboard",
   "uid": "be3pnd9u4sgsgc",
-  "version": 3
+  "version": 1
 }

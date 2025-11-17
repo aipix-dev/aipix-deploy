@@ -105,7 +105,7 @@
         "y": 1
       },
       "id": 18,
-      "interval": "$__interval/1m",
+      "interval": "1m",
       "options": {
         "legend": {
           "calcs": [],

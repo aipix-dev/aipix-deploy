@@ -29,32 +29,16 @@ helm -n ${NS_MONITORING} template redis-exporter prometheus-community/prometheus
 helm -n ${NS_MONITORING} template kube-state-metrics prometheus-community/kube-state-metrics -f ../monitoring/kube-state-metrics-values.yaml > ../kustomize/apps/monitoring/prometheus/kube-state-metrics.yaml
 helm -n ${NS_MONITORING} template vsaas-media-logger ${BRAND}/vsaas-media-logger -f ../monitoring/vsaas-media-logger.yaml > ../kustomize/apps/monitoring/media-logger/vsaas-media-logger.yaml
 
-
-
 ../kustomize/deployments/monitoring1/update-kustomization.sh
 kubectl apply -k ../kustomize/deployments/monitoring1
-kubectl -n ${NS_MONITORING} rollout restart deployment prometheus-server
-kubectl -n ${NS_MONITORING} rollout restart deployment grafana
-sleep 5
-PROMETHEUS_PORT=$(kubectl get service/prometheus-server --namespace=${NS_MONITORING} -o jsonpath='{.spec.ports[0].nodePort}')
-GRAFANA_PORT=$(kubectl get service/grafana --namespace=${NS_MONITORING} -o jsonpath='{.spec.ports[0].nodePort}')
-INFLUX_PORT=$(kubectl get service/influxdb-influxdb2 --namespace=${NS_MONITORING} -o jsonpath='{.spec.ports[0].nodePort}')
+kubectl -n ${NS_MONITORING} rollout restart deployment prometheus-server grafana
+kubectl -n ${NS_MONITORING} rollout status deployment prometheus-server grafana
+sleep 10
 
 echo """
 Monitoring deployment script completed successfuly!
 
-URL to access Prometheus is
-http://${K8S_API_ENDPOINT}:${PROMETHEUS_PORT}
-
-URL to access InfluxDB is
-http://${K8S_API_ENDPOINT}:${INFLUX_PORT}
-user: ${INFLUX_USR}
-pass: ${INFLUX_PSW}
-token: ${INFLUX_TOKEN}
-keep your credentials in safe place !
-
 URL to access Grafana is
-http://${K8S_API_ENDPOINT}:${GRAFANA_PORT}
 https://${VMS_DOMAIN}/monitoring
 Default credentials are admin/admin.
 Replace them during first login.

@@ -62,7 +62,7 @@ fi
 
 if [[ ${DEPLOY_CERT_MANAGER} == "yes" ]]; then
 	helm repo add jetstack https://charts.jetstack.io --force-update
-	echo "Wait a few minutes to deply cert-manager..."
+	echo "Wait a few minutes to deploy cert-manager..."
 	helm install cert-manager jetstack/cert-manager \
 			--namespace ${NS_CERT_MANAGER} \
 			--create-namespace \

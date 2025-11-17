@@ -1,0 +1,1174 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name: Vsaas
+      folder: MSE
+      interval: 20s
+      rules:
+        - uid: alert-017
+          title: Vsaas service exit status
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 120
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_host
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - host::tag
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: exec_signal
+                orderByTime: ASC
+                policy: default
+                query: SELECT max("exit_status") FROM "exec_signal" WHERE $timeFilter GROUP BY time($__interval), "host"::tag fill(none)
+                rawQuery: false
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - exit_status
+                        type: field
+                      - params: []
+                        type: max
+                tags: []
+            - refId: B
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          annotations:
+            summary: Vsaas service on host {{ $labels.host }} exited with status {{ $values.B.Value }}
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-018
+          title: Vsaas ports status
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_host, $tag_port
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - host::tag
+                      type: tag
+                    - params:
+                        - port::tag
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: net_response
+                orderByTime: ASC
+                policy: default
+                query: SELECT last("result_code") FROM "net_response" WHERE $timeFilter GROUP BY time($__interval), "server"::tag, "port"::tag fill(none)
+                rawQuery: false
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - result_code
+                        type: field
+                      - params: []
+                        type: last
+                tags:
+                    - key: host::tag
+                      operator: =~
+                      value: /ms-.*/
+            - refId: B
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: PPz0n0LNk
+          panelId: 6
+          noDataState: NoData
+          execErrState: Error
+          for: 5m
+          annotations:
+            __dashboardUid__: PPz0n0LNk
+            __panelId__: "6"
+            summary: Response from {{ $labels.host }} on port {{ $labels.port }} indicates a failure or abnormal result
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-019
+          title: MSE segmentation fault code 9
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_host
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - host::tag
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: exec_signal
+                orderByTime: ASC
+                policy: default
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - exit_status
+                        type: field
+                      - params: []
+                        type: max
+                tags: []
+            - refId: B
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 9
+                            - 9
+                        type: within_range
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          annotations:
+            summary: MSE {{ $labels.host }} encounters a segmentation fault (signal code 9)
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-020
+          title: MSE segmentation fault code 11
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_host
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - host::tag
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: exec_signal
+                orderByTime: ASC
+                policy: default
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - exit_status
+                        type: field
+                      - params: []
+                        type: max
+                tags: []
+            - refId: B
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 11
+                            - 11
+                        type: within_range
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          annotations:
+            summary: MSE {{ $labels.host }} encounters a segmentation fault (signal code 11)
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-021
+          title: MSE segmentation fault code 13
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_host
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - host::tag
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: exec_signal
+                orderByTime: ASC
+                policy: default
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - exit_status
+                        type: field
+                      - params: []
+                        type: max
+                tags: []
+            - refId: B
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: max
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 13
+                            - 13
+                        type: within_range
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          annotations:
+            summary: MSE {{ $labels.host }} encounters a segmentation fault (signal code 13)
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-022
+          title: Vsaas service status
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 120
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_host
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - host::tag
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: systemd_units
+                orderByTime: ASC
+                policy: default
+                query: SELECT max("active_code") FROM "systemd_units" WHERE ("name"::tag = 'vsaas.service') AND $timeFilter GROUP BY time($__interval), "host"::tag fill(none)
+                rawQuery: false
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - active_code
+                        type: field
+                      - params: []
+                        type: last
+                tags:
+                    - key: name::tag
+                      operator: =
+                      value: vsaas.service
+            - refId: B
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 60
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: AnWLulUS
+          panelId: 4
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          annotations:
+            __dashboardUid__: AnWLulUS
+            __panelId__: "4"
+            summary: MSE on host {{ $labels.host }} is in an inactive or abnormal state
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-023
+          title: MSE restarts
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: influxdb
+              model:
+                adhocFilters: []
+                alias: $tag_host
+                datasource:
+                    type: influxdb
+                    uid: influxdb
+                groupBy:
+                    - params:
+                        - 1s
+                      type: time
+                    - params:
+                        - host
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                limit: ""
+                maxDataPoints: 43200
+                measurement: zdpi_restarts
+                orderByTime: ASC
+                policy: default
+                query: |
+                    SELECT difference(last("vsaas_restarts_count")) AS difference_value
+                    FROM "vsaas_restarts"
+                    WHERE ("server_type" = 'ms') AND $timeFilter
+                    GROUP BY "host", time(30m) fill(null)
+                rawQuery: true
+                rawSql: ""
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - zdpi_restarts_count
+                        type: field
+                      - params: []
+                        type: difference
+                slimit: ""
+                tags:
+                    - key: server_type
+                      operator: =
+                      value: ce
+                tz: ""
+            - refId: B
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: AnWLulUSz
+          panelId: 3
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          annotations:
+            __dashboardUid__: AnWLulUSz
+            __panelId__: "3"
+            summary: MSE on host {{ $labels.host }} experiences restarts within the last 15 minutes
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-024
+          title: MSE Traffic IN
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_host, Mbit/s
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: net
+                orderByTime: ASC
+                policy: default
+                query: "SELECT non_negative_derivative(mean(bytes_recv),1s)*8/1000000 as \"in\"  \nFROM \"net\" \nWHERE (host =~ /ms-0002/ OR host =~ /ms-0001/) \nAND interface =~ /enp4s7/ \nAND $timeFilter \nGROUP BY time($interval), * \nfill(none)"
+                rawQuery: true
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - bytes_recv
+                        type: field
+                      - params: []
+                        type: last
+                      - params: []
+                        type: non_negative_difference
+                tags:
+                    - key: interface::tag
+                      operator: =
+                      value: enp4s4
+            - refId: B
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 300
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: hOAcH9nnk
+          panelId: 42026
+          noDataState: NoData
+          execErrState: Error
+          for: 5m
+          annotations:
+            __dashboardUid__: hOAcH9nnk
+            __panelId__: "42026"
+            summary: Incoming network traffic on the enp4s7 interface for {{ $labels.host }} is {{ $values.B.Value | printf "%.2f" }}Mbit/s
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-025
+          title: MSE Traffic OUT
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_host, Mbit/s
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: net
+                orderByTime: ASC
+                policy: default
+                query: "SELECT non_negative_derivative(mean(bytes_sent),1s)*8/1000000 as \"in\"  \nFROM \"net\" \nWHERE (host =~ /ms-0002/ OR host =~ /ms-0001/) \nAND interface =~ /enp4s4/ \nAND $timeFilter \nGROUP BY time($interval), * \nfill(none)"
+                rawQuery: true
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - bytes_recv
+                        type: field
+                      - params: []
+                        type: last
+                      - params: []
+                        type: non_negative_difference
+                tags:
+                    - key: interface::tag
+                      operator: =
+                      value: enp4s4
+            - refId: B
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 5
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: hOAcH9nnk
+          panelId: 42026
+          noDataState: NoData
+          execErrState: Error
+          for: 5m
+          annotations:
+            __dashboardUid__: hOAcH9nnk
+            __panelId__: "42026"
+            summary: Outgoing network traffic on the enp4s4 interface for {{ $labels.host }} is {{ $values.B.Value | printf "%.2f" }}Mbit/s
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-026
+          title: 'MSE LA15 '
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: influxdb
+              model:
+                alias: $tag_host
+                groupBy:
+                    - params:
+                        - $__interval
+                      type: time
+                    - params:
+                        - host::tag
+                      type: tag
+                    - params:
+                        - none
+                      type: fill
+                intervalMs: 1000
+                maxDataPoints: 43200
+                measurement: system
+                orderByTime: ASC
+                policy: default
+                query: SELECT mean(load1) as short,mean(load5) as medium,mean(load15) as long FROM "system" WHERE host =~ /$server$/ AND $timeFilter GROUP BY time($interval), * ORDER BY asc
+                rawQuery: false
+                refId: A
+                resultFormat: time_series
+                select:
+                    - - params:
+                            - load15
+                        type: field
+                      - params: []
+                        type: median
+                tags:
+                    - key: host::tag
+                      operator: =~
+                      value: /ms-.*/
+            - refId: B
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                settings:
+                    mode: dropNN
+                type: reduce
+            - refId: C
+              relativeTimeRange:
+                from: 900
+                to: 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 20
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: hOAcH9nnk
+          panelId: 54694
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          annotations:
+            __dashboardUid__: hOAcH9nnk
+            __panelId__: "54694"
+            summary: LA15 for host {{ $labels.host }} is above 20
+          isPaused: false
+          notification_settings:
+            receiver: Telegram
+        - uid: alert-027
+          title: MSE API Latency
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 300
+                to: 0
+              datasourceUid: prometheus
+              model:
+                adhocFilters: []
+                datasource:
+                    type: prometheus
+                    uid: prometheus
+                editorMode: code
+                expr: '{"mse-api-latency"}/1000000'
+                instant: false
+                interval: ""
+                intervalMs: 15000
+                legendFormat: '{{server}}'
+                maxDataPoints: 43200
+                range: true
+                refId: A
+            - refId: B
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params: []
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - B
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: B
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 1000
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: B
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: fej360exc41dsd
+          panelId: 3
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          annotations:
+            __dashboardUid__: fej360exc41dsd
+            __panelId__: "3"
+            summary: 'Instance: {{ $labels.server }} {{- "\t" -}} {{- "\t" -}} Latency: {{ $values.B.Value | printf "%.2f" }}%'
+          isPaused: false
+          notification_settings:
+            receiver: Telegram

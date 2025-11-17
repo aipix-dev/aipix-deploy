@@ -46,10 +46,57 @@ dashboardProviders:
           path: /var/lib/grafana/dashboards
           foldersFromFilesStructure: true
 
+alerting:
+  contactpoints.yaml:
+    secret:
+      apiVersion: 1
+      contactPoints:
+        - orgId: 1
+          name: Telegram
+          receivers:
+            - uid: telegram
+              type: telegram
+              settings:
+                bottoken: "${TELEGRAM_BOT_TOKEN}"
+                chatid: "-4268330636"
+                disable_notification: false
+                disable_web_page_preview: false
+                message: '{{ `{{ template "message" . }}` }}'
+                protect_content: false
+              disableResolveMessage: false
+  templates.yaml:
+    apiVersion: 1
+    templates:
+      - orgId: 1
+        name: alert
+        template: |
+          {{ `{{ define "alert" }}
+            **{{.Status | toUpper}}**
+            {{ .Labels.alertname }}
+            {{.Annotations.summary}}
+          {{ if gt (len .PanelURL) 0 }}
+            <a href="{{ .PanelURL }}">Link to Grafana</a>
+          {{ end }}
+          {{ end }}` }}
+      - orgId: 1
+        name: message
+        template: |
+          {{ `{{ define "message" }}
+          {{ if gt (.Alerts.Firing | len) 0 }}🚨 {{ .Alerts.Firing | len }} firing alerts. 
+          {{ range .Alerts.Firing }} {{ template "alert" .}} {{ end }}
+          {{ end }}
+          {{ if gt (.Alerts.Resolved | len) 0 }}✅ {{ .Alerts.Resolved | len }} resolved alerts.
+          {{ range .Alerts.Resolved }} {{ template "alert" .}} {{ end }}
+          {{ end }}
+          {{ end }}` }} 
+
 grafana.ini:
   server:
     root_url: https://${VMS_DOMAIN}/monitoring
     serve_from_sub_path: true
+  ## Enable api documentation at /monitoring/swagger
+  feature_toggles:
+    swaggerUi: true
 
 extraInitContainers:
   - name: download-dashboards
@@ -57,13 +104,24 @@ extraInitContainers:
     command: ["/bin/sh", "-c"]
     args:
       - |
-        mkdir -p /var/lib/grafana/dashboards &&
-        mc alias set local http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL} ${MINIO_GRAFANA_ACCESS_KEY} ${MINIO_GRAFANA_SECRET_KEY} &&
-        mc cp --recursive local/${MINIO_GRAFANA_BUCKET_NAME}/ /var/lib/grafana/dashboards
+        mkdir -p /var/lib/grafana/dashboards
+        mc alias set local http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL} ${MINIO_GRAFANA_ACCESS_KEY} ${MINIO_GRAFANA_SECRET_KEY}
+        mc cp --recursive local/${MINIO_GRAFANA_BUCKET_NAME}/dashboards/ /var/lib/grafana/dashboards
+        mc cp --recursive local/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/ /mnt/alerting
         chown 472:472 /var/lib/grafana/dashboards
     volumeMounts:
       - name: storage
         mountPath: /var/lib/grafana
+      - name: alerts
+        mountPath: /mnt/alerting
+
+extraVolumeMounts:
+  - name: alerts
+    mountPath: /etc/grafana/provisioning/alerting
+
+extraVolumes:
+  - name: alerts
+    emptyDir: {}
 
 persistence:
   type: pvc
