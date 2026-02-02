@@ -1,0 +1,92 @@
+apiVersion: 1
+deleteRules:
+  - orgId: 1
+    uid: alert-001
+  - orgId: 1
+    uid: alert-002
+  - orgId: 1
+    uid: alert-003
+  - orgId: 1
+    uid: alert-004
+  - orgId: 1
+    uid: alert-005
+  - orgId: 1
+    uid: alert-006
+  - orgId: 1
+    uid: alert-007
+  - orgId: 1
+    uid: alert-008
+  - orgId: 1
+    uid: alert-009
+  - orgId: 1
+    uid: alert-010
+  - orgId: 1
+    uid: alert-011
+  - orgId: 1
+    uid: alert-012
+  - orgId: 1
+    uid: alert-013
+  - orgId: 1
+    uid: alert-014
+  - orgId: 1
+    uid: alert-015
+  - orgId: 1
+    uid: alert-016
+  - orgId: 1
+    uid: alert-017
+  - orgId: 1
+    uid: alert-018
+  - orgId: 1
+    uid: alert-019
+  - orgId: 1
+    uid: alert-020
+  - orgId: 1
+    uid: alert-021
+  - orgId: 1
+    uid: alert-022
+  - orgId: 1
+    uid: alert-023
+  - orgId: 1
+    uid: alert-024
+  - orgId: 1
+    uid: alert-025
+  - orgId: 1
+    uid: alert-026
+  - orgId: 1
+    uid: alert-027
+  - orgId: 1
+    uid: alert-101
+  - orgId: 1
+    uid: alert-102
+  - orgId: 1
+    uid: alert-103
+  - orgId: 1
+    uid: alert-104
+  - orgId: 1
+    uid: alert-105
+  - orgId: 1
+    uid: alert-106
+  - orgId: 1
+    uid: alert-107
+  - orgId: 1
+    uid: alert-108
+  - orgId: 1
+    uid: alert-109
+  - orgId: 1
+    uid: alert-110
+  - orgId: 1
+    uid: alert-111
+  - orgId: 1
+    uid: alert-201
+  - orgId: 1
+    uid: alert-202
+  - orgId: 1
+    uid: alert-203
+  - orgId: 1
+    uid: alert-204
+  - orgId: 1
+    uid: alert-205
+  - orgId: 1
+    uid: alert-206
+  - orgId: 1
+    uid: alert-207

@@ -12,7 +12,7 @@ components:
 images:
 - name: download.aipix.ai:8443/vsaas-media-logger/release
   newName: download.aipix.ai:8443/vsaas-media-logger/release
-  newTag: 25.06.1.0
+  newTag: 25.12.0.0
 ${CUSTOM_IMAGES}
 
 patches:
@@ -21,14 +21,34 @@ patches:
     group: apps
     version: v1
     kind: (Deployment|StatefulSet)
-    name: (prometheus-.*|kube-state-metrics|grafana.*|.*influxdb2|loki.*|vsaas-media-logger|mysql-exporter.*|redis-exporter.*)
+    name: (prometheus-.*|kube-state-metrics|grafana.*|.*influxdb2|loki.*|vsaas-media-logger|mysql-exporter.*|redis-exporter.*|x509.*)
   path: patch-monitoring-affinity.yaml
 - target:
     group: apps
     version: v1
     kind: (Deployment|StatefulSet)
-    name: (prometheus-.*|kube-state-metrics|grafana.*|.*influxdb2|loki.*|vsaas-media-logger|mysql-exporter.*|redis-exporter.*)
+    name: (prometheus-.*|kube-state-metrics|grafana.*|.*influxdb2|loki.*|vsaas-media-logger|mysql-exporter.*|redis-exporter.*|x509.*)
   path: patch-monitoring-tolerations.yaml
+
+# Loki
+- target:
+    kind: Service
+    name: loki-gateway
+  patch: |-
+    - op: replace
+      path: /metadata/name
+      value: loki
+- target:
+    group: apps
+    version: v1
+    kind: StatefulSet
+    name: (loki-chunks-cache|loki-results-cache)
+  patch: |-
+    - op: add
+      path: /spec/template/metadata/annotations
+      value:
+        prometheus.io/port: "9150"
+        prometheus.io/scrape: "true"
 
 # Grafana
 - target:

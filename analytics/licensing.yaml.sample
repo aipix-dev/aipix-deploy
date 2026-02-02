@@ -11,3 +11,5 @@ pushServerApiUrl: http://push1st:6002/apps/orchestrator/events
 
 # for OFFLINE licensing (default)
 #publicKey:
+
+licenseServerConnectionTimeout: 10

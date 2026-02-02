@@ -20,4 +20,3 @@ spec:
     app.kubernetes.io/component: backend
     app.kubernetes.io/part-of: vms
     global-app-name: vsaas
-

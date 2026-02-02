@@ -5,7 +5,7 @@ groups:
       folder: MSE
       interval: 20s
       rules:
-        - uid: alert-017
+        - uid: alert-101
           title: Vsaas service exit status
           condition: C
           data:
@@ -108,7 +108,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-018
+        - uid: alert-102
           title: Vsaas ports status
           condition: C
           data:
@@ -221,7 +221,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-019
+        - uid: alert-103
           title: MSE segmentation fault code 9
           condition: C
           data:
@@ -323,7 +323,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-020
+        - uid: alert-104
           title: MSE segmentation fault code 11
           condition: C
           data:
@@ -425,7 +425,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-021
+        - uid: alert-105
           title: MSE segmentation fault code 13
           condition: C
           data:
@@ -527,7 +527,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-022
+        - uid: alert-106
           title: Vsaas service status
           condition: C
           data:
@@ -637,7 +637,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-023
+        - uid: alert-107
           title: MSE restarts
           condition: C
           data:
@@ -759,7 +759,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-024
+        - uid: alert-108
           title: MSE Traffic IN
           condition: C
           data:
@@ -868,7 +868,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-025
+        - uid: alert-109
           title: MSE Traffic OUT
           condition: C
           data:
@@ -977,7 +977,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-026
+        - uid: alert-110
           title: 'MSE LA15 '
           condition: C
           data:
@@ -1087,7 +1087,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-027
+        - uid: alert-111
           title: MSE API Latency
           condition: C
           data:

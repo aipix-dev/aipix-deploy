@@ -33,6 +33,22 @@ sleep 30
 
 kubectl patch Installation default --type 'json' -p '[{"op": "replace", "path": "/spec/calicoNetwork/nodeAddressAutodetectionV4", "value": {kubernetes: NodeInternalIP}}]'
 
+timeout=600
+interval=5
+elapsed=0
+while ! kubectl get bgpconfigurations >/dev/null 2>&1; do
+    if [ $elapsed -ge $timeout ]; then
+        echo "Timed out waiting for calico CRDs, continuing..."
+        break
+    fi
+    echo "Calico CRDs not available yet, sleeping $interval seconds..."
+    sleep $interval
+    elapsed=$((elapsed + interval))
+done
+
+echo "Waiting 10s for Calico CRDs"
+sleep 10 
+
 kubectl apply -f - <<EOF
 apiVersion: projectcalico.org/v3
 kind: BGPConfiguration

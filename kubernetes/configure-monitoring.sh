@@ -13,12 +13,12 @@ helm repo add grafana https://grafana.github.io/helm-charts
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo add influxdata https://helm.influxdata.com/
 helm repo add fluent https://fluent.github.io/helm-charts
+helm repo add enix https://charts.enix.io
 helm repo update
 
 ## Add aipix helm repo
 helm repo rm "${BRAND}" || true
 helm repo add "${BRAND}" "${HELM_REPO}" --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}"
-
 
 # Configure Grafana and Loki deployment
 if [ ${TYPE} == "prod" ]; then
@@ -26,25 +26,28 @@ if [ ${TYPE} == "prod" ]; then
 else
 	export S3_PORT_INTERNAL=":9000"
 fi
+
 envsubst < ../monitoring/grafana-values.yaml.sample > ../monitoring/grafana-values.yaml
 envsubst < ../monitoring/loki-values.yaml.sample > ../monitoring/loki-values.yaml
 
 # Configure Grafana alert rules
-cp -n ../monitoring/grafana-alerts/rules/system-rules.yaml.sample ../monitoring/grafana-alerts/rules/system-rules.yaml
-cp -n ../monitoring/grafana-alerts/rules/analytics-cases-rules.yaml.sample ../monitoring/grafana-alerts/rules/analytics-cases-rules.yaml
-cp -n ../monitoring/grafana-alerts/rules/mse-rules.yaml.sample ../monitoring/grafana-alerts/rules/mse-rules.yaml
+cp ../monitoring/grafana-alerts/rules/0-delete-alert-rules.yaml.sample ../monitoring/grafana-alerts/rules/0-delete-alert-rules.yaml
+cp ../monitoring/grafana-alerts/rules/system-rules.yaml.sample ../monitoring/grafana-alerts/rules/system-rules.yaml
+cp ../monitoring/grafana-alerts/rules/analytics-cases-rules.yaml.sample ../monitoring/grafana-alerts/rules/analytics-cases-rules.yaml
 
-# Copy grafana dashboards, alert message templates and rules to S3
+# Copy grafana dashboards and alert rules to S3
 if kubectl -n ${NS_MINIO} get services minio-1 > /dev/null 2>&1 ; then
+    mc rm --recursive minio-1/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules --force || true
     mc cp --recursive ../monitoring/grafana-dashboards/ minio-1/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy grafana dashboards to S3\033[0m"
-    mc cp ../monitoring/grafana-alerts/rules/system-rules.yaml minio-1/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules || echo -e "\033[31mUnable to copy grafana system rules to S3\033[0m"
-    mc cp ../monitoring/grafana-alerts/rules/analytics-cases-rules.yaml minio-1/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules || echo -e "\033[31mUnable to copy analytics-cases alert rules to S3\033[0m"
-    mc cp ../monitoring/grafana-alerts/rules/mse-rules.yaml minio-1/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules || echo -e "\033[31mUnable to copy mse alert rules to S3\033[0m"
+    mc cp ../monitoring/grafana-alerts/rules/0-delete-alert-rules.yaml minio-1/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/0-delete-alert-rules.yaml || echo -e "\033[31mUnable to copy grafana delete-alert rules to S3\033[0m"
+    mc cp ../monitoring/grafana-alerts/rules/system-rules.yaml minio-1/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/system-rules.yaml || echo -e "\033[31mUnable to copy grafana system rules to S3\033[0m"
+    mc cp ../monitoring/grafana-alerts/rules/analytics-cases-rules.yaml minio-1/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/analytics-cases-rules.yaml || echo -e "\033[31mUnable to copy analytics-cases alert rules to S3\033[0m"
 else
+    mc rm --recursive local/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules --force || true
 	mc cp --recursive ../monitoring/grafana-dashboards/ local/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy grafana dashboards to S3\033[0m"
+    mc cp ../monitoring/grafana-alerts/rules/0-delete-alert-rules.yaml local/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/0-delete-alert-rules.yaml || echo -e "\033[31mUnable to copy grafana delete-alert rules to S3\033[0m"
     mc cp ../monitoring/grafana-alerts/rules/system-rules.yaml local/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/system-rules.yaml || echo -e "\033[31mUnable to copy grafana system rules to S3\033[0m"
     mc cp ../monitoring/grafana-alerts/rules/analytics-cases-rules.yaml local/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/analytics-cases-rules.yaml || echo -e "\033[31mUnable to copy analytics-cases alert rules to S3\033[0m"
-    mc cp ../monitoring/grafana-alerts/rules/mse-rules.yaml local/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/mse-rules.yaml || echo -e "\033[31mUnable to copy mse alert rule to S3\033[0m"
 fi
 
 # Configure logging
@@ -76,6 +79,10 @@ envsubst < ../monitoring/kube-state-metrics-values.yaml.sample > ../monitoring/k
 
 # Configure vsaas-media-logger
 envsubst < ../monitoring/vsaas-media-logger.yaml.sample > ../monitoring/vsaas-media-logger.yaml
+
+# Configure X.509 Certificate Exporter
+envsubst < ../monitoring/x509-certificate-exporter-values.yaml.sample > ../monitoring/x509-certificate-exporter-values.yaml
+
 echo """
 
 Monitoring configuration script completed successfuly!

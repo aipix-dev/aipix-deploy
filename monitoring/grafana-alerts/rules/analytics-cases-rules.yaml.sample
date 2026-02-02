@@ -5,7 +5,7 @@ groups:
       folder: Alerts
       interval: 30m
       rules:
-        - uid: alert-016
+        - uid: alert-201
           title: Analytics cases status
           condition: C
           data:
@@ -28,7 +28,7 @@ groups:
                 measurement: analytics_workers_jobs
                 orderByTime: ASC
                 policy: default
-                query: SELECT mean("status") FROM "analytics_workers_jobs_stats" WHERE ("deployment_name"::tag = 'vsaas-analytics') AND $timeFilter GROUP BY time($__interval), "stream_uid"::tag, "ovms_uid"::tag fill(null)
+                query: SELECT last("status") FROM "analytics_workers_jobs_stats" WHERE $timeFilter GROUP BY time($__interval), "stream_uid"::tag, "ovms_uid"::tag fill(none)
                 rawQuery: true
                 refId: A
                 resultFormat: time_series
@@ -67,7 +67,7 @@ groups:
                 expression: A
                 intervalMs: 1000
                 maxDataPoints: 43200
-                reducer: last
+                reducer: mean
                 refId: B
                 settings:
                     mode: dropNN
@@ -110,6 +110,7 @@ groups:
             __dashboardUid__: f5cd5779-d583-48fa-b466-32930cfa9e7d
             __panelId__: "5"
             summary: Stream {{ $labels.stream_uid }} at {{ $labels.ovms_uid }} is not in running state
+          labels: {}
           isPaused: false
           notification_settings:
             receiver: Telegram

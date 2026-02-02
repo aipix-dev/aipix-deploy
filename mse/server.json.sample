@@ -36,10 +36,10 @@
     "ssl": true,
     "ip": 4
   },
-  "cview": {
+  "webui": {
     "listen": "*:9665:/",
     "accept": 1,
-    "path": "/opt/vsaas/services/cview",
+    "path": "/opt/vsaas/services/webui",
     "workers": 1,
     "poll": 1024,
     "ssl": true,
@@ -96,7 +96,8 @@
       "verbose": 4,
       "pattern": "[%Timestamp] [%AppId] [%Verbose] %Message",
       "path": "/var/log/vsaas/media-server.log",
-      "rotate": 20000000,
+      "errpath": "/var/log/vsaas/media-server.err",
+      "rotate": 200000000,
       "number": 5
     },
     "#remote": {

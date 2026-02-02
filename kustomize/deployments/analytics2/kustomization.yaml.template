@@ -11,16 +11,16 @@ components:
 images:
 - name: download.aipix.ai:8443/analytics-worker/release
   newName: download.aipix.ai:8443/analytics-worker/release
-  newTag: 25.06.0.2
+  newTag: 25.12.0.0
 - name: download.aipix.ai:8443/analytics-orchestrator-server/release
   newName: download.aipix.ai:8443/analytics-orchestrator-server/release
-  newTag: 25.06.0.3
+  newTag: 25.12.0.0
 - name: download.aipix.ai:8443/analytics-tarantool/release
   newName: download.aipix.ai:8443/analytics-tarantool/release
-  newTag: 25.06.0.3
+  newTag: 25.12.0.0
 - name: download.aipix.ai:8443/analytics-licensing/release
   newName: download.aipix.ai:8443/analytics-licensing/release
-  newTag: 25.06.0.0
+  newTag: 25.12.0.0
 - name: download.aipix.ai:8443/analytics-face-vectorization-service/release
   newName: download.aipix.ai:8443/analytics-face-vectorization-service/release
   newTag: latest

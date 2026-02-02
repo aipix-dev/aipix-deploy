@@ -4,7 +4,7 @@ resources:
 images:
 - name: download.aipix.ai:8443/vsaas-media-server/release
   newName: download.aipix.ai:8443/vsaas-media-server/release
-  newTag: 25.06.1.0
+  newTag: 25.12.0.0
 ${CUSTOM_IMAGES}
 
 patches:

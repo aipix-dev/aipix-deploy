@@ -56,7 +56,7 @@ fi
 source ../kubernetes/sources.sh
 ../kubernetes/configure-vms.sh
 
-# Create CONTROLLER configmsps
+# Create CONTROLLER configmaps
 kubectl create configmap controller-env --namespace=${NS_VMS} --from-env-file=../controller/environments/.env
 kubectl create configmap controller-nginx-conf --namespace=${NS_VMS} --from-file=../nginx/controller-nginx.conf
 kubectl create configmap controller-nginx-server-conf --namespace=${NS_VMS} --from-file=../nginx/controller-nginx-server.conf

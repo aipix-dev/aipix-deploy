@@ -63,6 +63,15 @@ cat <<EOF | sudo tee /etc/sysctl.d/99-inotify.conf
 fs.inotify.max_user_instances = 8192
 EOF
 
+cat <<EOF | sudo tee /etc/sysctl.d/99-net-tuning.conf
+net.core.rmem_max = 268435456
+net.core.wmem_max = 268435456
+net.core.netdev_max_backlog = 30000
+net.ipv4.tcp_rmem = 4096 87380 268435456
+net.ipv4.tcp_wmem = 4096 65536 268435456
+net.ipv4.tcp_window_scaling = 1
+EOF
+
 # Apply sysctl params without reboot
 sudo sysctl --system
 
@@ -83,8 +92,7 @@ sudo sh -c "containerd config default > ${CONFIG_FILE}"
 if sudo grep  "SystemdCgroup =" $CONFIG_FILE >/dev/null 2>&1; then
     echo "Seting existing SystemdCgroup in /etc/containerd/config.toml to true"
     sudo sed -i 's/SystemdCgroup =.*/SystemdCgroup = true/' ${CONFIG_FILE}
-elif
-    sudo grep -q "$TARGET_LINE_1" $CONFIG_FILE >/dev/null 2>&1 ; then
+elif sudo grep -q "$TARGET_LINE_1" $CONFIG_FILE >/dev/null 2>&1 ; then
     echo "Adding SystemdCgroup in /etc/containerd/config.toml and seting to true"
     sudo sed -i "/${TARGET_LINE_1}/a\            SystemdCgroup = true" ${CONFIG_FILE}
 else
@@ -95,8 +103,7 @@ fi
 if sudo grep  "sandbox_image =" $CONFIG_FILE >/dev/null 2>&1; then
     echo "Seting existing sandbox_image in /etc/containerd/config.toml to new value"
     sudo sed -i "s/sandbox_image =.*/sandbox_image = 'registry.k8s.io\/pause:3.10'/" ${CONFIG_FILE}
-elif
-    sudo grep -q "$TARGET_LINE_2" $CONFIG_FILE >/dev/null 2>&1 ; then
+elif sudo grep -q "$TARGET_LINE_2" $CONFIG_FILE >/dev/null 2>&1 ; then
     echo "Adding sandbox_image in /etc/containerd/config.toml and seting value"
     sudo sed -i "/${TARGET_LINE_2}/a\    sandbox_image = 'registry.k8s.io/pause:3.10'" ${CONFIG_FILE}
 else
@@ -107,8 +114,7 @@ fi
 #Replace config_path in config.toml
 if sudo grep '\[plugins\."io\.containerd\.grpc\.v1\.cri"\.registry\]' ${CONFIG_FILE} >/dev/null 2>&1; then
     sudo sed -i '/\[plugins\."io\.containerd\.grpc\.v1\.cri"\.registry\]/,/^$/s|config_path = ".*"|config_path = "/etc/containerd/certs.d"|' ${CONFIG_FILE}
-elif
-    sudo grep "\[plugins\.'io.containerd.cri.v1.images'\.registry\]" ${CONFIG_FILE} >/dev/null 2>&1; then
+elif sudo grep "\[plugins\.'io.containerd.cri.v1.images'\.registry\]" ${CONFIG_FILE} >/dev/null 2>&1; then
     sudo sed -i "/\[plugins\.'io.containerd.cri.v1.images'\.registry\]/,/^$/s|config_path = '.*'|config_path = '/etc/containerd/certs.d'|" ${CONFIG_FILE}
 else
     echo "Error: Unable to configure config_path in /etc/containerd/config.toml: Target line not found"

@@ -1,4 +1,4 @@
-deploymentMode: SingleBinary
+deploymentMode: SimpleScalable
 loki:
   auth_enabled: false
   commonConfig:
@@ -46,29 +46,34 @@ loki:
   gateway:
     nginxConfig:
       clientMaxBodySize: 8M
-singleBinary:
-#  replicas: 1
-  tolerations:
-  - effect: NoSchedule
-    key: monitoring
-    operator: Exists
-#  affinity: |-
-#    nodeAffinity:
-#      requiredDuringSchedulingIgnoredDuringExecution:
-#        nodeSelectorTerms:
-#        - matchExpressions:
-#          - key: monitoring
-#            operator: In
-#            values:
-#            - "true"
+# Caches storage settings
+resultsCache:
+  allocatedMemory: 512
+  maxItemMemory: 10
+chunksCache:
+  allocatedMemory: 2048
+  maxItemMemory: 10
+
+# SimpleScale deployment settings
+write:
+  replicas: 1
   persistence:
     storageClass: ${RWO_STORAGE}
-#write:
-#  replicas: 0
-#read:
-#  replicas: 0
-#backend:
-#  replicas: 0
+read:
+  replicas: 1
+  persistence:
+    storageClass: ${RWO_STORAGE}
+backend:
+  persistence:
+    storageClass: ${RWO_STORAGE}
+  replicas: 1
+
+# Adjustement to the fluent-bit settings
+gateway:
+  service:
+    port: 3100
+
+# Disable unused services
 lokiCanary:
   enabled: false
 ruler:

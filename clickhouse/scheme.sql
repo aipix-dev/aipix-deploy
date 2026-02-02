@@ -20,6 +20,10 @@ CREATE TABLE IF NOT EXISTS orchestrator.analytic_case_events (
     `event_frame_url` Nullable(String),
     `rect` Array(Array(UInt32)),
     `age`  Array(Float32),
+    `labels`  Array(String),
+    `classes`  Array(String),
+    `label`  String,
+    `area_name`  String,
     `fence_name`  Array(String),
     `container_code` Nested(
         code String,
@@ -34,6 +38,7 @@ CREATE TABLE IF NOT EXISTS orchestrator.analytic_case_events (
     `is_recognized` UInt8,
     `license_plate` String,
     `resource_license_plates` Array(String),
+    `licplate_country_code` Array(String),
     `matches` Nested(
         resource_uuid String,
         similarity Float32
@@ -60,6 +65,10 @@ SELECT
     JSONExtractString(inner_data, 'eventFrameUrl') AS event_frame_url,
     JSONExtract(inner_data, 'rect', 'Array(Array(UInt32))') AS rect,
     JSONExtract(inner_data, 'age', 'Array(Float32)') AS age,
+    JSONExtract(inner_data, 'labels',  'Array(String)') AS labels,
+    JSONExtract(inner_data, 'classes', 'Array(String)') AS classes,
+    JSONExtractString(inner_data, 'label')              AS label,
+    JSONExtractString(inner_data, 'areaName')           AS area_name,
     JSONExtract(inner_data, 'fenceName', 'Array(String)') AS fence_name,
     arrayMap(x -> (x.1), JSONExtract(inner_data, 'containerCode', 'Nested(code String, similarity Float32)')) as `container_code.code`,
     arrayMap(x -> (x.2), JSONExtract(inner_data, 'containerCode', 'Nested(code String, similarity Float32)')) as `container_code.similarity`,
@@ -70,6 +79,7 @@ SELECT
     JSONLength(inner_data, 'MatchResult') > 0 as is_recognized,
     arrayElement(JSONExtract(inner_data, 'licplateNumber', 'Array(String)'), 1) AS license_plate,
     arrayMap(x -> (x.3), JSONExtract(inner_data, 'MatchResult', 'Nested(resource_uuid String, similarity Float32, resource String)'))  as resource_license_plates,
+    JSONExtract(inner_data, 'licplateCountryCode', 'Array(String)') AS licplate_country_code,
     arrayMap(x -> (x.1), JSONExtract(inner_data, 'MatchResult', 'Nested(resource_uuid String, similarity Float32)'))  as `matches.resource_uuid`,
     arrayMap(x -> (x.2), JSONExtract(inner_data, 'MatchResult', 'Nested(resource_uuid String, similarity Float32)'))  as `matches.similarity`,
     received_at,
@@ -78,8 +88,9 @@ SELECT
     toString( generateUUIDv4() ) as uuid
 FROM orchestrator.events
 WHERE
-    JSONExtractString(message, 'channel') = 'events'
-    AND (has(JSONExtract(inner_data, 'fenceSide', 'Array(String)'), 'left') OR NOT JSONHas(inner_data, 'fenceSide'));
+    -- `fenceSide=left` the only valid value because of swapping line coordinates on client side
+    has(JSONExtract(inner_data, 'fenceSide', 'Array(String)'), 'left')
+    OR (NOT JSONHas(inner_data, 'fenceSide'));
 
 CREATE TABLE IF NOT EXISTS orchestrator.visitor_countings (
     `analytic_type` String,

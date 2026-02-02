@@ -8,7 +8,7 @@ source ./sources.sh
 # Delete registry secrets
 kubectl delete secret download-aipix-ai --namespace=${NS_VMS} || true
 
-# Delete VMS configs
+# Delete VMS configmaps
 kubectl delete secret vms-backend-oauth --namespace=${NS_VMS} || true
 kubectl delete configmap vms-backend-env --namespace=${NS_VMS} || true
 kubectl delete configmap vms-fcm-json --namespace=${NS_VMS} || true
@@ -25,10 +25,10 @@ if [ ${TYPE} != "prod" ]; then
 	kubectl delete configmap mysql-cnf --namespace=${NS_VMS} || true
 fi
 
-# Delete CONTROLLER configmsps
+# Delete CONTROLLER configmaps
 kubectl delete configmap controller-env --namespace=${NS_VMS} || true
 
-# Delete PORTAL configmsps
+# Delete PORTAL configmaps
 if [ ${PORTAL} == "yes" ]; then
 	kubectl delete configmap portal-landing-nginx --namespace=${NS_VMS} || true
 	kubectl delete configmap portal-client-nginx --namespace=${NS_VMS} || true
@@ -46,7 +46,7 @@ kubectl create secret docker-registry download-aipix-ai --namespace=${NS_VMS} \
 														--docker-username=${DOCKER_USERNAME} \
 														--docker-password=${DOCKER_PASSWORD}
 
-# Create VMS configmsps
+# Create VMS configmaps
 kubectl create configmap vms-backend-env --namespace=${NS_VMS} --from-env-file=../vms-backend/environments/.env
 kubectl create configmap vms-fcm-json --namespace=${NS_VMS} --from-file=../vms-backend/certificates/fcm.json
 kubectl create configmap vms-voip-p8 --namespace=${NS_VMS} --from-file=../vms-backend/certificates/voip.p8
@@ -86,10 +86,10 @@ if [ ${VMS_LIC_OFFLINE} == "yes" ]; then
 	kubectl create configmap vms-backend-license --namespace=${NS_VMS} --from-file=../vms-backend/license/license.json
 fi
 
-# Create CONTROLLER configmsps
+# Create CONTROLLER configmaps
 kubectl create configmap controller-env --namespace=${NS_VMS} --from-env-file=../controller/environments/.env
 
-# Create PORTAL configmsps
+# Create PORTAL configmaps
 if [ ${PORTAL} == "yes" ]; then
 	kubectl create configmap portal-landing-nginx --namespace=${NS_VMS} \
 		--from-file=nginx.conf=../portal/nginx-base-landing.conf \

@@ -1,9 +1,17 @@
 datasources:
   datasources.yaml:
     apiVersion: 1
+    deleteDatasources:
+      - name: prometheus
+        orgId: 1
+      - name: influxdb
+        orgId: 1
+      - name: loki
+        orgId: 1
     datasources:
       - name: prometheus
         type: prometheus
+        uid: prometheus
         access: proxy
         orgId: 1
         url: http://prometheus-server.${NS_MONITORING}.svc:8080
@@ -11,7 +19,9 @@ datasources:
         version: 1
       - name: influxdb
         type: influxdb
+        uid: influxdb
         access: proxy
+        orgId: 1
         url: http://influxdb-influxdb2.${NS_MONITORING}.svc
         editable: true
         jsonData:
@@ -22,6 +32,7 @@ datasources:
           httpHeaderValue1: "Token ${INFLUX_TOKEN}"
       - name: loki
         type: loki
+        uid: loki
         access: proxy
         orgId: 1
         url: http://loki.${NS_MONITORING}.svc:3100
@@ -47,6 +58,15 @@ dashboardProviders:
           foldersFromFilesStructure: true
 
 alerting:
+  policies.yaml:
+    apiVersion: 1
+    policies:
+      - orgId: 1
+        receiver: Telegram
+        group_by:
+          - grafana_folder
+          - alertname
+        repeat_interval: 3d
   contactpoints.yaml:
     secret:
       apiVersion: 1
@@ -58,7 +78,7 @@ alerting:
               type: telegram
               settings:
                 bottoken: "${TELEGRAM_BOT_TOKEN}"
-                chatid: "-4268330636"
+                chatid: "${TELEGRAM_CHAT_ID}"
                 disable_notification: false
                 disable_web_page_preview: false
                 message: '{{ `{{ template "message" . }}` }}'
@@ -97,6 +117,8 @@ grafana.ini:
   ## Enable api documentation at /monitoring/swagger
   feature_toggles:
     swaggerUi: true
+  log:
+    level: debug
 
 extraInitContainers:
   - name: download-dashboards

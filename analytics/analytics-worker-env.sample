@@ -12,7 +12,6 @@ REGIONS=
 #REGION_KEY=vsaas.analytics/zone
 
 ## Monitoring
-PUSH_ERRORS_MONITORING_ENDPOINT=http://metrics-pusher:8080/telegraf
 PUSH_ERRORS_VMS_ENDPOINT=http://backend/api/v1/ovms/callback
 
 ## MinIO configuration:
@@ -20,3 +19,6 @@ MINIO_URL=
 MINIO_ACCESS_KEY=
 MINIO_SECRET_KEY=
 MINIO_BUCKET_NAME=
+
+## OpenVINO
+OV_MAX_THREADS=0.4

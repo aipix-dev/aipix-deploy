@@ -52,7 +52,7 @@ spec:
       containers:
         - name: portal-stub
           args:
-            - php 
+            - php
             - artisan
             - octane:start
             - --port=8080

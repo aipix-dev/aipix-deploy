@@ -26,6 +26,7 @@ sed -i 's@^MONITORING_@#MONITORING_@g' ../analytics/.env
 sed -i 's@^DEPLOYMENT_NAME@#DEPLOYMENT_NAME@g' ../analytics/.env
 # sed -i "s@^POD_NAMESPACE.*@POD_NAMESPACE = ${NS_A}@g" ../analytics/.env
 sed -i "s@^BACKEND_SERVICE_HOST.*@BACKEND_SERVICE_HOST = \"backend.${NS_VMS}.svc\"@g" ../analytics/.env
+sed -i "s@^ORCH_ORIGIN_DOMAIN_NAME.*@ORCH_ORIGIN_DOMAIN_NAME = \"${ANALYTICS_DOMAIN}\"@g" ../analytics/.env
 sed -i "s@django:8000@orchestrator.${NS_A}.svc@g" ../push1st/orchestrator.yml
 
 #Creating configs for license service

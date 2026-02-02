@@ -4,3 +4,4 @@ resources:
 - prometheus-node-exporter.yaml
 - prometheus-redis-exporter.yaml
 - kube-state-metrics.yaml
+- x509-certificate-exporter.yaml

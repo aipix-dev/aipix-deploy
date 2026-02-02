@@ -1,0 +1,62 @@
+---
+# -- Override the deployment namespace
+#namespaceOverride: ""
+
+# -- Enable additional metrics to report per-certificate errors ; helps with identifying read errors origin not having to look at exporter logs, at the expense of additional storage on Prometheus
+#exposePerCertificateErrorMetrics: false
+
+secretsExporter:
+  enabled: true
+  resources:
+    limits:
+      cpu: 1
+      memory: 150Mi
+    requests:
+      cpu: 20m
+      memory: 20Mi
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 3
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 3
+  podAnnotations:
+    prometheus.io/port: "9793"
+    prometheus.io/scrape: "true"
+
+service:
+  create: false
+
+prometheusServiceMonitor:
+  create: false
+
+prometheusRules:
+  create: false
+# -- Annotations added to all Pods
+podAnnotations: {}
+#  prometheus.io/port: "9793"
+#  prometheus.io/scrape: "true"
+
+rbac:
+  # -- Should RBAC objects be created
+  create: true
+
+  secretsExporter:
+    # -- Name of the ServiceAccount for the Secrets exporter (required if `rbac.create=false`)
+    serviceAccountName:
+    # -- Annotations added to the ServiceAccount for the Secrets exporter
+    serviceAccountAnnotations: {}
+    # -- Annotations added to the ClusterRole for the Secrets exporter
+    clusterRoleAnnotations: {}
+    # -- Annotations added to the ClusterRoleBinding for the Secrets exporter
+    clusterRoleBindingAnnotations: {}
+
+  hostPathsExporter:
+    # -- Name of the ServiceAccount for hostPath exporters (required if `rbac.create=false`)
+    serviceAccountName:
+    # -- Annotations added to the ServiceAccount for the hostPath exporters
+    serviceAccountAnnotations: {}
+    # -- Annotations added to the ClusterRole for the hostPath exporters
+    clusterRoleAnnotations: {}
+    # -- Annotations added to the ClusterRoleBinding for the hostPath exporters
+    clusterRoleBindingAnnotations: {}
