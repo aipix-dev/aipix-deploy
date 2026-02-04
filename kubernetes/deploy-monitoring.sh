@@ -19,6 +19,7 @@ kubectl create secret docker-registry download-aipix-ai --namespace=${NS_MONITOR
 
 # Create manifests
 helm -n ${NS_MONITORING} template grafana grafana/grafana -f ../monitoring/grafana-values.yaml >../kustomize/apps/monitoring/grafana/grafana.yaml
+# helm -n ${NS_MONITORING} template grafana-community grafana-community/grafana -f ../monitoring/grafana-values.yaml >../kustomize/apps/monitoring/grafana/grafana.yaml
 helm -n ${NS_MONITORING} template loki grafana/loki -f ../monitoring/loki-values.yaml --version 6.48.0 >../kustomize/apps/monitoring/loki/loki.yaml
 helm -n ${NS_MONITORING} template fluent-bit fluent/fluent-bit -f ../monitoring/fluentbit-values.yaml --version 0.48.9 >../kustomize/apps/monitoring/fluent-bit/fluent-bit.yaml
 helm -n ${NS_MONITORING} template influxdb influxdata/influxdb2 -f ../monitoring/influxdb-values.yaml >../kustomize/apps/monitoring/influxdb/influxdb.yaml

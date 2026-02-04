@@ -38,7 +38,7 @@ images:
   newTag: 25.12.0.0
 - name: download.aipix.ai:8443/controller/release
   newName: download.aipix.ai:8443/controller/release
-  newTag: 25.12.0.0
+  newTag: 25.12.0.1
 - name: download.aipix.ai:8443/vms-portal-backend/release
   newName: download.aipix.ai:8443/vms-portal-backend/release
   newTag: 25.06.0.0

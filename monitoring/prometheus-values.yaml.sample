@@ -34,6 +34,14 @@ prometheus-node-exporter:
 prometheus-pushgateway:
   enabled: false
 
+scrapeConfigs:
+  kubernetes-nodes:
+    tls_config:
+      insecure_skip_verify: true
+  kubernetes-nodes-cadvisor:
+    tls_config:
+      insecure_skip_verify: true
+
 # adds additional scrape configs to prometheus.yml
 # must be a string so you have to add a | after extraScrapeConfigs:
 # example adds prometheus-blackbox-exporter scrape config  
