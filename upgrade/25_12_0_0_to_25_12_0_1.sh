@@ -8,6 +8,24 @@ source ../kubernetes/k8s-onprem/sources.sh
 
 ### Update monitoring
 if [ ${MONITORING} == "yes" ]; then
+	yq e '
+	.scrapeConfigs = (
+		.scrapeConfigs //
+		{
+			"kubernetes-nodes": {
+			"tls_config": {
+				"insecure_skip_verify": true
+			}
+			},
+			"kubernetes-nodes-cadvisor": {
+			"tls_config": {
+				"insecure_skip_verify": true
+			}
+			}
+		}
+		)
+		' -i ../monitoring/prometheus-values.yaml
+
 	../kubernetes/configure-monitoring.sh
 	../kubernetes/deploy-monitoring.sh
 else
