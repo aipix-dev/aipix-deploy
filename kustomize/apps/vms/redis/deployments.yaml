@@ -43,14 +43,14 @@ spec:
           livenessProbe:
             exec:
               command:
-              - sh
-              - -c
-              - redis-cli ping
+                - sh
+                - -c
+                - redis-cli ping
             initialDelaySeconds: 5
             periodSeconds: 5
           resources:
             requests:
               cpu: 5m
-              memory: 20Mi
+              memory: 50Mi
       hostname: redis-server
       restartPolicy: Always

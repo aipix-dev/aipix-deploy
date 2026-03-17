@@ -1,5 +1,0 @@
-resources:
-- portal.yaml
-- portal-stub.yaml
-- services.yaml
-- ingressroutes.yaml

@@ -1,4 +1,0 @@
-resources:
-- portal-landing.yaml
-- services.yaml
-- ingressroutes.yaml

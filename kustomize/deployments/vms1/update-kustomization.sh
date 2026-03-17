@@ -6,28 +6,27 @@ cd "$scriptdir"
 source ../../../kubernetes/sources.sh
 
 if [ ${ANALYTICS} == "yes" ]; then
-    export ADD_RESOURCE1="- ../../apps/vms/analytics"
-    export ADD_COMPONENT1="- ../../components/vms/push1st-orch-app
+	export ADD_RESOURCE1="- ../../apps/vms/analytics"
+	export ADD_COMPONENT1="- ../../components/vms/push1st-orch-app
 - ../../components/vms/analytics-env"
 fi
 
 if [ ${VMS_LIC_OFFLINE} == "yes" ]; then
-    export ADD_COMPONENT2="- ../../components/vms/vms-backend-license"
+	export ADD_COMPONENT2="- ../../components/vms/vms-backend-license"
 fi
 
 if [ ${PORTAL} == "yes" ]; then
-    export ADD_COMPONENT3="- ../../components/middlewares/strip-prefixes-portal"
-    export ADD_RESOURCE2="- ../../apps/vms/portal
-- ../../apps/vms/portal-landing"
+	export ADD_COMPONENT3="- ../../components/middlewares/strip-prefixes-portal"
+	export ADD_RESOURCE2="- ../../apps/portal"
 fi
 
 if [ ${VGW} == "yes" ]; then
-    export ADD_RESOURCE3="- ../../apps/vms/vgw"
+	export ADD_RESOURCE3="- ../../apps/vms/vgw-backend"
 fi
 
 if [ ${WB} == "yes" ]; then
-    export ADD_COMPONENT4="- ../../components/middlewares/strip-prefixes-iframe"
-    export ADD_RESOURCE4="- ../../apps/integration-wb"
+	export ADD_COMPONENT4="- ../../components/middlewares/strip-prefixes-iframe"
+	export ADD_RESOURCE4="- ../../apps/integration-wb"
 fi
 
 export CUSTOM_IMAGES="$(cat ./custom-images.d/*.yaml 2>/dev/null)"
@@ -39,6 +38,6 @@ files=$(ls | grep ".*.template$")
 for file in $files; do
 	new_file=$(echo $file | sed -e 's/\.template//g')
 	envsubst \
-	    < ./${file} \
-	    > ./${new_file}
+		<./${file} \
+		>./${new_file}
 done

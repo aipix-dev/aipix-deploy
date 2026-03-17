@@ -10,7 +10,7 @@ metadata:
   name: vgw-backend
   namespace: vsaas
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: vgw-backend
@@ -30,15 +30,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: vgw-backend
-                  app.kubernetes.io/component: backend
-                  app.kubernetes.io/part-of: vms
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: vgw-backend
+                    app.kubernetes.io/component: backend
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       securityContext:
         runAsUser: 33
         runAsGroup: 33
@@ -46,13 +46,13 @@ spec:
       containers:
         - name: vgw-backend
           args:
-          - php
-          - /var/www/api/artisan
-          - octane:start
-          - --port=8080
-          - --host=0.0.0.0
-          - --task-workers=2
-          - --max-requests=1000
+            - php
+            - /var/www/api/artisan
+            - octane:start
+            - --port=8080
+            - --host=0.0.0.0
+            - --task-workers=2
+            - --max-requests=1000
           envFrom:
             - configMapRef:
                 name: vms-backend-env
@@ -76,14 +76,14 @@ spec:
           resources:
             requests:
               cpu: 80m
-              memory: 400Mi
+              memory: 1000Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: vgw-backend
       restartPolicy: Always
       volumes:
-      - emptyDir: {}
-        name: run-php
-      - name: vms-backend-oauth
-        secret:
-          secretName: vms-backend-oauth
+        - emptyDir: {}
+          name: run-php
+        - name: vms-backend-oauth
+          secret:
+            secretName: vms-backend-oauth

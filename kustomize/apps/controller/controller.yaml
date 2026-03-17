@@ -10,7 +10,7 @@ metadata:
   name: controller-api
   namespace: controller
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: controller-api
@@ -30,19 +30,19 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: controller-api
-                  app.kubernetes.io/component: controller
-                  app.kubernetes.io/part-of: controller
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: controller-api
+                    app.kubernetes.io/component: controller
+                    app.kubernetes.io/part-of: controller
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       containers:
         - name: controller-api
           args:
-            - php 
+            - php
             - artisan
             - octane:start
             - --port=8080
@@ -58,15 +58,15 @@ spec:
             preStop:
               exec:
                 command:
-                - /bin/sleep
-                - "2"
+                  - /bin/sleep
+                  - "2"
           volumeMounts:
             - name: run-php
               mountPath: /var/run/php/
           resources:
             requests:
-              cpu: 5m
-              memory: 120Mi
+              cpu: 150m
+              memory: 1000Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: controller-api
@@ -107,15 +107,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: controller-queue
-                  app.kubernetes.io/component: worker
-                  app.kubernetes.io/part-of: controller
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: controller-queue
+                    app.kubernetes.io/component: worker
+                    app.kubernetes.io/part-of: controller
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       securityContext:
         runAsUser: 33
         runAsGroup: 33
@@ -124,7 +124,7 @@ spec:
         - name: controller-queue
           args:
             - php
-            - artisan 
+            - artisan
             - queue:work
             - --queue=controller
             - --sleep=3
@@ -136,8 +136,8 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              cpu: 80m
-              memory: 400Mi
+              cpu: 50m
+              memory: 100Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: controller-queue
@@ -188,7 +188,7 @@ spec:
           resources:
             requests:
               cpu: 50m
-              memory: 150Mi
+              memory: 100Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: controller-schedule
@@ -246,7 +246,7 @@ spec:
           resources:
             requests:
               cpu: 50m
-              memory: 150Mi
+              memory: 100Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: controller-control-plane-hls
@@ -304,7 +304,7 @@ spec:
           resources:
             requests:
               cpu: 50m
-              memory: 150Mi
+              memory: 100Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: controller-control-plane-rtsp
@@ -345,10 +345,10 @@ spec:
         - name: controller-queue-ms-callback
           args:
             - php
-            - artisan 
-            - queue:work 
-            - --queue=media_servers_callback 
-            - --sleep=3 
+            - artisan
+            - queue:work
+            - --queue=media_servers_callback
+            - --sleep=3
             - --tries=3
           envFrom:
             - configMapRef:
@@ -358,7 +358,7 @@ spec:
           resources:
             requests:
               cpu: 50m
-              memory: 250Mi
+              memory: 100Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: controller-queue-ms-callback
@@ -401,7 +401,7 @@ spec:
         - name: controller-queue-ms-stream
           args:
             - php
-            - /var/www/api/artisan 
+            - /var/www/api/artisan
             - queue:work
             - --queue=cron_media_server_v2_stream
             - --sleep=3
@@ -414,8 +414,8 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              cpu: 80m
-              memory: 400Mi
+              cpu: 50m
+              memory: 100Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: controller-queue-ms-stream
@@ -458,7 +458,7 @@ spec:
         - name: controller-queue-ms
           args:
             - php
-            - /var/www/api/artisan 
+            - /var/www/api/artisan
             - queue:work
             - --queue=cron_media_server_v2
             - --sleep=3
@@ -471,8 +471,8 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              cpu: 80m
-              memory: 400Mi
+              cpu: 50m
+              memory: 100Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: controller-queue-ms
@@ -510,15 +510,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: controller-queue-set-configs
-                  app.kubernetes.io/component: worker
-                  app.kubernetes.io/part-of: controller
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: controller-queue-set-configs
+                    app.kubernetes.io/component: worker
+                    app.kubernetes.io/part-of: controller
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       securityContext:
         runAsUser: 33
         runAsGroup: 33
@@ -538,8 +538,8 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              cpu: 5m
-              memory: 150Mi
+              cpu: 50m
+              memory: 100Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: controller-queue-set-configs
@@ -577,15 +577,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: controller-queue-mse-archive-ranges
-                  app.kubernetes.io/component: worker
-                  app.kubernetes.io/part-of: controller
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: controller-queue-mse-archive-ranges
+                    app.kubernetes.io/component: worker
+                    app.kubernetes.io/part-of: controller
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       securityContext:
         runAsUser: 33
         runAsGroup: 33
@@ -594,7 +594,7 @@ spec:
         - name: controller-queue-mse-archive-ranges
           args:
             - php
-            - /var/www/api/artisan 
+            - /var/www/api/artisan
             - queue:work
             - --queue=cron_mse_archive_ranges
             - --sleep=3
@@ -607,7 +607,7 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              cpu: 80m
+              cpu: 200m
               memory: 400Mi
       imagePullSecrets:
         - name: download-aipix-ai
@@ -646,15 +646,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: controller-queue-mse-stream-info
-                  app.kubernetes.io/component: worker
-                  app.kubernetes.io/part-of: controller
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: controller-queue-mse-stream-info
+                    app.kubernetes.io/component: worker
+                    app.kubernetes.io/part-of: controller
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       securityContext:
         runAsUser: 33
         runAsGroup: 33
@@ -663,7 +663,7 @@ spec:
         - name: controller-queue-mse-stream-info
           args:
             - php
-            - /var/www/api/artisan 
+            - /var/www/api/artisan
             - queue:work
             - --queue=cron_mse_stream_info
             - --sleep=3
@@ -676,9 +676,78 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              cpu: 80m
+              cpu: 50m
               memory: 400Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: controller-queue-mse-stream-info
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: controller-queue-cron-mse-server-info
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: controller
+    global-app-name: vsaas
+  name: controller-queue-cron-mse-server-info
+  namespace: vsaas-vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: controller-queue-cron-mse-server-info
+      app.kubernetes.io/component: worker
+      app.kubernetes.io/part-of: controller
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: controller-queue-cron-mse-server-info
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: controller
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: controller-queue-cron-mse-server-info
+                    app.kubernetes.io/component: worker
+                    app.kubernetes.io/part-of: controller
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+      containers:
+        - name: controller-queue-cron-mse-server-info
+          args:
+            - php
+            - /var/www/api/artisan
+            - queue:work
+            - --queue=cron_mse_server_info
+            - --sleep=3
+            - --tries=0
+            - --memory=5000
+          envFrom:
+            - configMapRef:
+                name: controller-env
+          image: download.aipix.ai:8443/controller/release:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 200m
+              memory: 100Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: controller-queue-cron-mse-server-info
       restartPolicy: Always

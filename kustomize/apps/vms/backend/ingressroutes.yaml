@@ -9,15 +9,15 @@ metadata:
   namespace: vms
 spec:
   entryPoints:
-  - websecure
+    - websecure
   routes:
-  - kind: Rule
-    match: Host (`example.com`) &&  ( PathPrefix(`/api`) || PathPrefix(`/storage`) || PathPrefix(`/apple-app-site-association`) )
-    middlewares:
-    - name: gzip-middleware
-    - name: max-body-size
-    services:
-    - kind: Service
-      name: backend
-      port: 80
-      scheme: http
+    - kind: Rule
+      match: Host (`example.com`) && ( PathPrefix(`/api`) || PathPrefix(`/storage`) || PathPrefix(`/apple-app-site-association`) || PathPrefix(`/openy/api/v1`) )
+      middlewares:
+        - name: gzip-middleware
+        - name: max-body-size
+      services:
+        - kind: Service
+          name: backend
+          port: 80
+          scheme: http

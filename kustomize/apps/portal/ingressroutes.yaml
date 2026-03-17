@@ -1,0 +1,90 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  namespace: vms
+  name: portal-backend
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host (`example.com`) && ( PathPrefix(`/portal/storage`) || PathPrefix(`/api/portal`) || PathPrefix(`/nova-api/`) || PathPrefix(`/portal/admin`) || PathPrefix(`/vendor/nova`) || PathPrefix(`/nova-vendor/`) )
+      middlewares:
+        - name: upgrade-insecure-requests
+        - name: gzip-middleware
+        - name: max-body-size
+      services:
+        - kind: Service
+          name: portal-backend
+          port: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  namespace: vms
+  name: portal-stub
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host (`example-stub.com`)
+      middlewares:
+        - name: upgrade-insecure-requests
+        - name: gzip-middleware
+        - name: max-body-size
+      services:
+        - kind: Service
+          name: portal-stub
+          port: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  namespace: vms
+  name: portal
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host (`example.com`) && PathPrefix(`/portal`)
+      middlewares:
+        - name: strip-prefix-portal
+        - name: upgrade-insecure-requests
+      services:
+        - kind: Service
+          name: portal-frontend-client
+          port: 80
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  namespace: vms
+  name: portal-landing
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host (`example.com`) && PathPrefix(`/portal/landing`)
+      middlewares:
+        - name: strip-prefix-portal-landing
+        - name: upgrade-insecure-requests
+      services:
+        - kind: Service
+          name: portal-landing
+          port: 80

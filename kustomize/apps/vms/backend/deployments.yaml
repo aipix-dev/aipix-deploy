@@ -10,7 +10,7 @@ metadata:
   name: backend
   namespace: vms
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: backend
@@ -30,19 +30,19 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: backend
-                  app.kubernetes.io/component: backend
-                  app.kubernetes.io/part-of: vms
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: backend
+                    app.kubernetes.io/component: backend
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       containers:
         - name: backend
           args:
-            - php 
+            - php
             - artisan
             - octane:start
             - --port=8080
@@ -71,8 +71,8 @@ spec:
               subPath: file.key
           resources:
             requests:
-              cpu: 5m
-              memory: 120Mi
+              cpu: 150m
+              memory: 1000Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: backend
@@ -146,7 +146,7 @@ spec:
           resources:
             requests:
               cpu: 5m
-              memory: 40Mi
+              memory: 50Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: cron
@@ -242,7 +242,7 @@ metadata:
   name: queue
   namespace: vms
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: queue
@@ -262,15 +262,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: queue
-                  app.kubernetes.io/component: worker
-                  app.kubernetes.io/part-of: vms
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: queue
+                    app.kubernetes.io/component: worker
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       securityContext:
         runAsUser: 33
         runAsGroup: 33
@@ -311,8 +311,8 @@ spec:
               subPath: file.key
           resources:
             requests:
-              cpu: 80m
-              memory: 400Mi
+              cpu: 50m
+              memory: 100Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: queue
@@ -340,7 +340,7 @@ metadata:
   name: archive
   namespace: vms
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: archive
@@ -360,15 +360,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: archive
-                  app.kubernetes.io/component: worker
-                  app.kubernetes.io/part-of: vms
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: archive
+                    app.kubernetes.io/component: worker
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       securityContext:
         runAsUser: 33
         runAsGroup: 33
@@ -403,7 +403,7 @@ spec:
               subPath: file.key
           resources:
             requests:
-              cpu: 5m
+              cpu: 50m
               memory: 150Mi
       imagePullSecrets:
         - name: download-aipix-ai
@@ -426,7 +426,7 @@ metadata:
   name: reports
   namespace: vms
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: reports
@@ -446,15 +446,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: reports
-                  app.kubernetes.io/component: worker
-                  app.kubernetes.io/part-of: vms
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: reports
+                    app.kubernetes.io/component: worker
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       securityContext:
         runAsUser: 33
         runAsGroup: 33
@@ -487,7 +487,7 @@ spec:
               subPath: file.key
           resources:
             requests:
-              cpu: 5m
+              cpu: 50m
               memory: 150Mi
       imagePullSecrets:
         - name: download-aipix-ai
@@ -510,7 +510,7 @@ metadata:
   name: queue-intercom-calls
   namespace: vms
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: queue-intercom-calls
@@ -530,15 +530,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: queue-intercom-calls
-                  app.kubernetes.io/component: worker
-                  app.kubernetes.io/part-of: vms
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: queue-intercom-calls
+                    app.kubernetes.io/component: worker
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       securityContext:
         runAsUser: 33
         runAsGroup: 33
@@ -581,8 +581,8 @@ spec:
               subPath: file.key
           resources:
             requests:
-              cpu: 80m
-              memory: 400Mi
+              cpu: 50m
+              memory: 150Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: queue-intercom-calls
@@ -610,7 +610,7 @@ metadata:
   name: queue-controller-webhooks
   namespace: vms
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: queue-controller-webhooks
@@ -630,15 +630,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: queue-controller-webhooks
-                  app.kubernetes.io/component: worker
-                  app.kubernetes.io/part-of: vms
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: queue-controller-webhooks
+                    app.kubernetes.io/component: worker
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       securityContext:
         runAsUser: 33
         runAsGroup: 33
@@ -659,14 +659,6 @@ spec:
           image: download.aipix.ai:8443/vms-backend/release:latest
           imagePullPolicy: Always
           volumeMounts:
-            # - name: vms-fcm-json
-            #   mountPath: /var/www/api/fcm.json
-            #   subPath: fcm.json
-            #   readOnly: true
-            # - name: vms-voip-p8
-            #   mountPath: /var/www/api/voip.p8
-            #   subPath: voip.p8
-            #   readOnly: true
             - mountPath: /var/www/api/storage/oauth-private.key
               name: vms-backend-oauth
               readOnly: true
@@ -681,11 +673,97 @@ spec:
               subPath: file.key
           resources:
             requests:
-              cpu: 80m
+              cpu: 5m
               memory: 400Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: queue-controller-webhooks
+      restartPolicy: Always
+      volumes:
+        - name: vms-backend-oauth
+          secret:
+            secretName: vms-backend-oauth
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: queue-intercom-setup
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: queue-intercom-setup
+  namespace: vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: queue-intercom-setup
+      app.kubernetes.io/component: worker
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: queue-intercom-setup
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: queue-intercom-setup
+                    app.kubernetes.io/component: worker
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+      containers:
+        - name: queue-intercom-setup
+          args:
+            - php
+            - /var/www/api/artisan
+            - queue:work
+            - --queue=intercom_setup
+            - --sleep=3
+            - --tries=1
+            - --timeout=1200
+          envFrom:
+            - configMapRef:
+                name: vms-backend-env
+          image: download.aipix.ai:8443/vms-backend/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /var/www/api/storage/oauth-private.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-private.key
+            - mountPath: /var/www/api/storage/oauth-public.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-public.key
+            - mountPath: /var/www/api/storage/file.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: file.key
+          resources:
+            requests:
+              cpu: 50m
+              memory: 100Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: queue-intercom-setup
       restartPolicy: Always
       volumes:
         - name: vms-backend-oauth

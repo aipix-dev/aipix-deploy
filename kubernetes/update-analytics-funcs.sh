@@ -73,10 +73,10 @@ update_push1st() {
 
 update_clickhouse() {
 	set -e
-	if [[ $(kubectl -n ${NS_A} exec deployments/clickhouse-server -- clickhouse-client -q "SELECT name FROM system.columns WHERE database = 'orchestrator' AND table = 'analytic_case_events' AND name = 'area_name';") != "area_name" ]]; then
-		echo -e "\e[1;32mRun upgrade clickhouse scheme script\e[0m"
-		../analytics/upgrade-clickhouse-scheme.sh
-	fi
+	# if [[ $(kubectl -n ${NS_A} exec deployments/clickhouse-server -- clickhouse-client -q "SELECT name FROM system.columns WHERE database = 'orchestrator' AND table = 'analytic_case_events' AND name = 'area_name';") != "area_name" ]]; then
+	# 	echo -e "\e[1;32mRun upgrade clickhouse scheme script\e[0m"
+	# 	../analytics/upgrade-clickhouse-scheme.sh
+	# fi
 	kubectl delete configmap clickhouse-orchestrator --namespace=${NS_A} || true
 	kubectl delete configmap clickhouse-scheme --namespace=${NS_A} || true
 	kubectl delete configmap clickhouse-timezone --namespace=${NS_A} || true

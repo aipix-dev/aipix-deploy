@@ -1,53 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_PROMETHEUS",
-      "label": "prometheus",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    }
-  ],
-  "__elements": {},
-  "__requires": [
-    {
-      "type": "panel",
-      "id": "gauge",
-      "name": "Gauge",
-      "version": ""
-    },
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "10.2.3"
-    },
-    {
-      "type": "datasource",
-      "id": "prometheus",
-      "name": "Prometheus",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "stat",
-      "name": "Stat",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "text",
-      "name": "Text",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "timeseries",
-      "name": "Time series",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -67,11 +18,9 @@
   "description": "Monitors Kubernetes cluster using Prometheus. Shows  individual pods statistics. Uses cAdvisor metrics only.",
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "gnetId": 747,
   "graphTooltip": 0,
-  "id": null,
+  "id": 6,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
       "collapsed": false,
@@ -87,17 +36,17 @@
       "type": "row"
     },
     {
-      "editable": true,
-      "error": false,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 3,
         "w": 6,
         "x": 0,
         "y": 1
       },
-      "height": "1px",
       "id": 34,
-      "links": [],
       "options": {
         "code": {
           "language": "plaintext",
@@ -107,16 +56,15 @@
         "content": "# $Pod_ip",
         "mode": "markdown"
       },
-      "pluginVersion": "10.2.3",
-      "style": {
-        "font-size": "72pt"
-      },
+      "pluginVersion": "12.3.1",
       "title": "Pod IP Address",
       "type": "text"
     },
     {
-      "editable": true,
-      "error": false,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 3,
         "w": 6,
@@ -124,7 +72,6 @@
         "y": 1
       },
       "id": 40,
-      "links": [],
       "options": {
         "code": {
           "language": "plaintext",
@@ -134,7 +81,7 @@
         "content": "# $Node",
         "mode": "markdown"
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.1",
       "title": "Pod Host",
       "type": "text"
     },
@@ -164,7 +111,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -183,13 +130,13 @@
         "y": 1
       },
       "id": 41,
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "none",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "mean"
@@ -197,10 +144,11 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -259,7 +207,7 @@
             "steps": [
               {
                 "color": "rgba(50, 172, 45, 0.97)",
-                "value": null
+                "value": 0
               },
               {
                 "color": "rgba(237, 129, 40, 0.89)",
@@ -282,7 +230,6 @@
         "y": 5
       },
       "id": 4,
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "minVizHeight": 200,
@@ -299,7 +246,7 @@
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -347,7 +294,7 @@
             "steps": [
               {
                 "color": "rgba(50, 172, 45, 0.97)",
-                "value": null
+                "value": 0
               },
               {
                 "color": "rgba(237, 129, 40, 0.89)",
@@ -370,7 +317,6 @@
         "y": 5
       },
       "id": 6,
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "minVizHeight": 200,
@@ -387,7 +333,7 @@
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -432,7 +378,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -451,13 +397,13 @@
         "y": 10
       },
       "id": 36,
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "none",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "mean"
@@ -465,10 +411,11 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -512,7 +459,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -531,13 +478,13 @@
         "y": 10
       },
       "id": 37,
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "none",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "mean"
@@ -545,10 +492,11 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -592,7 +540,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -611,13 +559,13 @@
         "y": 10
       },
       "id": 38,
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "none",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "mean"
@@ -625,10 +573,11 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -672,7 +621,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -691,13 +640,13 @@
         "y": 10
       },
       "id": 39,
-      "links": [],
       "maxDataPoints": 100,
       "options": {
         "colorMode": "none",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "mean"
@@ -705,10 +654,11 @@
           "fields": "",
           "values": false
         },
+        "showPercentChange": false,
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -756,6 +706,7 @@
             "axisLabel": "cores",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -773,6 +724,7 @@
               "type": "log"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -788,7 +740,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -807,24 +759,24 @@
         "y": 14
       },
       "id": 17,
-      "links": [],
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull"
+            "lastNotNull",
+            "min",
+            "max"
           ],
           "displayMode": "table",
           "placement": "right",
-          "showLegend": true,
-          "width": 300
+          "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -875,6 +827,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -891,6 +844,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -906,7 +860,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -925,24 +879,24 @@
         "y": 22
       },
       "id": 25,
-      "links": [],
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull"
+            "lastNotNull",
+            "min",
+            "max"
           ],
           "displayMode": "table",
           "placement": "right",
-          "showLegend": true,
-          "width": 300
+          "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -993,6 +947,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
@@ -1009,6 +964,7 @@
               "type": "linear"
             },
             "showPoints": "never",
+            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -1024,7 +980,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
@@ -1043,24 +999,24 @@
         "y": 30
       },
       "id": 16,
-      "links": [],
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "lastNotNull"
+            "lastNotNull",
+            "min",
+            "max"
           ],
           "displayMode": "table",
           "placement": "right",
-          "showLegend": true,
-          "width": 300
+          "showLegend": true
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
       },
-      "pluginVersion": "10.2.3",
+      "pluginVersion": "12.3.1",
       "targets": [
         {
           "datasource": {
@@ -1097,8 +1053,9 @@
       "type": "timeseries"
     }
   ],
+  "preload": false,
   "refresh": "30s",
-  "schemaVersion": 39,
+  "schemaVersion": 42,
   "tags": [
     "kubernetes"
   ],
@@ -1106,24 +1063,24 @@
     "list": [
       {
         "current": {
-          "selected": false,
           "text": "prometheus",
-          "value": "P1809F7CD0C75ACF3"
+          "value": "prometheus"
         },
         "hide": 2,
         "includeAll": false,
-        "multi": false,
         "name": "DS_PROMETHEUS",
         "options": [],
         "query": "prometheus",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
         "type": "datasource"
       },
       {
         "allValue": ".*",
-        "current": {},
+        "current": {
+          "text": "k8s-node1",
+          "value": "k8s-node1"
+        },
         "datasource": {
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
@@ -1131,7 +1088,6 @@
         "definition": "label_values(kube_pod_info{pod=\"$Pod\"},node)",
         "hide": 2,
         "includeAll": false,
-        "multi": false,
         "name": "Node",
         "options": [],
         "query": {
@@ -1141,12 +1097,17 @@
         },
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       },
       {
-        "current": {},
+        "current": {
+          "text": [
+            "10.244.36.184"
+          ],
+          "value": [
+            "10.244.36.184"
+          ]
+        },
         "datasource": {
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
@@ -1164,10 +1125,7 @@
         },
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "type": "query",
-        "useTags": false
+        "type": "query"
       },
       {
         "current": {},
@@ -1176,10 +1134,8 @@
           "uid": "${DS_PROMETHEUS}"
         },
         "definition": "label_values(kube_pod_info,namespace)",
-        "hide": 0,
         "includeAll": false,
         "label": "Name Space",
-        "multi": false,
         "name": "NS",
         "options": [],
         "query": {
@@ -1189,8 +1145,6 @@
         },
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       },
       {
@@ -1201,10 +1155,8 @@
           "uid": "${DS_PROMETHEUS}"
         },
         "definition": "label_values(kube_pod_info{namespace=\"$NS\"},pod)",
-        "hide": 0,
         "includeAll": false,
         "label": "Pod",
-        "multi": false,
         "name": "Pod",
         "options": [],
         "query": {
@@ -1214,8 +1166,6 @@
         },
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       }
     ]
@@ -1224,34 +1174,9 @@
     "from": "now-30m",
     "to": "now"
   },
-  "timepicker": {
-    "refresh_intervals": [
-      "5s",
-      "10s",
-      "30s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h",
-      "2h",
-      "1d"
-    ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d",
-      "30d"
-    ]
-  },
+  "timepicker": {},
   "timezone": "browser",
   "title": "k8s-cluster-pod-view",
   "uid": "bcfd24a9-a781-4c03-8d37-cfe7ce322dfd",
-  "version": 3,
-  "weekStart": ""
+  "version": 1
 }

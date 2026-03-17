@@ -30,15 +30,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: queue-analytics-events
-                  app.kubernetes.io/component: worker
-                  app.kubernetes.io/part-of: vms
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: queue-analytics-events
+                    app.kubernetes.io/component: worker
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       securityContext:
         runAsUser: 33
         runAsGroup: 33
@@ -71,8 +71,8 @@ spec:
               subPath: file.key
           resources:
             requests:
-              cpu: 80m
-              memory: 400Mi
+              cpu: 5m
+              memory: 100Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: queue-analytics-events
@@ -81,4 +81,3 @@ spec:
         - name: vms-backend-oauth
           secret:
             secretName: vms-backend-oauth
-        

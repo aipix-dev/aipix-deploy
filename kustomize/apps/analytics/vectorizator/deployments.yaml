@@ -35,6 +35,10 @@ spec:
             - containerPort: 8000
               name: http
               protocol: TCP
+          resources:
+            requests:
+              cpu: 5m
+              memory: 700Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: vectorizator

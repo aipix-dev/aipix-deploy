@@ -53,6 +53,10 @@ spec:
               mountPath: /opt/analytics-orchestrator-server/.env
               subPath: .env
               readOnly: true
+          resources:
+            requests:
+              cpu: 5m
+              memory: 400Mi
         - name: celery
           args:
             - scripts/celery.sh
@@ -74,6 +78,10 @@ spec:
               mountPath: /opt/analytics-orchestrator-server/.env
               subPath: .env
               readOnly: true
+          resources:
+            requests:
+              cpu: 20m
+              memory: 500Mi
         - name: matcher
           args:
             - scripts/matcher.sh
@@ -95,6 +103,10 @@ spec:
               mountPath: /opt/analytics-orchestrator-server/.env
               subPath: .env
               readOnly: true
+          resources:
+            requests:
+              cpu: 5m
+              memory: 500Mi
         - name: stats-processor
           args:
             - scripts/stats_processor.sh
@@ -116,6 +128,10 @@ spec:
               mountPath: /opt/analytics-orchestrator-server/.env
               subPath: .env
               readOnly: true
+          resources:
+            requests:
+              cpu: 5m
+              memory: 300Mi
         - name: events-collector
           args:
             - scripts/events_collector.sh
@@ -137,6 +153,10 @@ spec:
               mountPath: /opt/analytics-orchestrator-server/.env
               subPath: .env
               readOnly: true
+          resources:
+            requests:
+              cpu: 5m
+              memory: 250Mi
         - name: cron
           args:
             - scripts/cron.sh
@@ -158,6 +178,10 @@ spec:
               mountPath: /opt/analytics-orchestrator-server/.env
               subPath: .env
               readOnly: true
+          resources:
+            requests:
+              cpu: 5m
+              memory: 10Mi
         - name: analytics-licensing
           args:
             - /bin/sh
@@ -185,6 +209,10 @@ spec:
               mountPath: /opt/analytics-licensing/license.json
               subPath: license.json
               readOnly: true
+          resources:
+            requests:
+              cpu: 5m
+              memory: 50Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: orchestrator

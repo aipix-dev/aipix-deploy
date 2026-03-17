@@ -29,15 +29,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: frontend-client
-                  app.kubernetes.io/component: frontend
-                  app.kubernetes.io/part-of: vms
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: frontend-client
+                    app.kubernetes.io/component: frontend
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       containers:
         - name: frontend-client
           image: download.aipix.ai:8443/vms-frontend-client/release:latest
@@ -62,19 +62,19 @@ spec:
               cpu: 5m
               memory: 25Mi
           volumeMounts:
-          - mountPath: /etc/nginx/nginx.conf
-            name: vms-frontend-client-nginx
-            readOnly: true
-            subPath: nginx.conf
-          - mountPath: /etc/nginx/conf.d/default.conf
-            name: vms-frontend-client-nginx
-            readOnly: true
-            subPath: default.conf
+            - mountPath: /etc/nginx/nginx.conf
+              name: vms-frontend-client-nginx
+              readOnly: true
+              subPath: nginx.conf
+            - mountPath: /etc/nginx/conf.d/default.conf
+              name: vms-frontend-client-nginx
+              readOnly: true
+              subPath: default.conf
       imagePullSecrets:
         - name: download-aipix-ai
-      hostname: frontend
+      hostname: frontend-client
       restartPolicy: Always
       volumes:
-      - name: vms-frontend-client-nginx
-        configMap:
-          name: vms-frontend-client-nginx
+        - name: vms-frontend-client-nginx
+          configMap:
+            name: vms-frontend-client-nginx

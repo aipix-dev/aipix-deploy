@@ -41,6 +41,10 @@ spec:
           volumeMounts:
             - name: tarantool
               mountPath: /var/lib/tarantool
+          resources:
+            requests:
+              cpu: 5m
+              memory: 20Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: tarantool
@@ -48,4 +52,3 @@ spec:
       volumes:
         - name: tarantool
           emptyDir: {}
-

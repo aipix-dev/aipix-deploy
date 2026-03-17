@@ -31,11 +31,11 @@ spec:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-            - matchExpressions:
-              - key: analytics
-                operator: In
-                values:
-                - "true"
+              - matchExpressions:
+                  - key: analytics
+                    operator: In
+                    values:
+                      - "true"
       containers:
         - name: analytics-worker
           env:
@@ -62,8 +62,8 @@ spec:
                   containerName: analytics-worker
                   resource: requests.memory
           envFrom:
-          - configMapRef:
-              name: analytics-worker-env
+            - configMapRef:
+                name: analytics-worker-env
           image: download.aipix.ai:8443/analytics-worker/release:latest
           imagePullPolicy: Always
           resources:
@@ -74,4 +74,3 @@ spec:
       hostname: analytics-worker
       imagePullSecrets:
         - name: download-aipix-ai
-      

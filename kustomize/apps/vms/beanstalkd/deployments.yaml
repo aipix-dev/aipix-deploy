@@ -49,8 +49,8 @@ spec:
             periodSeconds: 5
           resources:
             requests:
-              cpu: 10m
-              memory: 25Mi
+              cpu: 5m
+              memory: 10Mi
         - name: beanstalkd-exporter
           image: download.aipix.ai:8443/beanstalkd-exporter:2.0.0
           imagePullPolicy: Always

@@ -6,7 +6,10 @@ source ./update-analytics-funcs.sh
 
 apply_manifests
 
-update_push1st
+if [ ${TYPE} != "prod" ]; then
+	update_push1st
+fi
+
 update_secrets
 update_tarantool
 update_vectorizator

@@ -30,19 +30,19 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: portal-backend
-                  app.kubernetes.io/component: backend
-                  app.kubernetes.io/part-of: vms
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: portal-backend
+                    app.kubernetes.io/component: backend
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       containers:
         - name: portal-backend
           args:
-            - php 
+            - php
             - artisan
             - octane:start
             - --port=8080
@@ -56,8 +56,8 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              cpu: 5m
-              memory: 120Mi
+              cpu: 150m
+              memory: 1000Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: portal-backend
@@ -95,24 +95,24 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: portal-queue
-                  app.kubernetes.io/component: backend
-                  app.kubernetes.io/part-of: vms
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: portal-queue
+                    app.kubernetes.io/component: backend
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       securityContext:
         runAsUser: 33
         runAsGroup: 33
-        fsGroup: 33  
+        fsGroup: 33
       containers:
         - name: portal-queue
           args:
             - php
-            - artisan 
+            - artisan
             - queue:work
             - --queue=portal
           envFrom:
@@ -122,8 +122,8 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              cpu: 5m
-              memory: 120Mi
+              cpu: 10m
+              memory: 100Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: portal-queue
@@ -175,8 +175,8 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              cpu: 5m
-              memory: 120Mi
+              cpu: 50m
+              memory: 150Mi
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: portal-schedule
@@ -213,15 +213,15 @@ spec:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: portal-frontend-client
-                  app.kubernetes.io/component: frontend
-                  app.kubernetes.io/part-of: vms
-                  global-app-name: vsaas
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: portal-frontend-client
+                    app.kubernetes.io/component: frontend
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
       containers:
         - name: portal-frontend-client
           image: download.aipix.ai:8443/vms-portal-frontend-client/release:latest
@@ -241,19 +241,19 @@ spec:
               cpu: 5m
               memory: 25Mi
           volumeMounts:
-          - mountPath: /etc/nginx/nginx.conf
-            name: portal-client-nginx
-            readOnly: true
-            subPath: nginx.conf
-          - mountPath: /etc/nginx/conf.d/default.conf
-            name: portal-client-nginx
-            readOnly: true
-            subPath: default.conf
+            - mountPath: /etc/nginx/nginx.conf
+              name: portal-client-nginx
+              readOnly: true
+              subPath: nginx.conf
+            - mountPath: /etc/nginx/conf.d/default.conf
+              name: portal-client-nginx
+              readOnly: true
+              subPath: default.conf
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: portal-frontend-client
       restartPolicy: Always
       volumes:
-      - name: portal-client-nginx
-        configMap:
-          name: portal-client-nginx
+        - name: portal-client-nginx
+          configMap:
+            name: portal-client-nginx

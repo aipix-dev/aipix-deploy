@@ -28,7 +28,6 @@ export MS_LIC_OFFLINE=no  #If mediaserver offline license will be used ("yes" or
 export A_LIC_OFFLINE=no   #If analytics offline license will be used ("yes" or "no")
 
 #S3 minio basic deployment parameters:
-export BACKEND_STORAGE_TYPE=s3                                                #backend storage type for demo installation: s3, disk or s3_and_disk (for migration to s3)
 export MINIO_CONSOLE_DOMAIN=minio-console.example.com                         #define minio console domain name for single installation
 export MINIO_CONSOLE_DOMAIN_1=minio-console-1.example.com                     #define minio console domain name for redundant installation
 export MINIO_CONSOLE_DOMAIN_2=minio-console-2.example.com                     #define minio console domain name for redundant installation

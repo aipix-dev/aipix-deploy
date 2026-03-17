@@ -38,6 +38,10 @@ spec:
               name: client
               protocol: TCP
           imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 500Mi
           volumeMounts:
             - name: clickhouse
               mountPath: /var/lib/clickhouse/

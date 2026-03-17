@@ -2,8 +2,8 @@
     group: ""
     version: v1
     kind: Service
-    name: (prometheus-server|grafana|.*influxdb2)
-  path: ./custom-patches.d/patch-service.yaml
+    name: (.*influxdb2)
+  path: ./custom-patches.d/patch-influx-service.yaml
 - target:
     group: apps
     version: v1

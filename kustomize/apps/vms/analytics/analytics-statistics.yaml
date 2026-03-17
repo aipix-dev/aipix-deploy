@@ -55,7 +55,7 @@ spec:
               subPath: file.key
           resources:
             requests:
-              cpu: 20m
+              cpu: 5m
               memory: 50Mi
       imagePullSecrets:
         - name: download-aipix-ai
