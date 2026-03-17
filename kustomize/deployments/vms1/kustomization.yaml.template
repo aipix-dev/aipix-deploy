@@ -29,16 +29,16 @@ ${ADD_COMPONENT4}
 images:
 - name: download.aipix.ai:8443/vms-backend/release
   newName: download.aipix.ai:8443/vms-backend/release
-  newTag: 25.12.1.9
+  newTag: 25.12.1.10
 - name: download.aipix.ai:8443/vms-frontend-admin/release
   newName: download.aipix.ai:8443/vms-frontend-admin/release
-  newTag: 25.12.1.0
+  newTag: 25.12.1.1
 - name: download.aipix.ai:8443/vms-frontend-client/release
   newName: download.aipix.ai:8443/vms-frontend-client/release
   newTag: 25.12.1.0
 - name: download.aipix.ai:8443/controller/release
   newName: download.aipix.ai:8443/controller/release
-  newTag: 25.12.1.2
+  newTag: 25.12.1.3
 - name: download.aipix.ai:8443/vms-portal-backend/release
   newName: download.aipix.ai:8443/vms-portal-backend/release
   newTag: 25.12.1.0

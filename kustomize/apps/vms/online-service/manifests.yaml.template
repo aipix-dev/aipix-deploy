@@ -1,0 +1,119 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: online-service
+    app.kubernetes.io/component: online-service
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: online-service
+  namespace: vsaas-vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: online-service
+      app.kubernetes.io/component: online-service
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: online-service
+        app.kubernetes.io/component: online-service
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: online-service
+                    app.kubernetes.io/component: online-service
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
+      containers:
+        - name: online-service
+          envFrom:
+            - configMapRef:
+                name: online-env
+          image: download.aipix.ai:8443/smartairkey/dev:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 150m
+              memory: 500Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: online-service
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: online-service
+    app.kubernetes.io/component: online-service
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: online-service
+  namespace: vsaas-vms
+spec:
+  ports:
+    - name: "api"
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    - name: "lock"
+      port: 6444
+      protocol: TCP
+      targetPort: 6444
+  selector:
+    app.kubernetes.io/name: online-service
+    app.kubernetes.io/component: online-service
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  name: online-service-api
+  namespace: vsaas-vms
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host (`example.com`) && (PathPrefix(`/wifi-ota`) || PathPrefix(`/ble`))
+      services:
+        - kind: Service
+          name: online-service
+          port: 80
+          scheme: http
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  name: online-service-lock
+  namespace: vsaas-vms
+spec:
+  entryPoints:
+    - online-lock
+  routes:
+    - match: HostSNI(`example.com`)
+      services:
+        - name: online-service
+          port: 6444
