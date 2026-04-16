@@ -9,11 +9,12 @@ metadata:
   name: grafana
 spec:
   entryPoints:
-  - websecure
+    - websecure
   routes:
-  - kind: Rule
-    match: Host (`example.com`) && ( PathPrefix(`/monitoring`) || PathPrefix(`/swagger`) )
-    services:
-    - kind: Service
-      name: grafana
-      port: 80
+    - kind: Rule
+      priority: 300
+      match: Host (`example.com`) && ( PathPrefix(`/monitoring`) || PathPrefix(`/swagger`) || PathPrefix(`/apis/features.grafana.app`) )
+      services:
+        - kind: Service
+          name: grafana
+          port: 80

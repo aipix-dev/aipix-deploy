@@ -7,7 +7,7 @@ source ../kubernetes/sources.sh
 source ../kubernetes/k8s-onprem/sources.sh
 
 # Delete BACKEND_STORAGE_TYPE env from ../kubernetes/sources.sh file
-sed -i '/^BACKEND_STORAGE_TYPE=/d' ../kubernetes/sources.sh
+sed -i '/BACKEND_STORAGE_TYPE=/d' ../kubernetes/sources.sh
 
 ### Update VMS
 ../kubernetes/configure-vms.sh

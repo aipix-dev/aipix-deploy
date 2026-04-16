@@ -54,7 +54,7 @@ dashboardProviders:
         updateIntervalSeconds: 30
         editable: true
         options:
-          path: /var/lib/grafana/dashboards
+          path: /etc/grafana/provisioning/dashboards
           foldersFromFilesStructure: true
 
 alerting:
@@ -126,23 +126,27 @@ extraInitContainers:
     command: ["/bin/sh", "-c"]
     args:
       - |
-        mkdir -p /var/lib/grafana/dashboards
         mc alias set local http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL} ${MINIO_GRAFANA_ACCESS_KEY} ${MINIO_GRAFANA_SECRET_KEY}
-        mc cp --recursive local/${MINIO_GRAFANA_BUCKET_NAME}/dashboards/ /var/lib/grafana/dashboards
+        mc cp --recursive local/${MINIO_GRAFANA_BUCKET_NAME}/dashboards/ /mnt/dashboards
         mc cp --recursive local/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/ /mnt/alerting
-        chown 472:472 /var/lib/grafana/dashboards
     volumeMounts:
       - name: storage
         mountPath: /var/lib/grafana
       - name: alerts
         mountPath: /mnt/alerting
+      - name: dashboards
+        mountPath: /mnt/dashboards
 
 extraVolumeMounts:
   - name: alerts
     mountPath: /etc/grafana/provisioning/alerting
+  - name: dashboards
+    mountPath: /etc/grafana/provisioning/dashboards
 
 extraVolumes:
   - name: alerts
+    emptyDir: {}
+  - name: dashboards
     emptyDir: {}
 
 persistence:

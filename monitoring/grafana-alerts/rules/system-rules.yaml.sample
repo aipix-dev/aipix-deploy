@@ -1,233 +1,11 @@
 apiVersion: 1
 groups:
     - orgId: 1
-      name: Alerts
+      name: System Alerts
       folder: Alerts
       interval: 1m
       rules:
         - uid: alert-001
-          title: Used RAM by analytic workers
-          condition: C
-          data:
-            - refId: A
-              relativeTimeRange:
-                from: 600
-                to: 0
-              datasourceUid: influxdb
-              model:
-                alias: $tag_ip
-                groupBy:
-                    - params:
-                        - $__interval
-                      type: time
-                    - params:
-                        - ip::tag
-                      type: tag
-                    - params:
-                        - none
-                      type: fill
-                intervalMs: 1000
-                maxDataPoints: 43200
-                measurement: analytics_workers_resource_usage
-                orderByTime: ASC
-                policy: default
-                query: SELECT last("used_percent_memory") FROM "analytics_workers_resource_usage" WHERE $timeFilter GROUP BY time($__interval), "ip"::tag fill(none)
-                rawQuery: true
-                refId: A
-                resultFormat: time_series
-                select:
-                    - - params:
-                            - used_percent_memory
-                        type: field
-                      - params: []
-                        type: last
-                tags:
-                    - key: deployment_name::tag
-                      operator: =
-                      value: vsaas-analytics
-            - refId: B
-              relativeTimeRange:
-                from: 10800
-                to: 0
-              datasourceUid: __expr__
-              model:
-                conditions:
-                    - evaluator:
-                        params: []
-                        type: gt
-                      operator:
-                        type: and
-                      query:
-                        params:
-                            - B
-                      reducer:
-                        params: []
-                        type: last
-                      type: query
-                datasource:
-                    type: __expr__
-                    uid: __expr__
-                expression: A
-                intervalMs: 1000
-                maxDataPoints: 43200
-                reducer: mean
-                refId: B
-                settings:
-                    mode: dropNN
-                type: reduce
-            - refId: C
-              relativeTimeRange:
-                from: 10800
-                to: 0
-              datasourceUid: __expr__
-              model:
-                conditions:
-                    - evaluator:
-                        params:
-                            - 90
-                        type: gt
-                      operator:
-                        type: and
-                      query:
-                        params:
-                            - C
-                      reducer:
-                        params: []
-                        type: last
-                      type: query
-                datasource:
-                    type: __expr__
-                    uid: __expr__
-                expression: B
-                intervalMs: 1000
-                maxDataPoints: 43200
-                refId: C
-                type: threshold
-          dashboardUid: f5cd5779-d583-48fa-b466-32930cfa9e7d
-          panelId: 3
-          noDataState: Alerting
-          execErrState: Error
-          for: 5m
-          annotations:
-            __dashboardUid__: f5cd5779-d583-48fa-b466-32930cfa9e7d
-            __panelId__: "3"
-            summary: 'Instance: {{ $labels.ip }} {{- "\t" -}} {{- "\t" -}} Usage: {{ $values.B.Value | printf "%.2f" }}%'
-          labels: {}
-          isPaused: false
-          notification_settings:
-            receiver: Telegram
-        - uid: alert-002
-          title: Used CPU by analytic workers
-          condition: C
-          data:
-            - refId: A
-              relativeTimeRange:
-                from: 600
-                to: 0
-              datasourceUid: influxdb
-              model:
-                alias: $tag_ip
-                groupBy:
-                    - params:
-                        - $__interval
-                      type: time
-                    - params:
-                        - ip::tag
-                      type: tag
-                    - params:
-                        - none
-                      type: fill
-                intervalMs: 1000
-                maxDataPoints: 43200
-                measurement: analytics_workers_resource_usage
-                orderByTime: ASC
-                policy: default
-                query: SELECT last("cpu_loadavg_percent_1min") FROM "analytics_workers_resource_usage" WHERE $timeFilter GROUP BY time($__interval), "ip"::tag fill(none)
-                rawQuery: true
-                refId: A
-                resultFormat: time_series
-                select:
-                    - - params:
-                            - cpu_loadavg_percent_1min
-                        type: field
-                      - params: []
-                        type: mean
-                tags:
-                    - key: deployment_name::tag
-                      operator: =
-                      value: vsaas-analytics
-            - refId: B
-              relativeTimeRange:
-                from: 600
-                to: 0
-              datasourceUid: __expr__
-              model:
-                conditions:
-                    - evaluator:
-                        params: []
-                        type: gt
-                      operator:
-                        type: and
-                      query:
-                        params:
-                            - B
-                      reducer:
-                        params: []
-                        type: last
-                      type: query
-                datasource:
-                    type: __expr__
-                    uid: __expr__
-                expression: A
-                intervalMs: 1000
-                maxDataPoints: 43200
-                reducer: mean
-                refId: B
-                settings:
-                    mode: dropNN
-                type: reduce
-            - refId: C
-              relativeTimeRange:
-                from: 600
-                to: 0
-              datasourceUid: __expr__
-              model:
-                conditions:
-                    - evaluator:
-                        params:
-                            - 95
-                        type: gt
-                      operator:
-                        type: and
-                      query:
-                        params:
-                            - C
-                      reducer:
-                        params: []
-                        type: last
-                      type: query
-                datasource:
-                    type: __expr__
-                    uid: __expr__
-                expression: B
-                intervalMs: 1000
-                maxDataPoints: 43200
-                refId: C
-                type: threshold
-          dashboardUid: f5cd5779-d583-48fa-b466-32930cfa9e7d
-          panelId: 2
-          noDataState: Alerting
-          execErrState: Error
-          for: 5m
-          annotations:
-            __dashboardUid__: f5cd5779-d583-48fa-b466-32930cfa9e7d
-            __panelId__: "2"
-            summary: 'Instance: {{ $labels.ip }} {{- "\t" -}} {{- "\t" -}} Usage: {{ $values.B.Value | printf "%.2f" }}%'
-          labels: {}
-          isPaused: false
-          notification_settings:
-            receiver: Telegram
-        - uid: alert-003
           title: Nodes status
           condition: C
           data:
@@ -293,7 +71,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-004
+        - uid: alert-002
           title: Pod not Running
           condition: C
           data:
@@ -388,7 +166,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-005
+        - uid: alert-003
           title: Free Space / (k8s)
           condition: B
           data:
@@ -450,7 +228,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-006
+        - uid: alert-004
           title: Free Memory (k8s)
           condition: B
           data:
@@ -513,7 +291,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-007
+        - uid: alert-005
           title: CPU load (k8s)
           condition: B
           data:
@@ -575,7 +353,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-008
+        - uid: alert-006
           title: Free Space (/mnt/disk-sdb, /storage) (k8s)
           condition: B
           data:
@@ -642,7 +420,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-009
+        - uid: alert-007
           title: Beanstalkd jobs ready (delta)
           condition: C
           data:
@@ -738,7 +516,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        - uid: alert-010
+        - uid: alert-008
           title: Beanstalkd jobs ready (threshold)
           condition: C
           data:
@@ -834,4 +612,3 @@ groups:
           isPaused: false
           notification_settings:
             receiver: Telegram
-        

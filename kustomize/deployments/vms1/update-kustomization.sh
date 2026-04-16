@@ -29,6 +29,10 @@ if [ ${WB} == "yes" ]; then
 	export ADD_RESOURCE4="- ../../apps/integration-wb"
 fi
 
+if [ ${BLE} == "yes" ]; then
+	export ADD_RESOURCE5="- ../../apps/ble-service"
+fi
+
 export CUSTOM_IMAGES="$(cat ./custom-images.d/*.yaml 2>/dev/null)"
 export CUSTOM_PATCHES="$(cat ./custom-patches.d/custom-patches.yaml 2>/dev/null)"
 export CUSTOM_RESOURCES="$(cat ./custom-resources.d/custom-resources.yaml 2>/dev/null)"

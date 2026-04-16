@@ -1,0 +1,54 @@
+---
+# Source: vgw/templates/daemonsets.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: rtpengine-exporter
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/name: rtpengine-exporter
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rtpengine-exporter
+  updateStrategy:
+    rollingUpdate:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9282"
+      labels:
+        app.kubernetes.io/name: rtpengine-exporter
+    spec:
+      imagePullSecrets:
+        - name: download-aipix-ai
+      securityContext: null
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      containers:
+        - name: rtpengine-exporter
+          image: download.aipix.ai:8443/rtpengine-exporter-linux-amd64:latest
+          args: ["--web.listen-address=:9282", "-u", "udp://localhost:2223"]
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: vgw
+                    operator: In
+                    values:
+                      - "true"
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: vgw
+              topologyKey: kubernetes.io/hostname
+      tolerations:
+        - effect: NoSchedule
+          key: vgw
+          operator: Exists

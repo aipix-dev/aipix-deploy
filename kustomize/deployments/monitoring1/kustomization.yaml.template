@@ -6,6 +6,7 @@ resources:
 - ../../apps/monitoring/loki
 - ../../apps/monitoring/prometheus
 - ../../apps/monitoring/media-logger
+${ADD_RESOURCE1}
 ${CUSTOM_RESOURCES}
 components:
 - ../../components/tolerations

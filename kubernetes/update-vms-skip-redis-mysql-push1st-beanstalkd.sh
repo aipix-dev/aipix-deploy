@@ -143,7 +143,12 @@ done
 echo "Manifests were successfully aplied"
 
 #Rollout restart
-for i in $(kubectl get deployments -n ${NS_VMS} | awk 'NR>1 { print $1 }'); do kubectl rollout restart deployment.apps/$i -n ${NS_VMS}; done
+for i in $(kubectl get deployments -n ${NS_VMS} | awk 'NR>1 { print $1 }'); do
+	if [[ $i != "redis-server" ]] && [[ $i != "beanstalkd" ]] && [[ $i != "push1st" ]] && [[ $i != "mysql-server" ]]; then
+		kubectl rollout restart deployment.apps/$i -n ${NS_VMS}
+	fi
+done
+
 kubectl -n ${NS_VMS} rollout status deployment backend >/dev/null
 kubectl -n ${NS_VMS} rollout status deployment controller-api >/dev/null
 kubectl -n ${NS_VMS} rollout status deployment redis-server >/dev/null

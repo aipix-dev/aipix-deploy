@@ -155,7 +155,8 @@ create_minio_bucket -m minio-1 -b ${MINIO_LOGS_BUCKET_NAME} -a ${MINIO_LOGS_ACCE
 create_minio_bucket -m minio-2 -b ${MINIO_LOGS_BUCKET_NAME} -a ${MINIO_LOGS_ACCESS_KEY} -s ${MINIO_LOGS_SECRET_KEY} -v -e 3
 create_minio_bucket -m minio-1 -b ${MINIO_GRAFANA_BUCKET_NAME} -a ${MINIO_GRAFANA_ACCESS_KEY} -s ${MINIO_GRAFANA_SECRET_KEY} -v -p
 create_minio_bucket -m minio-2 -b ${MINIO_GRAFANA_BUCKET_NAME} -a ${MINIO_GRAFANA_ACCESS_KEY} -s ${MINIO_GRAFANA_SECRET_KEY} -v -p
-
+create_minio_bucket -m minio-1 -b ${MINIO_BLE_BUCKET_NAME} -a ${MINIO_BLE_ACCESS_KEY} -s ${MINIO_BLE_SECRET_KEY} -v -p
+create_minio_bucket -m minio-2 -b ${MINIO_BLE_BUCKET_NAME} -a ${MINIO_BLE_ACCESS_KEY} -s ${MINIO_BLE_SECRET_KEY} -v -p
 
 #Replication
 export MINIO_REPLICATION_USER=replication-user
@@ -199,6 +200,7 @@ replicate_minio_bucket -m minio-1 -r minio-2 -b ${MINIO_PORTAL_BUCKET_NAME_PRIV}
 replicate_minio_bucket -m minio-1 -r minio-2 -b ${MINIO_ANALYTICS_BUCKET_NAME}
 replicate_minio_bucket -m minio-1 -r minio-2 -b ${MINIO_LOGS_BUCKET_NAME}
 replicate_minio_bucket -m minio-1 -r minio-2 -b ${MINIO_GRAFANA_BUCKET_NAME}
+replicate_minio_bucket -m minio-1 -r minio-2 -b ${MINIO_BLE_BUCKET_NAME}
 
 
 echo """

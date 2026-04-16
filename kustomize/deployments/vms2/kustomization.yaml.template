@@ -11,6 +11,7 @@ ${ADD_RESOURCE1}
 ${ADD_RESOURCE2}
 ${ADD_RESOURCE3}
 ${ADD_RESOURCE4}
+${ADD_RESOURCE5}
 ${CUSTOM_RESOURCES}
 components:
 - ../../components/single-replica
@@ -28,16 +29,16 @@ ${ADD_COMPONENT4}
 images:
 - name: download.aipix.ai:8443/vms-backend/release
   newName: download.aipix.ai:8443/vms-backend/release
-  newTag: 25.12.1.9
+  newTag: 25.12.1.31
 - name: download.aipix.ai:8443/vms-frontend-admin/release
   newName: download.aipix.ai:8443/vms-frontend-admin/release
-  newTag: 25.12.1.0
+  newTag: 25.12.1.4
 - name: download.aipix.ai:8443/vms-frontend-client/release
   newName: download.aipix.ai:8443/vms-frontend-client/release
-  newTag: 25.12.1.0
+  newTag: 25.12.1.1
 - name: download.aipix.ai:8443/controller/release
   newName: download.aipix.ai:8443/controller/release
-  newTag: 25.12.1.2
+  newTag: 25.12.1.11
 - name: download.aipix.ai:8443/vms-portal-backend/release
   newName: download.aipix.ai:8443/vms-portal-backend/release
   newTag: 25.12.1.0
@@ -56,6 +57,9 @@ images:
 - name: download.aipix.ai:8443/vms-embedded-player/release
   newName: download.aipix.ai:8443/vms-embedded-player/release
   newTag: 25.12.1.0
+- name: download.aipix.ai:8443/ble-service/release
+  newName: download.aipix.ai:8443/ble-service/release
+  newTag: 25.12.1.8
 - name: download.aipix.ai:8443/beanstalkd
   newName: download.aipix.ai:8443/beanstalkd
   newTag: "1.13"
@@ -172,4 +176,16 @@ patches:
     kind: IngressRoute
     name: embedded-player
   path: patch-ingressroute-embedded-player.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: ble-service-api
+  path: patch-ingressroute-ble-service-api.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRouteTCP
+    name: ble-service-lock
+  path: patch-ingressroute-ble-service-lock.yaml
 ${CUSTOM_PATCHES}

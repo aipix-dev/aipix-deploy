@@ -1,0 +1,4 @@
+resources:
+- ble-service.yaml
+- services.yaml
+- ingressroutes.yaml

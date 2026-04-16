@@ -49,6 +49,12 @@ ports:
     expose:
       default: true
     exposedPort: 8109
+  ble-service:
+    port: 6444
+    protocol: TCP
+    expose:
+      default: true
+    exposedPort: 6444
 
 service:
   spec:

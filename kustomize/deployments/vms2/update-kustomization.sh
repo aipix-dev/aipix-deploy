@@ -17,8 +17,7 @@ fi
 
 if [ ${PORTAL} == "yes" ]; then
 	export ADD_COMPONENT3="- ../../components/middlewares/strip-prefixes-portal"
-	export ADD_RESOURCE2="- ../../apps/vms/portal
-- ../../apps/vms/portal-landing"
+	export ADD_RESOURCE2="- ../../apps/portal"
 fi
 
 if [ ${VGW} == "yes" ]; then
@@ -28,6 +27,10 @@ fi
 if [ ${WB} == "yes" ]; then
 	export ADD_COMPONENT4="- ../../components/middlewares/strip-prefixes-iframe"
 	export ADD_RESOURCE4="- ../../apps/integration-wb"
+fi
+
+if [ ${BLE} == "yes" ]; then
+	export ADD_RESOURCE5="- ../../apps/ble-service"
 fi
 
 export CUSTOM_IMAGES="$(cat ./custom-images.d/*.yaml 2>/dev/null)"

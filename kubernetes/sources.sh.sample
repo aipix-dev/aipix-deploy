@@ -77,6 +77,14 @@ export WB=no #If WB integration will be deployed ("yes" or "no")
 #Location parameters
 export CITY= #define City name
 
+#BLE parameters
+export BLE=no                                                        #If ble-service will be deployed ("yes" or "no")
+export BLE_DOMAIN=ble.example.com                                    #Domain name for ble
+export MINIO_BLE_BUCKET_NAME=ble-service                             #define bucket name for ble
+export MINIO_BLE_ACCESS_KEY=SF2GI0WH6XBM59MH3SDC                     #define minio access key for ble bucket
+export MINIO_BLE_SECRET_KEY=wQh8SUmGuf7HDPn7wqvZq3qJxyIxVsqIXP9Ew6dw #define minio secret key for ble bucket
+export BLE_JWT_SECRET=eVU6RcFWlC4lR4pE9dHwipmKLFeASbCE               #define JWT secret for ble
+
 ###END of the VSaaS base config ###
 
 if [ ${TYPE} == "single" ]; then

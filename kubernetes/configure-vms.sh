@@ -140,6 +140,15 @@ if [ ${WB} == "yes" ]; then
 	cp -n ../integration-wb/environments/env.sample ../integration-wb/environments/.env
 fi
 
+if [ ${BLE} == "yes" ]; then
+	cp -n ../ble-service/environments/env.sample ../ble-service/environments/.env
+	sed -i "s@MINIO_ENDPOINT=.*@MINIO_ENDPOINT=minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../ble-service/environments/.env
+	sed -i "s@MINIO_ACCESS_KEY=.*@MINIO_ACCESS_KEY=${MINIO_BLE_ACCESS_KEY}@g" ../ble-service/environments/.env
+	sed -i "s@MINIO_SECRET_KEY=.*@MINIO_SECRET_KEY=${MINIO_BLE_SECRET_KEY}@g" ../ble-service/environments/.env
+	sed -i "s@MINIO_BUCKET=.*@MINIO_BUCKET=${MINIO_BLE_BUCKET_NAME}@g" ../ble-service/environments/.env
+	sed -i "s@JWT_SECRET=.*@JWT_SECRET=${BLE_JWT_SECRET}@g" ../ble-service/environments/.env
+fi
+
 echo """
 
 VMS configuration script completed successfuly!

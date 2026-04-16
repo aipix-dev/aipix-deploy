@@ -35,11 +35,11 @@ helm -n ${NS_MONITORING} template x509-certificate-exporter enix/x509-certificat
 kubectl apply -k ../kustomize/deployments/monitoring1
 kubectl -n ${NS_MONITORING} rollout restart deployment prometheus-server
 kubectl -n ${NS_MONITORING} rollout status deployment prometheus-server
-sleep 10
+sleep 5
 
 kubectl -n ${NS_MONITORING} rollout restart deployment grafana
 kubectl -n ${NS_MONITORING} rollout status deployment grafana
-sleep 10
+sleep 5
 
 echo """
 Monitoring deployment script completed successfuly!

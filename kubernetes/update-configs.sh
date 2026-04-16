@@ -81,6 +81,7 @@ if [ -f ../portal/environments/.env ]; then print_new_config_lines ../portal/env
 if [ -f ../portal/environments-stub/.env ]; then print_new_config_lines ../portal/environments-stub/.env ../portal/environments-stub/env.sample; fi
 if [ -f ../analytics/.env ]; then print_new_config_lines ../analytics/.env ../analytics/env.sample; fi
 if [ -f ../analytics/analytics-worker-env ]; then print_new_config_lines ../analytics/analytics-worker-env ../analytics/analytics-worker-env.sample; fi
+if [ -f ../ble-service/environments/.env ]; then print_new_config_lines ../ble-service/environments/.env ../ble-service/environments/env.sample; fi
 if [ -f ../analytics/metrics-pusher.env ]; then print_new_config_lines ../analytics/metrics-pusher.env ../analytics/metrics-pusher.env.sample; fi
 
 echo """

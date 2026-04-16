@@ -75,6 +75,11 @@ if [ ${WB} == "yes" ]; then
 	kubectl create configmap integration-wb-env --namespace=${NS_VMS} --from-env-file=../integration-wb/environments/.env
 fi
 
+#Create BLE configmaps
+if [ ${BLE} == "yes" ]; then
+	kubectl create configmap ble-service-env --namespace=${NS_VMS} --from-env-file=../ble-service/environments/.env
+fi
+
 # Deploying VMS
 ../kustomize/deployments/${VMS_TEMPLATE}/update-kustomization.sh || exit 1
 kubectl apply -k ../kustomize/deployments/${VMS_TEMPLATE}
@@ -110,6 +115,16 @@ if [ ${WB} == "yes" ]; then
 		fi
 		sleep 5
 		echo "Waiting for starting integration-wb container ..."
+	done
+fi
+
+if [ ${BLE} == "yes" ]; then
+	while true; do
+		if [[ $(kubectl get deployment ble-service -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]; then
+			break
+		fi
+		sleep 5
+		echo "Waiting for starting ble-service container ..."
 	done
 fi
 
@@ -152,13 +167,31 @@ if [ ${WB} == "yes" ]; then
 	echo -e "\033[32mEnd WB migrations\033[0m"
 fi
 
-VMS_IP=$(kubectl -n ${TRAEFIK_NAMESPACE} get services/traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+if [ ${BLE} == "yes" ]; then
+	echo -e "\033[32mStart BLE migrations\033[0m"
+	# Create database, user, grant permissions
+	IFS="=" read name DB_HOST <<<$(cat ../ble-service/environments/.env | grep DB_HOST)
+	IFS="=" read name DB_PORT <<<$(cat ../ble-service/environments/.env | grep -i DB_PORT)
+	IFS="=" read name DB_NAME <<<$(cat ../ble-service/environments/.env | grep -i DB_NAME)
+	IFS="=" read name DB_USER <<<$(cat ../ble-service/environments/.env | grep -i DB_USER)
+	IFS="=" read name DB_PASSWORD <<<$(cat ../ble-service/environments/.env | grep -i DB_PASSWORD)
+	IFS="=" read name DB_ROOT_USERNAME <<<$(cat ../vms-backend/environments/.env | grep -i DB_ROOT_USERNAME)
+	IFS="=" read name DB_ROOT_PASSWORD <<<$(cat ../vms-backend/environments/.env | grep -i DB_ROOT_PASSWORD)
+
+	CREATE_DATABASE="CREATE DATABASE IF NOT EXISTS ${DB_NAME} character set 'utf8mb4' collate 'utf8mb4_unicode_ci';"
+	CREATE_USER="CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';"
+	GRANT_PRIVILEGES="GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%';FLUSH PRIVILEGES;"
+
+	kubectl exec -n ${NS_VMS} deployment.apps/backend -- mysql --protocol=TCP -u ${DB_ROOT_USERNAME} -p${DB_ROOT_PASSWORD} -P ${DB_PORT} -h ${DB_HOST} --execute="${CREATE_DATABASE}"
+	kubectl exec -n ${NS_VMS} deployment.apps/backend -- mysql --protocol=TCP -u ${DB_ROOT_USERNAME} -p${DB_ROOT_PASSWORD} -P ${DB_PORT} -h ${DB_HOST} --execute="${CREATE_USER}"
+	kubectl exec -n ${NS_VMS} deployment.apps/backend -- mysql --protocol=TCP -u ${DB_ROOT_USERNAME} -p${DB_ROOT_PASSWORD} -P ${DB_PORT} -h ${DB_HOST} --execute="${GRANT_PRIVILEGES}"
+	echo -e "\033[32mEnd BLE migrations\033[0m"
+fi
 
 echo """
 
 VMS deployment script completed successfuly!
 
 Access your VMS with the following URL:
-http://${VMS_IP}/admin
 https://${VMS_DOMAIN}/admin (${VMS_DOMAIN} should be resolved on DNS-server)
 """

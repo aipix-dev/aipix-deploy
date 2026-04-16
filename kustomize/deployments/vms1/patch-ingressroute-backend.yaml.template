@@ -1,3 +1,6 @@
 - op: replace
   path: /spec/routes/0/match
-  value: Host (`${VMS_DOMAIN}`) && ( PathPrefix(`/api`) || PathPrefix(`/storage`) || PathPrefix(`/apple-app-site-association`) || PathPrefix(`/openy/api/v1`) )
+  value: Host (`${VMS_DOMAIN}`) && PathPrefix(`/api`)
+- op: replace
+  path: /spec/routes/1/match
+  value: Host (`${VMS_DOMAIN}`) && ( PathPrefix(`/storage`) || PathPrefix(`/apple-app-site-association`) || PathPrefix(`/openy/api/v1`) )
