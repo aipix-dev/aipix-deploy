@@ -48,8 +48,8 @@ sleep 10
 #Helm instalation
 curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg >/dev/null
 echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-sudo apt-get update
-sudo apt-get install helm
+sudo apt update
+sudo apt install -y helm
 sudo helm completion bash | sudo tee /etc/bash_completion.d/helm >/dev/null
 
 #MetalLB instalation
@@ -97,7 +97,7 @@ if [ $? = 0 ]; then
 fi
 
 #Install minio client
-curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o $HOME/minio-binaries/mc
+curl -L https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o $HOME/minio-binaries/mc
 chmod +x $HOME/minio-binaries/mc
 export PATH=$PATH:$HOME/minio-binaries/
 echo 'export PATH=$PATH:$HOME/minio-binaries/' >>$HOME/.bashrc

@@ -43,7 +43,7 @@ spec:
         - name: backend
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - octane:start
             - --port=8080
             - --host=0.0.0.0
@@ -197,7 +197,7 @@ spec:
         - name: schedule
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - schedule:work
           envFrom:
             - configMapRef:
@@ -279,7 +279,7 @@ spec:
         - name: queue
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - queue:work
             - --queue=vms
             - --sleep=3
@@ -377,7 +377,7 @@ spec:
         - name: archive
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - queue:work
             - --queue=archive_generation
             - --sleep=3
@@ -463,7 +463,7 @@ spec:
         - name: reports
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - queue:work
             - --queue=reports
             - --sleep=3
@@ -547,7 +547,7 @@ spec:
         - name: queue-intercom-calls
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - queue:work
             - --queue=intercom_calls
             - --sleep=3
@@ -764,6 +764,91 @@ spec:
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: queue-intercom-setup
+      restartPolicy: Always
+      volumes:
+        - name: vms-backend-oauth
+          secret:
+            secretName: vms-backend-oauth
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: queue-mobile-push
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: queue-mobile-push
+  namespace: vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: queue-mobile-push
+      app.kubernetes.io/component: worker
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: queue-mobile-push
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: queue-mobile-push
+                    app.kubernetes.io/component: worker
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+      containers:
+        - name: queue-mobile-push
+          args:
+            - php
+            - /var/www/api/artisan
+            - queue:work
+            - --queue=mobile_push
+            - --sleep=3
+            - --tries=3
+          envFrom:
+            - configMapRef:
+                name: vms-backend-env
+          image: download.aipix.ai:8443/vms-backend/release:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /var/www/api/storage/oauth-private.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-private.key
+            - mountPath: /var/www/api/storage/oauth-public.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: oauth-public.key
+            - mountPath: /var/www/api/storage/file.key
+              name: vms-backend-oauth
+              readOnly: true
+              subPath: file.key
+          resources:
+            requests:
+              cpu: 5m
+              memory: 100Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: queue-mobile-push
       restartPolicy: Always
       volumes:
         - name: vms-backend-oauth

@@ -47,7 +47,7 @@ spec:
         - name: queue-analytics-events
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - queue:work
             - --queue=analytics_events
             - --tries=1

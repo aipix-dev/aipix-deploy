@@ -43,7 +43,7 @@ spec:
         - name: controller-api
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - octane:start
             - --port=8080
             - --host=0.0.0.0
@@ -124,7 +124,7 @@ spec:
         - name: controller-queue
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - queue:work
             - --queue=controller
             - --sleep=3
@@ -178,7 +178,7 @@ spec:
         - name: controller-schedule
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - schedule:work
           envFrom:
             - configMapRef:
@@ -229,7 +229,7 @@ spec:
         - name: controller-control-plane-hls
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - control-plain:redirect
             - --protocol=http
             - --port=8888
@@ -287,7 +287,7 @@ spec:
         - name: controller-control-plane-rtsp
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - control-plain:redirect
             - --protocol=rtsp
             - --port=5554
@@ -345,7 +345,7 @@ spec:
         - name: controller-queue-ms-callback
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - queue:work
             - --queue=media_servers_callback
             - --sleep=3
@@ -527,7 +527,7 @@ spec:
         - name: controller-queue-set-configs
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - queue:work
             - --queue=set_configs
             - --sleep=3

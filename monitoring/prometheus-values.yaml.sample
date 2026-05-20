@@ -78,3 +78,10 @@ extraScrapeConfigs: |
     scheme: http
     static_configs:
       - targets: ['minio.${NS_MINIO}.svc:9000']
+  - job_name: "media-server"
+    scheme: https
+    metrics_path: /metrics
+    tls_config:
+      insecure_skip_verify: true
+    static_configs:
+      - targets: ["mse.example.com:9665"]

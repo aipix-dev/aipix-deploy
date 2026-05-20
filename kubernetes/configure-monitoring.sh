@@ -23,9 +23,9 @@ helm repo add "${BRAND}" "${HELM_REPO}" --username "${DOCKER_USERNAME}" --passwo
 
 # Configure Grafana and Loki deployment
 if [ ${TYPE} == "prod" ]; then
-  export S3_PORT_INTERNAL=""
+	export S3_PORT_INTERNAL=""
 else
-  export S3_PORT_INTERNAL=":9000"
+	export S3_PORT_INTERNAL=":9000"
 fi
 
 envsubst <../monitoring/grafana-values.yaml.sample >../monitoring/grafana-values.yaml
@@ -35,14 +35,14 @@ envsubst <../monitoring/loki-values.yaml.sample >../monitoring/loki-values.yaml
 cp ../monitoring/grafana-alerts/rules/0-delete-alert-rules.yaml.sample ../monitoring/grafana-alerts/rules/0-delete-alert-rules.yaml
 cp ../monitoring/grafana-alerts/rules/system-rules.yaml.sample ../monitoring/grafana-alerts/rules/system-rules.yaml
 if [ ${ANALYTICS} == "yes" ]; then
-  cp ../monitoring/grafana-alerts/rules/analytics-rules.yaml.sample ../monitoring/grafana-alerts/rules/analytics-rules.yaml
+	cp ../monitoring/grafana-alerts/rules/analytics-rules.yaml.sample ../monitoring/grafana-alerts/rules/analytics-rules.yaml
 fi
 
 # Copy grafana dashboards and alert rules to S3
 if kubectl -n ${NS_MINIO} get services minio-1 >/dev/null 2>&1; then
-  MINIO_ALIAS="minio1"
+	MINIO_ALIAS="minio1"
 else
-  MINIO_ALIAS="local"
+	MINIO_ALIAS="local"
 fi
 mc rm --recursive ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules --force || true
 mc rm --recursive ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/dashboards --force || true
@@ -50,6 +50,7 @@ mc rm --recursive ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/dashboards --force
 mc cp --recursive ../monitoring/grafana-dashboards/K8s ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy K8s dashboards to S3\033[0m"
 mc cp --recursive ../monitoring/grafana-dashboards/Logs ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy Logs dashboards to S3\033[0m"
 mc cp --recursive ../monitoring/grafana-dashboards/MinIO ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy MinIO dashboards to S3\033[0m"
+mc cp --recursive ../monitoring/grafana-dashboards/MSE ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy MSE dashboards to S3\033[0m"
 mc cp ../monitoring/grafana-dashboards/beanstalkd.json ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy beanstalkd dashboards to S3\033[0m"
 mc cp ../monitoring/grafana-dashboards/mysql-k8s.json ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy mysql dashboards to S3\033[0m"
 mc cp ../monitoring/grafana-dashboards/redis-k8s.json ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy redis dashboards to S3\033[0m"
@@ -58,17 +59,17 @@ mc cp ../monitoring/grafana-alerts/rules/0-delete-alert-rules.yaml ${MINIO_ALIAS
 mc cp ../monitoring/grafana-alerts/rules/system-rules.yaml ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/system-rules.yaml || echo -e "\033[31mUnable to copy system rules to S3\033[0m"
 
 if [ ${ANALYTICS} == "yes" ]; then
-  mc cp ../monitoring/grafana-dashboards/analytics-workers.json ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy analytics-workers dashboards to S3\033[0m"
-  mc cp ../monitoring/grafana-alerts/rules/analytics-rules.yaml ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/analytics-rules.yaml || echo -e "\033[31mUnable to copy analytics alert rules to S3\033[0m"
+	mc cp ../monitoring/grafana-dashboards/analytics-workers.json ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy analytics-workers dashboards to S3\033[0m"
+	mc cp ../monitoring/grafana-alerts/rules/analytics-rules.yaml ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/alerts/rules/analytics-rules.yaml || echo -e "\033[31mUnable to copy analytics alert rules to S3\033[0m"
 fi
 
 if [ ${VGW} == "yes" ]; then
-  mc cp --recursive ../monitoring/grafana-dashboards/VGW ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy VGW dashboards to S3\033[0m"
+	mc cp --recursive ../monitoring/grafana-dashboards/VGW ${MINIO_ALIAS}/${MINIO_GRAFANA_BUCKET_NAME}/dashboards || echo -e "\033[31mUnable to copy VGW dashboards to S3\033[0m"
 fi
 
 # Configure logging
 ## Configure fluent-bit
-cp -n ../monitoring/fluentbit-values.yaml.sample ../monitoring/fluentbit-values.yaml
+cp ../monitoring/fluentbit-values.yaml.sample ../monitoring/fluentbit-values.yaml
 
 # Configure InfluxDB deployment
 envsubst <../monitoring/influxdb-values.yaml.sample >../monitoring/influxdb-values.yaml

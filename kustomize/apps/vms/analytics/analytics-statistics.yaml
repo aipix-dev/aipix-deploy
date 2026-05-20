@@ -33,7 +33,7 @@ spec:
         - name: analytic-statistics
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - orchestrator:socket:stat:connect
           envFrom:
             - configMapRef:

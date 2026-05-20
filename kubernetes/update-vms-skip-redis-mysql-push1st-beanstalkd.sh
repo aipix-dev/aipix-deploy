@@ -140,7 +140,7 @@ for deployment in $(kubectl -n ${NS_VMS} get deployment | awk 'NR>1 { print $1 }
 		ready_replicas=$(kubectl get deployment $deployment -n ${NS_VMS} -o jsonpath='{.status.availableReplicas}')
 	done
 done
-echo "Manifests were successfully aplied"
+echo -e "\033[32mManifests were successfully aplied\033[0m"
 
 #Rollout restart
 for i in $(kubectl get deployments -n ${NS_VMS} | awk 'NR>1 { print $1 }'); do
@@ -156,7 +156,7 @@ if [ ${TYPE} != "prod" ]; then
 	kubectl -n ${NS_VMS} rollout status deployment mysql-server >/dev/null
 fi
 
-echo "Deployments were successfully restarted"
+echo -e "\033[32mDeployments were successfully restarted\033[0m"
 sleep 15
 
 echo -e "\033[32mStart backend migrations\033[0m"

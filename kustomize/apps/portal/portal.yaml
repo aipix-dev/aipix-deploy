@@ -43,7 +43,7 @@ spec:
         - name: portal-backend
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - octane:start
             - --port=8080
             - --host=0.0.0.0
@@ -112,7 +112,7 @@ spec:
         - name: portal-queue
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - queue:work
             - --queue=portal
           envFrom:
@@ -166,7 +166,7 @@ spec:
         - name: portal-schedule
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - schedule:work
           envFrom:
             - configMapRef:

@@ -33,6 +33,9 @@ config:
 
     [INPUT]
         Name    syslog
+        Buffer_Chunk_Size 64000
+        Receive_Buffer_Size 2048000
+        Mem_Buf_Limit 50MB
         Listen  0.0.0.0
         Port    5140
         Parser  syslog
@@ -42,6 +45,14 @@ config:
   ## https://docs.fluentbit.io/manual/pipeline/filters
   filters: |
     [FILTER]
+        Name          parser
+        Match         syslog-std
+        Key_Name      log
+        Parser        app_json
+        Preserve_Key  On
+        Reserve_Data  On
+    
+    [FILTER]
         Name kubernetes
         Match kube.*
         Merge_Log On
@@ -49,20 +60,30 @@ config:
         K8S-Logging.Parser Off
         K8S-Logging.Exclude Off
     [FILTER]
-        Name    multiline
-        match   syslog-std
-        multiline.key_content log
-        multiline.parser      go, multiline-php
+        Name          rewrite_tag
+        Match         kube.*
+        Rule          $kubernetes['pod_name'] ^((vgw-)?backend|archive|queue|reports).*$ vsaas.vms false
+        Rule          $kubernetes['pod_name'] ^controller.*$ vsaas.controller false
 
   ## https://docs.fluentbit.io/manual/pipeline/outputs
   outputs: |
     [OUTPUT]
         Name loki
-        Match syslog*
+        Match syslog-std
         Host loki.monitoring.svc.cluster.local
         labels job=syslog
-        label_keys $host,$app_name,$pri
+        label_keys $level,$container,$hostname,$namespace,$instance,$action,$version
         Port 3100
+    [OUTPUT]
+        Name loki
+        Match vsaas.*
+        Host loki.monitoring.svc.cluster.local
+        remove_keys kubernetes,stream,_p
+        labels job=vsaas, level=$level, container=$container, host=$host, namespace=$namespace, instance=$instance,action=$action, version=$version
+        Port 3100
+    [OUTPUT]
+        Name stdout
+        Match syslog-std
     [OUTPUT]
         Name loki
         Match kube.*
@@ -71,9 +92,9 @@ config:
         labels job=kubernetes
         label_map_path /fluent-bit/etc/conf/labelmap.json
         Port 3100
-    # [OUTPUT]
-        # Name stdout
-        # Match kube.*
+    [OUTPUT]
+        Name stdout
+        Match kube.*
 
   ## https://docs.fluentbit.io/manual/pipeline/parsers
   customParsers: |
@@ -84,14 +105,35 @@ config:
         Time_Key    time
         Time_Format %Y-%m-%dT%H:%M:%S.%L%z
         Time_Keep   On
+    [PARSER]
+        Name        app_json
+        Format      json
+        Time_Key    ts
+        Time_Format %Y-%m-%dT%H:%M:%S.%LZ
+
     [MULTILINE_PARSER]
         name          multiline-php
         type          regex
         flush_timeout 1000
         # rules |   state name  | regex pattern                  | next state
         # ------|---------------|--------------------------------------------
-        rule      "start_state"   "/(\[.*[A-Z]+\] )(.*)/"  "cont"
+        rule      "start_state"   "/(\[.*\.[A-Z]{4,9}\] ).*$/"  "cont"
         rule      "cont"          "/^(?!\[.*\.[A-Z]+\] ).*$/" "cont"
+    [MULTILINE_PARSER]
+        name          debug_multiline
+        type          regex
+        parser        syslog
+        flush_timeout 5s
+        # rules |   state name  | regex pattern                  | next state
+        # ------|---------------|--------------------------------------------
+        rule      "start_state"   "/(\[.*\.[A-Z]{4,9}\] ).*$/"  "cont"
+        rule       "cont"         "/^(Stack trace:|\[stacktrace\])$/" "cont2"
+        rule      "cont"          "/^(?!\[.*\.[A-Z]+\] ).*$/" "cont"
+        rule       "cont2"        "/\"} $/"
+
+
+
+
 
   # This allows adding more files with arbitary filenames to /fluent-bit/etc/conf by providing key/value pairs.
   # The key becomes the filename, the value becomes the file content.

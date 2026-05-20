@@ -15,11 +15,10 @@ else
 	echo "Using ENV from sources.sh"
 	source ./sources.sh
 	if [ -z "${SRC_K8S_VER}" ]; then
-		echo >&2  "ERROR: File sources.sh does not contain K8S version variables. Copy system variables fom sources.sh.sample file."
+		echo >&2 "ERROR: File sources.sh does not contain K8S version variables. Copy system variables fom sources.sh.sample file."
 		exit 2
 	fi
 fi
-
 
 K8S_VER=${SRC_K8S_VER}
 K8S_VER_PATCH=${SRC_K8S_VER_PATCH}
@@ -31,14 +30,14 @@ CALICO_VER=${SRC_CALICO_VER}
 sudo swapoff -a
 sudo sed -i '/^\/swap/s/^/#/' /etc/fstab
 
-sudo apt update -y && sudo apt install -y apt-transport-https ca-certificates gnupg rsync curl ntp net-tools lvm2 ioping
+sudo apt update && sudo apt install -y apt-transport-https ca-certificates gnupg rsync curl ntp net-tools lvm2 ioping
 sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
 sudo chmod a+x /usr/local/bin/yq
 
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v${K8S_VER}/deb/Release.key | sudo gpg --dearmor -o /usr/share/keyrings/kubernetes-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v${K8S_VER}/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
-sudo apt update -y
+sudo apt update 
 sudo apt install -y kubelet=${K8S_VER}.${K8S_VER_PATCH}-${K8S_VER_BUILD} \
 					kubeadm=${K8S_VER}.${K8S_VER_PATCH}-${K8S_VER_BUILD} \
 					kubectl=${K8S_VER}.${K8S_VER_PATCH}-${K8S_VER_BUILD}

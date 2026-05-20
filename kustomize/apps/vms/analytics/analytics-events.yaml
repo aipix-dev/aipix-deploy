@@ -33,7 +33,7 @@ spec:
         - name: analytic-events
           args:
             - php
-            - artisan
+            - /var/www/api/artisan
             - orchestrator:socket:connect
           envFrom:
             - configMapRef:

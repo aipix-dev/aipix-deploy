@@ -1,0 +1,12 @@
+- op: add
+  path: /spec/template/spec/containers/0/readinessProbe
+  value:
+    failureThreshold: 3
+    httpGet:
+      path: /internal/health/readiness
+      port: 8080
+      scheme: HTTP
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    successThreshold: 1
+    timeoutSeconds: 3
