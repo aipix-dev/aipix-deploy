@@ -487,7 +487,7 @@
           "type": 1
         },
         "refresh": 1,
-        "regex": "/vsaas-*/",
+        "regex": "/vsaas-*|devices/",
         "type": "query"
       },
       {

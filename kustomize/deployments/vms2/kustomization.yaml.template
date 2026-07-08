@@ -1,68 +1,72 @@
 namespace: ${NS_VMS}
 resources:
-- ../../apps/vms/backend
 - ../../apps/vms/beanstalkd
 - ../../apps/vms/redis
 - ../../apps/vms/push1st
+- ../../apps/vms/backend
 - ../../apps/vms/frontend-client
 - ../../apps/vms/frontend-admin
+- ../../apps/vms/frontend-new-admin
 - ../../apps/controller
 ${ADD_RESOURCE1}
 ${ADD_RESOURCE2}
 ${ADD_RESOURCE3}
 ${ADD_RESOURCE4}
 ${ADD_RESOURCE5}
+${ADD_RESOURCE6}
 ${CUSTOM_RESOURCES}
 components:
 - ../../components/single-replica
 - ../../components/middlewares/cors-middleware
 - ../../components/middlewares/gzip-middleware
-- ../../components/middlewares/strip-prefixes-controller
-- ../../components/middlewares/strip-prefixes-frontend-admin
 - ../../components/middlewares/upgrade-insecure-requests
 - ../../components/middlewares/max-body-size
 - ../../components/vms/push1st-devices-app
 - ../../components/vms/empty-env-list
-- ../../components/vms/livenessprobe
-- ../../components/vms/readinessprobe
+#- ../../components/vms/livenessprobe
+#- ../../components/vms/readinessprobe
 ${ADD_COMPONENT1}
 ${ADD_COMPONENT2}
-${ADD_COMPONENT3}
-${ADD_COMPONENT4}
 images:
 - name: download.aipix.ai:8443/vms-backend/release
   newName: download.aipix.ai:8443/vms-backend/release
-  newTag: 26.05.0.0
+  newTag: 26.06.0.0
 - name: download.aipix.ai:8443/vms-frontend-admin/release
   newName: download.aipix.ai:8443/vms-frontend-admin/release
-  newTag: 26.05.0.0
+  newTag: 26.06.0.0
+- name: download.aipix.ai:8443/vms-frontend-new-admin/release
+  newName: download.aipix.ai:8443/vms-frontend-new-admin/release
+  newTag: 26.06.0.0
 - name: download.aipix.ai:8443/vms-frontend-client/release
   newName: download.aipix.ai:8443/vms-frontend-client/release
-  newTag: 26.05.0.0
+  newTag: 26.06.0.0
 - name: download.aipix.ai:8443/controller/release
   newName: download.aipix.ai:8443/controller/release
-  newTag: 26.05.0.0
+  newTag: 26.06.0.0
 - name: download.aipix.ai:8443/vms-portal-backend/release
   newName: download.aipix.ai:8443/vms-portal-backend/release
-  newTag: 25.12.1.0
+  newTag: 26.06.0.0
 - name: download.aipix.ai:8443/vms-portal-frontend-client/release
   newName: download.aipix.ai:8443/vms-portal-frontend-client/release
-  newTag: 26.05.0.0
+  newTag: 26.06.0.0
 - name: download.aipix.ai:8443/vms-portal-stub/release
   newName: download.aipix.ai:8443/vms-portal-stub/release
   newTag: latest
 - name: download.aipix.ai:8443/vms-portal-landing/release
   newName: download.aipix.ai:8443/vms-portal-landing/release
-  newTag: 26.05.0.0
+  newTag: 26.06.0.0
 - name: download.aipix.ai:8443/vms-integration-wb/release
   newName: download.aipix.ai:8443/vms-integration-wb/release
-  newTag: 26.05.0.0
+  newTag: 26.06.0.0
 - name: download.aipix.ai:8443/vms-embedded-player/release
   newName: download.aipix.ai:8443/vms-embedded-player/release
-  newTag: 26.05.0.0
+  newTag: 26.06.0.0
+- name: download.aipix.ai:8443/vms-internal-player/release
+  newName: download.aipix.ai:8443/vms-internal-player/release
+  newTag: 26.06.0.0
 - name: download.aipix.ai:8443/ble-service/release
   newName: download.aipix.ai:8443/ble-service/release
-  newTag: 25.12.1.10
+  newTag: 26.06.1.0
 - name: download.aipix.ai:8443/beanstalkd
   newName: download.aipix.ai:8443/beanstalkd
   newTag: "1.13"
@@ -77,7 +81,7 @@ patches:
     group: apps
     version: v1
     kind: Deployment
-    name: "(archive|backend|controller-.*|embedded-player|frontend-.*|integration-wb|portal-.*|queue.*|reports|vgw-backend)"
+    name: "(archive|backend|controller-.*|embedded-player|frontend-.*|integration-wb|portal-.*|queue.*|reports|vgw-backend|internal-player)"
   patch: |-
     - op: replace
       path: /spec/replicas
@@ -141,14 +145,14 @@ patches:
     group: traefik.io
     version: v1alpha1
     kind: IngressRoute
-    name: frontend-client
-  path: patch-ingressroute-frontend-client.yaml
+    name: frontend-new-admin
+  path: patch-ingressroute-frontend-new-admin.yaml
 - target:
     group: traefik.io
     version: v1alpha1
     kind: IngressRoute
-    name: portal
-  path: patch-ingressroute-portal.yaml
+    name: frontend-client
+  path: patch-ingressroute-frontend-client.yaml
 - target:
     group: traefik.io
     version: v1alpha1
@@ -161,6 +165,12 @@ patches:
     kind: IngressRoute
     name: portal-stub
   path: patch-ingressroute-portal-stub.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: portal-frontend-client
+  path: patch-ingressroute-portal-frontend-client.yaml
 - target:
     group: traefik.io
     version: v1alpha1
@@ -197,4 +207,10 @@ patches:
     kind: IngressRouteTCP
     name: ble-service-lock
   path: patch-ingressroute-ble-service-lock.yaml
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: internal-player
+  path: patch-ingressroute-internal-player.yaml
 ${CUSTOM_PATCHES}

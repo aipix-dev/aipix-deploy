@@ -5,7 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/instance: traefik-traefik-v2
     app.kubernetes.io/name: traefik
-  name: strip-prefix-frontend-admin
+  name: strip-prefix-frontend-new-admin
   namespace: vms
 spec:
   stripPrefix:

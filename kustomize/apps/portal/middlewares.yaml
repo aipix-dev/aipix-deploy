@@ -5,36 +5,38 @@ metadata:
   labels:
     app.kubernetes.io/instance: traefik-traefik-v2
     app.kubernetes.io/name: traefik
-  name: add-host-header
-  namespace: minio-single
-spec:
-  headers:
-    customRequestHeaders:
-      Host: "minio.minio-single.svc"
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  labels:
-    app.kubernetes.io/instance: traefik-traefik-v2
-    app.kubernetes.io/name: traefik
-  name: access-control-expose-headers
-  namespace: minio-single
-spec:
-  headers:
-    accessControlExposeHeaders:
-    - '*'
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  labels:
-    app.kubernetes.io/instance: traefik-traefik-v2
-    app.kubernetes.io/name: traefik
-  name: strip-prefix-s3
+  name: strip-prefix-portal-landing
   namespace: vms
 spec:
   stripPrefix:
     prefixes:
-      - /s3
+      - /portal/landing
+    forceSlash: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  name: strip-prefix-portal-stub
+  namespace: vms
+spec:
+  stripPrefix:
+    prefixes:
+      - /portal-stub
+    forceSlash: false
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  labels:
+    app.kubernetes.io/instance: traefik-traefik-v2
+    app.kubernetes.io/name: traefik
+  name: strip-prefix-portal
+  namespace: vms
+spec:
+  stripPrefix:
+    prefixes:
+      - /portal
     forceSlash: true

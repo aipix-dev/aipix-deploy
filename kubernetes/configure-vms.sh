@@ -41,6 +41,16 @@ sed -i "s@PRIVATE_AWS_SECRET_ACCESS_KEY=.*@PRIVATE_AWS_SECRET_ACCESS_KEY=${MINIO
 sed -i "s@PRIVATE_AWS_ENDPOINT=.*@PRIVATE_AWS_ENDPOINT=http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../vms-backend/environments/.env
 sed -i "s@PRIVATE_AWS_URL=.*@PRIVATE_AWS_URL=https://${VMS_DOMAIN}/s3@g" ../vms-backend/environments/.env
 
+sed -i "s@K8S_CLUSTER_NAME=.*@K8S_CLUSTER_NAME=${VMS_DOMAIN}@g" ../vms-backend/environments/.env
+sed -i "s@K8S_NAMESPACE=.*@K8S_NAMESPACE=${NS_VMS}@g" ../vms-backend/environments/.env
+
+if grep -q '^APP_KEY=[[:space:]]*$' "../vms-backend/environments/.env"; then
+    APP_KEY="base64:$(openssl rand -base64 32)"
+    sed -i "s@^APP_KEY=.*@APP_KEY=${APP_KEY}@" ../vms-backend/environments/.env
+else
+	echo -e "\033[32mAPP_KEY has been already set\033[0m"
+fi
+
 if [ -z $CITY ]; then
 	echo -e "\033[31mCITY env is not set in sources.sh file, using default\033[0m"
 else
@@ -96,6 +106,7 @@ if [ ${ANALYTICS} == "yes" ]; then
 	sed -E -i "s@^ *#? *CLICKHOUSE_PASSWORD@CLICKHOUSE_PASSWORD@g" ../vms-backend/environments/.env
 	sed -E -i "s@^ *#? *CLICKHOUSE_TIMEOUT@CLICKHOUSE_TIMEOUT@g" ../vms-backend/environments/.env
 	sed -E -i "s@^ *#? *CLICKHOUSE_PROTOCOL@CLICKHOUSE_PROTOCOL@g" ../vms-backend/environments/.env
+	sed -E -i "s@^ *#? *ORCHESTRATOR_ENDPOINT@ORCHESTRATOR_ENDPOINT@g" ../vms-backend/environments/.env
 	sed -i "s@ORCHESTRATOR_ENDPOINT=http://.*@ORCHESTRATOR_ENDPOINT=http://orchestrator.${NS_A}.svc@g" ../vms-backend/environments/.env
 	sed -i "s@CLICKHOUSE_HOST=.*@CLICKHOUSE_HOST=clickhouse-server.${NS_A}.svc@g" ../vms-backend/environments/.env
 	sed -i "s@ANALYTIC_CASE_CALLBACK_ENDPOINT=.*@ANALYTIC_CASE_CALLBACK_ENDPOINT=http://backend.${NS_VMS}.svc@g" ../vms-backend/environments/.env
@@ -110,7 +121,7 @@ else
 	sed -E -i "s@^ *#? *ORCHESTRATOR_ENDPOINT@#ORCHESTRATOR_ENDPOINT@g" ../vms-backend/environments/.env
 fi
 
-cp -n ../vms-backend/license/license.json.sample ../vms-backend/license/license.json
+cp -n ../vms-backend/license/license.jwt.sample ../vms-backend/license/license.jwt
 
 #Creating configs files for portal
 if [ ${PORTAL} == "yes" ]; then

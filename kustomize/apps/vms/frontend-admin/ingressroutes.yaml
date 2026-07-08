@@ -12,9 +12,9 @@ spec:
   - websecure
   routes:
   - kind: Rule
-    match: Host (`example.com`) && PathPrefix(`/admin`)
+    match: Host (`example.com`) && PathPrefix(`/admin/v1`)
     middlewares:
-    - name: strip-prefix-frontend-admin
+    - name: strip-prefix-frontend-admin-v1
     - name: gzip-middleware
     services:
     - kind: Service

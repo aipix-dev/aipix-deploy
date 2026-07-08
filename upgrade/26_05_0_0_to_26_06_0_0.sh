@@ -6,15 +6,24 @@ cd "$scriptdir"
 source ../kubernetes/sources.sh
 source ../kubernetes/k8s-onprem/sources.sh
 
-### Change default log channel to stdout for backend and controller
-if [ ${MONITORING} == "no" ]; then
-	sed -i "s@LOG_CHANNEL=.*@LOG_CHANNEL=stdout@g" ../vms-backend/environments/.env
-	sed -i "s@LOG_CHANNEL=.*@LOG_CHANNEL=stdout@g" ../controller/environments/.env
-fi
+### Delete unused envs and resources
+sed -i '/CONTROLLER_ENDPOINT=/d' ../vms-backend/environments/.env
+sed -i '/Liscensing source/d' ../vms-backend/environments/.env
+sed -i '/LICENSE_SOURCE=/d' ../vms-backend/environments/.env
+sed -i '/Online Liscensing/d' ../vms-backend/environments/.env
+sed -i '/LICENSE_URL=/d' ../vms-backend/environments/.env
+sed -i '/Offline Licensing/d' ../vms-backend/environments/.env
+sed -i '/LICENSE_PUBLIC_KEY=/d' ../vms-backend/environments/.env
+
+kubectl -n ${NS_VMS} delete ingressroutes.traefik.io portal frontend-admin || true
+kubectl -n ${NS_VMS} delete middlewares.traefik.io strip-prefix-frontend-admin || true
+
+rm ../kustomize/deployments/${VMS_TEMPLATE}/patch-ingressroute-portal.yaml || true
+rm ../vms-backend/license/license.json || true
 
 ### Update VMS
 ../kubernetes/configure-vms.sh
-../kubernetes/update-vms-skip-redis-mysql-push1st-beanstalkd.sh
+../kubernetes/update-vms.sh
 
 ### Update VGW
 if [ ${VGW} == "yes" ]; then
@@ -41,17 +50,6 @@ fi
 
 ### Update monitoring
 if [ ${MONITORING} == "yes" ]; then
-	cat <<'EOF' >/tmp/prometheus-values.yaml
-- job_name: "media-server"
-  scheme: https
-  metrics_path: /metrics
-  tls_config:
-    insecure_skip_verify: true
-  static_configs:
-    - targets: ["mse.example.com:9665"]
-EOF
-	yq -i '.extraScrapeConfigs += load_str("/tmp/prometheus-values.yaml")' ../monitoring/prometheus-values.yaml
-	rm /tmp/prometheus-values.yaml
 	../kubernetes/configure-monitoring.sh
 	../kubernetes/deploy-monitoring.sh
 else

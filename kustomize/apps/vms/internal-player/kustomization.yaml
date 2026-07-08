@@ -1,5 +1,5 @@
 resources:
-  - ingressroutes.yaml
-  - integration-wb.yaml
+  - internal-player.yaml
   - services.yaml
+  - ingressroutes.yaml
   - middlewares.yaml

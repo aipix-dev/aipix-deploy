@@ -52,7 +52,7 @@ metadata:
     app.kubernetes.io/instance: traefik-traefik-v2
     app.kubernetes.io/name: traefik
   namespace: vms
-  name: portal
+  name: portal-frontend-client
 spec:
   entryPoints:
     - websecure

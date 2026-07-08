@@ -16,7 +16,6 @@ if [ ${VMS_LIC_OFFLINE} == "yes" ]; then
 fi
 
 if [ ${PORTAL} == "yes" ]; then
-	export ADD_COMPONENT3="- ../../components/middlewares/strip-prefixes-portal"
 	export ADD_RESOURCE2="- ../../apps/portal"
 fi
 
@@ -25,12 +24,15 @@ if [ ${VGW} == "yes" ]; then
 fi
 
 if [ ${WB} == "yes" ]; then
-	export ADD_COMPONENT4="- ../../components/middlewares/strip-prefixes-iframe"
 	export ADD_RESOURCE4="- ../../apps/integration-wb"
 fi
 
 if [ ${BLE} == "yes" ]; then
 	export ADD_RESOURCE5="- ../../apps/ble-service"
+fi
+
+if [ ${INTERNAL_PLAYER} == "yes" ]; then
+	export ADD_RESOURCE6="- ../../apps/vms/internal-player"
 fi
 
 export CUSTOM_IMAGES="$(cat ./custom-images.d/*.yaml 2>/dev/null)"

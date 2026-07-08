@@ -3,6 +3,8 @@
 scriptdir="$(dirname "$0")"
 cd "$scriptdir"
 
+UPDATE_MODE=$1   #If passed "full" script will rollout restart all of services
+
 source ./sources.sh
 
 # Delete registry secrets
@@ -89,7 +91,7 @@ fi
 
 if [ ${VMS_LIC_OFFLINE} == "yes" ]; then
 	kubectl delete configmap vms-backend-license --namespace=${NS_VMS} || true
-	kubectl create configmap vms-backend-license --namespace=${NS_VMS} --from-file=../vms-backend/license/license.json
+	kubectl create configmap vms-backend-license --namespace=${NS_VMS} --from-file=../vms-backend/license/license.jwt
 fi
 
 # Create CONTROLLER configmaps
@@ -143,10 +145,21 @@ done
 echo -e "\033[32mManifests were successfully aplied\033[0m"
 
 #Rollout restart
-for i in $(kubectl get deployments -n ${NS_VMS} | awk 'NR>1 { print $1 }'); do kubectl rollout restart deployment.apps/$i -n ${NS_VMS}; done
+if [[ "${UPDATE_MODE:-}" == "full" ]]; then
+	echo -e "\033[32mUPDATE_MODE = 'full', restarting all deployments\033[0m"
+	for i in $(kubectl get deployments -n ${NS_VMS} | awk 'NR>1 { print $1 }'); do kubectl rollout restart deployment.apps/$i -n ${NS_VMS}; done
+else
+	echo -e "\033[32mUPDATE_MODE = ' ', restarting all deployments except mysql-server, redis-server, beanstalkd and push1st\033[0m"
+	for i in $(kubectl get deployments -n ${NS_VMS} | awk 'NR>1 { print $1 }'); do
+		if [[ $i != "redis-server" ]] && [[ $i != "beanstalkd" ]] && [[ $i != "push1st" ]] && [[ $i != "mysql-server" ]]; then
+			kubectl rollout restart deployment.apps/$i -n ${NS_VMS}
+		fi
+	done
+fi
 kubectl -n ${NS_VMS} rollout status deployment backend >/dev/null
 kubectl -n ${NS_VMS} rollout status deployment controller-api >/dev/null
 kubectl -n ${NS_VMS} rollout status deployment redis-server >/dev/null
+kubectl -n ${NS_VMS} rollout status deployment beanstalkd >/dev/null
 if [ ${TYPE} != "prod" ]; then
 	kubectl -n ${NS_VMS} rollout status deployment mysql-server >/dev/null
 fi

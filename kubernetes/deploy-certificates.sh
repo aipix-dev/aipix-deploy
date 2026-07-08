@@ -14,6 +14,7 @@ Use the following options to run the script
 						minio-console-2 	for secondary minio console service (used in HA/production installation);
 						orchestrator		for analytics orchestrator service;
 						traefik-dashboard 	for traefik dashboard service;
+						ble				 	for ble service;
 -h 					display this help;
 
 For example: 
@@ -359,3 +360,37 @@ EOF
 	fi
 fi
 
+if [[ ${CERT_SERVICE} == "ble" ]]; then
+	if [ ${BLE} != "yes" ]; then echo "Error: BLE service is not deployed"; exit 1; fi
+	kubectl apply -f - <<EOF
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ble
+  namespace: ${NS_VMS}
+spec:
+  secretName: ble-cert
+  dnsNames:
+    - "${BLE_DOMAIN}"
+  issuerRef:
+    name: acme
+    kind: ClusterIssuer
+EOF
+	IS_PATCH_EXIST=$(cat ../kustomize/deployments/${VMS_TEMPLATE}/custom-patches.d/custom-patches.yaml 2>/dev/null | grep "secretName: *ble-cert$" | wc -l || echo 0)
+	if [[ ${IS_PATCH_EXIST} == "0" ]]; then
+		cat << EOF >> ../kustomize/deployments/${VMS_TEMPLATE}/custom-patches.d/custom-patches.yaml 
+- target:
+    group: traefik.io
+    version: v1alpha1
+    kind: IngressRoute
+    name: ble-service-api
+  patch: |-
+    - op: replace
+      path: /spec/tls
+      value:
+        secretName: ble-cert
+EOF
+		../kustomize/deployments/${VMS_TEMPLATE}/update-kustomization.sh || exit 1
+		kubectl apply -k ../kustomize/deployments/${VMS_TEMPLATE}
+	fi
+fi

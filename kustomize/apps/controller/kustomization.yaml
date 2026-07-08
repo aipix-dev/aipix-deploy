@@ -2,3 +2,4 @@ resources:
 - controller.yaml
 - services.yaml
 - ingressroutes.yaml
+- middlewares.yaml

@@ -1,0 +1,5 @@
+resources:
+  - frontend-new-admin.yaml
+  - services.yaml
+  - ingressroutes.yaml
+  - middlewares.yaml

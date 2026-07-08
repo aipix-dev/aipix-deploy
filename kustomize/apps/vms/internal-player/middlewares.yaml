@@ -5,10 +5,10 @@ metadata:
   labels:
     app.kubernetes.io/instance: traefik-traefik-v2
     app.kubernetes.io/name: traefik
-  name: strip-prefix-s3
-  namespace: vms
+  name: strip-prefix-internal-player
+  namespace: vsaas-vms
 spec:
   stripPrefix:
     prefixes:
-      - /s3
+      - /player/embeded
     forceSlash: true

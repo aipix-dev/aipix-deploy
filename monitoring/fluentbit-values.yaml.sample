@@ -18,8 +18,6 @@ config:
         HTTP_Listen 0.0.0.0
         HTTP_Port {{ .Values.metricsPort }}
         Health_Check On
-
-  ## https://docs.fluentbit.io/manual/pipeline/inputs
   inputs: |
     [INPUT]
         Name tail
@@ -30,7 +28,6 @@ config:
         Mem_Buf_Limit 5MB
         Skip_Long_Lines On
         Inotify_Watcher true
-
     [INPUT]
         Name    syslog
         Buffer_Chunk_Size 64000
@@ -40,18 +37,15 @@ config:
         Port    5140
         Parser  syslog
         Mode    udp
-        Tag     syslog-std
-
-  ## https://docs.fluentbit.io/manual/pipeline/filters
+        Tag     syslog
   filters: |
     [FILTER]
         Name          parser
-        Match         syslog-std
+        Match         syslog
         Key_Name      log
         Parser        app_json
         Preserve_Key  On
         Reserve_Data  On
-    
     [FILTER]
         Name kubernetes
         Match kube.*
@@ -64,26 +58,22 @@ config:
         Match         kube.*
         Rule          $kubernetes['pod_name'] ^((vgw-)?backend|archive|queue|reports).*$ vsaas.vms false
         Rule          $kubernetes['pod_name'] ^controller.*$ vsaas.controller false
-
-  ## https://docs.fluentbit.io/manual/pipeline/outputs
+        Rule          $kubernetes['pod_name'] ^vsaas-media-logger.*$ vsaas.logger false
   outputs: |
     [OUTPUT]
         Name loki
-        Match syslog-std
+        Match syslog
         Host loki.monitoring.svc.cluster.local
         labels job=syslog
-        label_keys $level,$container,$hostname,$namespace,$instance,$action,$version
+        label_keys $level,$container,$hostname,$namespace,$instance,$version
         Port 3100
     [OUTPUT]
         Name loki
         Match vsaas.*
         Host loki.monitoring.svc.cluster.local
         remove_keys kubernetes,stream,_p
-        labels job=vsaas, level=$level, container=$container, host=$host, namespace=$namespace, instance=$instance,action=$action, version=$version
+        labels job=vsaas, level=$level, container=$container, host=$host, namespace=$namespace, instance=$instance, version=$version
         Port 3100
-    [OUTPUT]
-        Name stdout
-        Match syslog-std
     [OUTPUT]
         Name loki
         Match kube.*
@@ -92,11 +82,6 @@ config:
         labels job=kubernetes
         label_map_path /fluent-bit/etc/conf/labelmap.json
         Port 3100
-    [OUTPUT]
-        Name stdout
-        Match kube.*
-
-  ## https://docs.fluentbit.io/manual/pipeline/parsers
   customParsers: |
     [PARSER]
         Name        syslog
@@ -130,44 +115,9 @@ config:
         rule       "cont"         "/^(Stack trace:|\[stacktrace\])$/" "cont2"
         rule      "cont"          "/^(?!\[.*\.[A-Z]+\] ).*$/" "cont"
         rule       "cont2"        "/\"} $/"
-
-
-
-
-
   # This allows adding more files with arbitary filenames to /fluent-bit/etc/conf by providing key/value pairs.
   # The key becomes the filename, the value becomes the file content.
   extraFiles:
-    pritolevel.lua: |
-      function pritolevel(tag, timestamp, record)
-        priority = tonumber(record["pri"]);
-        facility_num = math.floor(priority / 8)
-        severity = priority % 8
-        if (severity == 0) then level =  "emerg" end
-        if (severity == 1) then level =  "alert" end
-        if (severity == 2) then level =  "critical" end
-        if (severity == 3) then level =  "error" end
-        if (severity == 4) then level =  "warning" end
-        if (severity == 5) then level =  "notice" end
-        if (severity == 6) then level =  "info" end
-        if (severity == 7) then level =  "debug" end
-        if (facility_num == 0) then  facility = "kernel" end
-        if (facility_num == 1) then  facility = "user" end
-        if (facility_num == 2) then  facility = "mail" end
-        if (facility_num == 3) then  facility = "system" end
-        if (facility_num == 4) then  facility = "security" end
-        if (facility_num == 16) then  facility = "local0" end
-        if (facility_num == 17) then  facility = "local1" end
-        if (facility_num == 18) then  facility = "local2" end
-        if (facility_num == 19) then  facility = "local3" end
-        if (facility_num == 20) then  facility = "local4" end
-        if (facility_num == 21) then  facility = "local5" end
-        if (facility_num == 22) then  facility = "local6" end
-        if (facility_num == 23) then  facility = "local7" end
-        record["facility"]=facility
-        record["level"]= level
-        return 1, timestamp, record
-      end
     labelmap.json: |
        {
          "kubernetes": {

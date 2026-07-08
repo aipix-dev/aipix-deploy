@@ -1,0 +1,68 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: internal-player
+    app.kubernetes.io/component: vms-frontend
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: internal-player
+  namespace: vsaas-vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: internal-player
+      app.kubernetes.io/component: frontend
+      app.kubernetes.io/part-of: vms
+      global-app-name: vsaas
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: internal-player
+        app.kubernetes.io/component: frontend
+        app.kubernetes.io/part-of: vms
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: internal-player
+                    app.kubernetes.io/component: frontend
+                    app.kubernetes.io/part-of: vms
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
+      containers:
+        - name: internal-player
+          image: download.aipix.ai:8443/vms-internal-player/release:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /
+              port: 80
+          readinessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /
+              port: 80
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 5m
+              memory: 50Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: internal-player
+      restartPolicy: Always

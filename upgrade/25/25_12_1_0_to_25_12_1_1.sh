@@ -17,7 +17,7 @@ else
 fi
 
 # Add new entrypoint for ble-service
-yq -i '.ports.ble-service={"port": 6444, "protocol": "TCP", "expose": {"default": true},"exposedPort": 6444}' ../traefik/traefik-helm-values.yaml || echo -e "\033[31mError adding ble-service entrypoint\033[0m"
+yq e -i '.ports.ble-service={"port": 6444, "protocol": "TCP", "expose": {"default": true},"exposedPort": 6444}' ../traefik/traefik-helm-values.yaml || echo -e "\033[31mError adding ble-service entrypoint\033[0m"
 
 if [[ $(kubectl -n ${NS_VMS} get deployments.apps | grep online-service) ]]; then
 	kubectl -n ${NS_VMS} delete Service online-service
@@ -30,7 +30,7 @@ if [[ $(kubectl -n ${NS_VMS} get deployments.apps | grep online-service) ]]; the
 	mc admin user remove local online-service-user
 	mc admin policy remove local online-service-policy
 	mc rb local/online-service --force
-	yq -i 'del(.ports["online-lock"])' ../traefik/traefik-helm-values.yaml || echo -e "\033[31mError delete online-lock entrypoint\033[0m"
+	yq e -i 'del(.ports["online-lock"])' ../traefik/traefik-helm-values.yaml || echo -e "\033[31mError delete online-lock entrypoint\033[0m"
 	sed -i "s@OPENY_ONLINE_URL=.*@OPENY_ONLINE_URL=http://ble-service:8080@g" ../vms-backend/environments/.env
 	rm -rf ../kustomize/apps/vms/online-service
 fi

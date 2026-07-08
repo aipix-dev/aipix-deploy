@@ -47,7 +47,7 @@ if [ ${TYPE} != "prod" ]; then
 fi
 
 if [ ${VMS_LIC_OFFLINE} == "yes" ]; then
-	kubectl create configmap vms-backend-license --namespace=${NS_VMS} --from-file=../vms-backend/license/license.json
+	kubectl create configmap vms-backend-license --namespace=${NS_VMS} --from-file=../vms-backend/license/license.jwt
 fi
 
 if [ ${ANALYTICS} == "yes" ]; then

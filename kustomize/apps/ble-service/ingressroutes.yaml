@@ -35,5 +35,4 @@ spec:
       services:
         - name: ble-service
           port: 6444
-  tls:
-    secretName: certificate
+  tls: {}

@@ -1,6 +1,7 @@
 resources:
-  - portal.yaml
-  - portal-stub.yaml
-  - portal-landing.yaml
-  - services.yaml
-  - ingressroutes.yaml
+- portal.yaml
+- portal-stub.yaml
+- portal-landing.yaml
+- services.yaml
+- ingressroutes.yaml
+- middlewares.yaml

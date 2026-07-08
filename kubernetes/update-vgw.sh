@@ -24,8 +24,8 @@ if [ ! -e "$VALUES" ]; then
 	exit 1
 fi
 
-kubectl delete secret vgw-certificate -n ${NS_VMS} || true
-kubectl create secret tls vgw-certificate -n ${NS_VMS} --cert=../vgw/tls.crt --key=../vgw/tls.key
+kubectl -n ${NS_VMS} delete secret vgw-certificate || true
+kubectl -n ${NS_VMS} create secret tls vgw-certificate --cert=../vgw/tls.crt --key=../vgw/tls.key
 
 yq -V
 if [[ $? -ne 0 ]]; then
@@ -33,7 +33,7 @@ if [[ $? -ne 0 ]]; then
 	exit 1
 fi
 
-ver=$(yq '.version' ${VALUES})
+ver=$(yq e '.version' ${VALUES})
 if [[ $ver == 'null' ]]; then
 	VERSION=""
 else

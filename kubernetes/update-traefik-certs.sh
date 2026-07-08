@@ -1,10 +1,11 @@
-#Create configs and secrets
+#!/bin/bash
 
 scriptdir="$(dirname "$0")"
 cd "$scriptdir"
 
 source ./sources.sh
 
+#Create configs and secrets
 kubectl -n ${TRAEFIK_NAMESPACE} delete secret certificate >/dev/null || true
 kubectl -n ${TRAEFIK_NAMESPACE} create secret tls certificate \
 					--cert=../nginx/ssl/tls.crt \

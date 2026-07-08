@@ -5,10 +5,10 @@ metadata:
   labels:
     app.kubernetes.io/instance: traefik-traefik-v2
     app.kubernetes.io/name: traefik
-  name: strip-prefix-portal
+  name: strip-prefix-frontend-admin-v1
   namespace: vms
 spec:
   stripPrefix:
     prefixes:
-      - /portal
+      - /admin/v1
     forceSlash: true

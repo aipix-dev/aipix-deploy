@@ -75,6 +75,7 @@ print_new_config_lines() {
 if [ -f ./sources.sh ]; then print_new_config_lines ./sources.sh ./sources.sh.sample; fi
 if [ -f ./k8s-onprem/sources.sh ]; then print_new_config_lines ./k8s-onprem/sources.sh ./k8s-onprem/sources.sh.sample; fi
 if [ -f ../vms-backend/environments/.env ]; then print_new_config_lines ../vms-backend/environments/.env ../vms-backend/environments/env.sample; fi
+if [ -f ../vms-frontend/admin.env ]; then print_new_config_lines ../vms-frontend/admin.env ../vms-frontend/admin.env.sample; fi
 if [ -f ../controller/environments/.env ]; then print_new_config_lines ../controller/environments/.env ../controller/environments/env.sample; fi
 if [ -f ../integration-wb/environments/.env ]; then print_new_config_lines ../integration-wb/environments/.env ../integration-wb/environments/env.sample; fi
 if [ -f ../portal/environments/.env ]; then print_new_config_lines ../portal/environments/.env ../portal/environments/env.sample; fi
