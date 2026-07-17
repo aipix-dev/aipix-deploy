@@ -74,17 +74,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/name: embedded-player
+    app.kubernetes.io/name: wb-share-player
     app.kubernetes.io/component: frontend
     app.kubernetes.io/part-of: vms
     global-app-name: vsaas
-  name: embedded-player
+  name: wb-share-player
   namespace: vsaas-vms
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: embedded-player
+      app.kubernetes.io/name: wb-share-player
       app.kubernetes.io/component: frontend
       app.kubernetes.io/part-of: vms
       global-app-name: vsaas
@@ -93,7 +93,7 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: embedded-player
+        app.kubernetes.io/name: wb-share-player
         app.kubernetes.io/component: frontend
         app.kubernetes.io/part-of: vms
         global-app-name: vsaas
@@ -105,14 +105,14 @@ spec:
               podAffinityTerm:
                 labelSelector:
                   matchLabels:
-                    app.kubernetes.io/name: embedded-player
+                    app.kubernetes.io/name: wb-share-player
                     app.kubernetes.io/component: frontend
                     app.kubernetes.io/part-of: vms
                     global-app-name: vsaas
                 topologyKey: kubernetes.io/hostname
       containers:
-        - name: embedded-player
-          image: download.aipix.ai:8443/vms-embedded-player/release:latest
+        - name: wb-share-player
+          image: download.aipix.ai:8443/vms-wb-share-player/release:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -135,5 +135,5 @@ spec:
               memory: 50Mi
       imagePullSecrets:
         - name: download-aipix-ai
-      hostname: embedded-player
+      hostname: wb-share-player
       restartPolicy: Always

@@ -27,7 +27,7 @@ metadata:
     app.kubernetes.io/instance: traefik-traefik-v2
     app.kubernetes.io/name: traefik
   namespace: vsaas-vms
-  name: embedded-player
+  name: wb-share-player
 spec:
   entryPoints:
     - websecure
@@ -38,5 +38,5 @@ spec:
       - name: strip-prefix-iframe
       services:
         - kind: Service
-          name: embedded-player
+          name: wb-share-player
           port: 80

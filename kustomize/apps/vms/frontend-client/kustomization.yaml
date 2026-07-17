@@ -1,4 +1,4 @@
 resources:
-- frontend-client.yaml
+- deployments.yaml
 - services.yaml
 - ingressroutes.yaml

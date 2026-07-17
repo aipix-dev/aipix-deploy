@@ -1,5 +1,5 @@
 resources:
-  - frontend-new-admin.yaml
+  - deployments.yaml
   - services.yaml
   - ingressroutes.yaml
   - middlewares.yaml

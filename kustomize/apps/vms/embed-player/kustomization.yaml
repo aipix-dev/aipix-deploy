@@ -1,5 +1,5 @@
 resources:
-  - internal-player.yaml
+  - deployments.yaml
   - services.yaml
   - ingressroutes.yaml
   - middlewares.yaml

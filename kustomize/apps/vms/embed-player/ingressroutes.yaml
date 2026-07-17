@@ -6,16 +6,16 @@ metadata:
     app.kubernetes.io/instance: traefik-traefik-v2
     app.kubernetes.io/name: traefik
   namespace: vsaas-vms
-  name: internal-player
+  name: embed-player
 spec:
   entryPoints:
     - websecure
   routes:
     - kind: Rule
-      match: Host (`vms.example.com`) && PathPrefix(`/player/embeded`)
+      match: Host (`vms.example.com`) && PathPrefix(`/player/embed`)
       middlewares:
-      - name: strip-prefix-internal-player
+      - name: strip-prefix-embed-player
       services:
         - kind: Service
-          name: internal-player
+          name: embed-player
           port: 80

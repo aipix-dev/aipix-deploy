@@ -31,8 +31,8 @@ if [ ${BLE} == "yes" ]; then
 	export ADD_RESOURCE5="- ../../apps/ble-service"
 fi
 
-if [ ${INTERNAL_PLAYER} == "yes" ]; then
-	export ADD_RESOURCE6="- ../../apps/vms/internal-player"
+if [ ${EMBED_PLAYER} == "yes" ]; then
+	export ADD_RESOURCE6="- ../../apps/vms/embed-player"
 fi
 
 export CUSTOM_IMAGES="$(cat ./custom-images.d/*.yaml 2>/dev/null)"

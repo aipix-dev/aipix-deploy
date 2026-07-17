@@ -45,10 +45,11 @@ sed -i "s@K8S_CLUSTER_NAME=.*@K8S_CLUSTER_NAME=${VMS_DOMAIN}@g" ../vms-backend/e
 sed -i "s@K8S_NAMESPACE=.*@K8S_NAMESPACE=${NS_VMS}@g" ../vms-backend/environments/.env
 
 if grep -q '^APP_KEY=[[:space:]]*$' "../vms-backend/environments/.env"; then
+	echo -e "\033[32mSetting backend APP_KEY\033[0m"
     APP_KEY="base64:$(openssl rand -base64 32)"
     sed -i "s@^APP_KEY=.*@APP_KEY=${APP_KEY}@" ../vms-backend/environments/.env
 else
-	echo -e "\033[32mAPP_KEY has been already set\033[0m"
+	echo -e "\033[32mBackend APP_KEY has been already set\033[0m"
 fi
 
 if [ -z $CITY ]; then
@@ -90,6 +91,14 @@ sed -i "s@CONTROL_PLAIN_HLS_REDIRECT_ENDPOINT_INTERNAL=.*@CONTROL_PLAIN_HLS_REDI
 sed -i -E "s@(CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT)=(.*):(.*)@\1=${VMS_DOMAIN}:\3@g" ../controller/environments/.env
 sed -i "s@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT_INTERNAL=.*@CONTROL_PLAIN_RTSP_REDIRECT_ENDPOINT_INTERNAL=controller-control-plane-rtsp.${NS_VMS}.svc:5554@g" ../controller/environments/.env
 sed -i "s@ONVIF_EXTERNAL_HOST=.*@ONVIF_EXTERNAL_HOST=http://${CONTROLLER_ONVIF_EXTERNAL_HOST}:${CONTROLLER_ONVIF_EXTERNAL_PORT}@g" ../controller/environments/.env
+
+if grep -q '^APP_KEY=[[:space:]]*$' "../controller/environments/.env"; then
+	echo -e "\033[32mSetting controller APP_KEY\033[0m"
+    APP_KEY="base64:$(openssl rand -base64 32)"
+    sed -i "s@^APP_KEY=.*@APP_KEY=${APP_KEY}@" ../controller/environments/.env
+else
+	echo -e "\033[32mController APP_KEY has been already set\033[0m"
+fi
 
 #Creating configs files for frontend
 cp -n ../vms-frontend/admin.env.sample ../vms-frontend/admin.env
@@ -145,10 +154,33 @@ if [ ${PORTAL} == "yes" ]; then
 	sed -i "s@PRIVATE_AWS_SECRET_ACCESS_KEY=.*@PRIVATE_AWS_SECRET_ACCESS_KEY=${MINIO_PORTAL_SECRET_KEY_PRIV}@g" ../portal/environments/.env
 	sed -i "s@PRIVATE_AWS_ENDPOINT=.*@PRIVATE_AWS_ENDPOINT=http://minio.${NS_MINIO}.svc${S3_PORT_INTERNAL}@g" ../portal/environments/.env
 	sed -i "s@PRIVATE_AWS_URL=.*@PRIVATE_AWS_URL=https://${VMS_DOMAIN}/s3@g" ../portal/environments/.env
+
+	if grep -q '^APP_KEY=[[:space:]]*$' "../portal/environments/.env"; then
+		echo -e "\033[32mSetting portal APP_KEY\033[0m"
+		APP_KEY="base64:$(openssl rand -base64 32)"
+		sed -i "s@^APP_KEY=.*@APP_KEY=${APP_KEY}@" ../portal/environments/.env
+	else
+		echo -e "\033[32mPortal APP_KEY has been already set\033[0m"
+	fi
+
+	if grep -q '^APP_KEY=[[:space:]]*$' "../portal/environments-stub/.env"; then
+		echo -e "\033[32mSetting portal APP_KEY\033[0m"
+		APP_KEY="base64:$(openssl rand -base64 32)"
+		sed -i "s@^APP_KEY=.*@APP_KEY=${APP_KEY}@" ../portal/environments-stub/.env
+	else
+		echo -e "\033[32mPortal APP_KEY has been already set\033[0m"
+	fi
 fi
 
 if [ ${WB} == "yes" ]; then
 	cp -n ../integration-wb/environments/env.sample ../integration-wb/environments/.env
+	if grep -q '^APP_KEY=[[:space:]]*$' "../integration-wb/environments/.env"; then
+		echo -e "\033[32mSetting integration-wb APP_KEY\033[0m"
+		APP_KEY="base64:$(openssl rand -base64 32)"
+		sed -i "s@^APP_KEY=.*@APP_KEY=${APP_KEY}@" ../integration-wb/environments/.env
+	else
+		echo -e "\033[32mIntegration-wb APP_KEY has been already set\033[0m"
+	fi
 fi
 
 if [ ${BLE} == "yes" ]; then

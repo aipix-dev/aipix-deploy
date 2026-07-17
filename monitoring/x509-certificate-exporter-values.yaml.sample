@@ -60,3 +60,43 @@ rbac:
     clusterRoleAnnotations: {}
     # -- Annotations added to the ClusterRoleBinding for the hostPath exporters
     clusterRoleBindingAnnotations: {}
+hostPathsExporter:
+  podAnnotations:
+    prometheus.io/port: "9793"
+    prometheus.io/scrape: "true"
+  daemonSets:
+    controlplane:
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ""
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      watchFiles:
+        # apiserver
+        - /etc/kubernetes/pki/apiserver.crt
+        - /etc/kubernetes/pki/apiserver-etcd-client.crt
+        - /etc/kubernetes/pki/apiserver-kubelet-client.crt
+        - /etc/kubernetes/pki/front-proxy-client.crt
+        # CAs
+        - /etc/kubernetes/pki/ca.crt
+        - /etc/kubernetes/pki/front-proxy-ca.crt
+        - /etc/kubernetes/pki/etcd/ca.crt
+        # etcd
+        - /etc/kubernetes/pki/etcd/server.crt
+        - /etc/kubernetes/pki/etcd/peer.crt
+        - /etc/kubernetes/pki/etcd/healthcheck-client.crt
+        # kubelet client (rotated symlink)
+        - /var/lib/kubelet/pki/kubelet-client-current.pem
+      watchKubeconfFiles:
+        - /etc/kubernetes/admin.conf
+        - /etc/kubernetes/super-admin.conf
+        - /etc/kubernetes/controller-manager.conf
+        - /etc/kubernetes/scheduler.conf
+
+    workers:
+      # nodeSelector:
+      #   node-role.kubernetes.io/worker: ""
+      watchFiles:
+        - /etc/kubernetes/pki/ca.crt
+        - /var/lib/kubelet/pki/kubelet-client-current.pem

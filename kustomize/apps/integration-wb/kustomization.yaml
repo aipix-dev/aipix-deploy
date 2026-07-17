@@ -1,5 +1,5 @@
 resources:
   - ingressroutes.yaml
-  - integration-wb.yaml
+  - deployments.yaml
   - services.yaml
   - middlewares.yaml

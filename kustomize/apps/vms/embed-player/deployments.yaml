@@ -3,17 +3,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/name: internal-player
+    app.kubernetes.io/name: embed-player
     app.kubernetes.io/component: vms-frontend
     app.kubernetes.io/part-of: vms
     global-app-name: vsaas
-  name: internal-player
+  name: embed-player
   namespace: vsaas-vms
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: internal-player
+      app.kubernetes.io/name: embed-player
       app.kubernetes.io/component: frontend
       app.kubernetes.io/part-of: vms
       global-app-name: vsaas
@@ -22,7 +22,7 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: internal-player
+        app.kubernetes.io/name: embed-player
         app.kubernetes.io/component: frontend
         app.kubernetes.io/part-of: vms
         global-app-name: vsaas
@@ -34,14 +34,14 @@ spec:
               podAffinityTerm:
                 labelSelector:
                   matchLabels:
-                    app.kubernetes.io/name: internal-player
+                    app.kubernetes.io/name: embed-player
                     app.kubernetes.io/component: frontend
                     app.kubernetes.io/part-of: vms
                     global-app-name: vsaas
                 topologyKey: kubernetes.io/hostname
       containers:
-        - name: internal-player
-          image: download.aipix.ai:8443/vms-internal-player/release:latest
+        - name: embed-player
+          image: download.aipix.ai:8443/vms-embed-player/release:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -64,5 +64,5 @@ spec:
               memory: 50Mi
       imagePullSecrets:
         - name: download-aipix-ai
-      hostname: internal-player
+      hostname: embed-player
       restartPolicy: Always
