@@ -17,8 +17,6 @@ spec:
       app.kubernetes.io/component: integration-wb
       app.kubernetes.io/part-of: vms
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -52,11 +50,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: integration-wb-env
-          image: download.aipix.ai:8443/vms-integration-wb/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/integration-wb/release:latest
           imagePullPolicy: Always
-          volumeMounts:
-            - name: run-php
-              mountPath: /var/run/php/
           resources:
             requests:
               cpu: 40m
@@ -65,10 +60,6 @@ spec:
         - name: download-aipix-ai
       hostname: integration-wb
       restartPolicy: Always
-      volumes:
-        - name: run-php
-          emptyDir: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -88,8 +79,6 @@ spec:
       app.kubernetes.io/component: frontend
       app.kubernetes.io/part-of: vms
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -112,7 +101,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
       containers:
         - name: wb-share-player
-          image: download.aipix.ai:8443/vms-wb-share-player/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/wb-share-player/release:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80

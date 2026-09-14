@@ -77,4 +77,7 @@ Analytics deployment script completed successfuly!
 
 Access your ORCHESTRATOR with the following URL:
 https://${ANALYTICS_DOMAIN}/orch-admin/ (${ANALYTICS_DOMAIN} should be resolved on DNS-server)
+
+List of used images:
 """
+../kubernetes/print-image-versions.sh ${NS_A}

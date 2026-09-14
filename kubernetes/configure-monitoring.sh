@@ -29,18 +29,21 @@ else
 fi
 
 envsubst <../monitoring/grafana-values.yaml.sample >../monitoring/grafana-values.yaml
+sed -i "s@Source:.*@Source: ${VMS_DOMAIN}@g" ../monitoring/grafana-values.yaml
 envsubst <../monitoring/loki-values.yaml.sample >../monitoring/loki-values.yaml
 
 # Configure Grafana alert rules
 cp ../monitoring/grafana-alerts/rules/0-delete-alert-rules.yaml.sample ../monitoring/grafana-alerts/rules/0-delete-alert-rules.yaml
 cp ../monitoring/grafana-alerts/rules/system-rules.yaml.sample ../monitoring/grafana-alerts/rules/system-rules.yaml
+sed -i "s@receiver:.*@receiver: ${CONTACT_POINT}@g" ../monitoring/grafana-alerts/rules/system-rules.yaml
 if [ ${ANALYTICS} == "yes" ]; then
 	cp ../monitoring/grafana-alerts/rules/analytics-rules.yaml.sample ../monitoring/grafana-alerts/rules/analytics-rules.yaml
+	sed -i "s@receiver:.*@receiver: ${CONTACT_POINT}@g" ../monitoring/grafana-alerts/rules/analytics-rules.yaml
 fi
 
 # Copy grafana dashboards and alert rules to S3
 if kubectl -n ${NS_MINIO} get services minio-1 >/dev/null 2>&1; then
-	MINIO_ALIAS="minio1"
+	MINIO_ALIAS="minio-1"
 else
 	MINIO_ALIAS="local"
 fi

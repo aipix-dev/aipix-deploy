@@ -28,12 +28,12 @@ server:
         whitelist: []
 
 cluster:
-#    listen: disable # udp://<host>:<port>, multicast://<multicast-group-address>:<port>/<bind-iface-ip-address>
-    ping-interval: 30 # 0 - to disable ping
-    listen: udp://*:8001 # strongly recommended bind to internal IP or close port with iptables
-    family: [ push1st-0.push1st, push1st-1.push1st ]
-    sync: [ register, unregister, join, leave, push ]
-#    module: lua://modules/cluster.lua # cluster module
+    # listen: disable # udp://<host>:<port>, multicast://<multicast-group-address>:<port>/<bind-iface-ip-address>
+    ping-interval: 5 # 0 - to disable ping
+    listen: udp://*:8002 # strongly recommended bind to internal IP or block port with iptables
+    family:
+        adapter: k8s
+    sync: [register, unregister, join, leave, push]
 
 api:
     keep-alive-timeout: 10          # http api keep-alive connection timeout
@@ -45,3 +45,14 @@ api:
 
 credentials:
     - apps/*.yml
+
+log:
+    stdout:
+        verbose: 5
+        pattern: "[%Timestamp] [%Verbose] %Message"
+    #file:
+    #    verbose: 3
+    #    pattern: "[%Timestamp] [%Verbose] %Message"
+    #    number: 3
+    #    rotate: 1024
+    #    path: "./logs/log"

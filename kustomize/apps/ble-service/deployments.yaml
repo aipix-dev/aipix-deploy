@@ -17,8 +17,6 @@ spec:
       app.kubernetes.io/component: ble-service
       app.kubernetes.io/part-of: vms
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -44,7 +42,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: ble-service-env
-          image: download.aipix.ai:8443/ble-service/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/ble-service/release:latest
           imagePullPolicy: Always
           resources:
             requests:

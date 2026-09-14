@@ -31,7 +31,7 @@ spec:
         - name: django
           args:
             - scripts/django.sh
-          image: download.aipix.ai:8443/analytics-orchestrator-server/release:latest
+          image: download.aipix.ai:8443/vsaas-analytics/orchestrator/release:latest
           imagePullPolicy: Always
           env:
             - name: TARANTOOL_PORT
@@ -60,7 +60,7 @@ spec:
         - name: celery
           args:
             - scripts/celery.sh
-          image: download.aipix.ai:8443/analytics-orchestrator-server/release:latest
+          image: download.aipix.ai:8443/vsaas-analytics/orchestrator/release:latest
           imagePullPolicy: Always
           env:
             - name: TARANTOOL_PORT
@@ -85,7 +85,7 @@ spec:
         - name: matcher
           args:
             - scripts/matcher.sh
-          image: download.aipix.ai:8443/analytics-orchestrator-server/release:latest
+          image: download.aipix.ai:8443/vsaas-analytics/orchestrator/release:latest
           imagePullPolicy: Always
           env:
             - name: TARANTOOL_PORT
@@ -110,7 +110,7 @@ spec:
         - name: stats-processor
           args:
             - scripts/stats_processor.sh
-          image: download.aipix.ai:8443/analytics-orchestrator-server/release:latest
+          image: download.aipix.ai:8443/vsaas-analytics/orchestrator/release:latest
           imagePullPolicy: Always
           env:
             - name: TARANTOOL_PORT
@@ -135,7 +135,7 @@ spec:
         - name: events-collector
           args:
             - scripts/events_collector.sh
-          image: download.aipix.ai:8443/analytics-orchestrator-server/release:latest
+          image: download.aipix.ai:8443/vsaas-analytics/orchestrator/release:latest
           imagePullPolicy: Always
           env:
             - name: TARANTOOL_PORT
@@ -160,7 +160,7 @@ spec:
         - name: cron
           args:
             - scripts/cron.sh
-          image: download.aipix.ai:8443/analytics-orchestrator-server/release:latest
+          image: download.aipix.ai:8443/vsaas-analytics/orchestrator/release:latest
           imagePullPolicy: Always
           env:
             - name: TARANTOOL_PORT
@@ -187,7 +187,7 @@ spec:
             - /bin/sh
             - -c
             - ./analytics_licensing.aot -c config.yaml
-          image: download.aipix.ai:8443/analytics-licensing/release:latest
+          image: download.aipix.ai:8443/vsaas-analytics/licensing/release:latest
           imagePullPolicy: Always
           env:
             - name: TARANTOOL_PORT

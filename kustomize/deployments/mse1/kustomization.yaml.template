@@ -2,9 +2,9 @@ namespace: ${NS_MS}
 resources:
 - ../../apps/mse/
 images:
-- name: download.aipix.ai:8443/vsaas-media-server/release
-  newName: download.aipix.ai:8443/vsaas-media-server/release
-  newTag: 26.05.1.7
+- name: download.aipix.ai:8443/vsaas-mse/media-server/release
+  newName: download.aipix.ai:8443/vsaas-mse/media-server/release
+  newTag: 26.05.1.12
 ${CUSTOM_IMAGES}
 
 patches:

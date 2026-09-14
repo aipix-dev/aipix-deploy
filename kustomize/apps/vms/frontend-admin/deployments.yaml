@@ -17,7 +17,6 @@ spec:
       app.kubernetes.io/component: frontend
       app.kubernetes.io/part-of: vms
       global-app-name: vsaas
-  strategy: {}
   template:
     metadata:
       labels:
@@ -45,7 +44,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: vms-frontend-env
-          image: download.aipix.ai:8443/vms-frontend-admin/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/frontend-admin/release:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80

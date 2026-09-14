@@ -18,7 +18,7 @@ providers:
   file:
     enabled: true
     watch: true
-    content: |
+    content:
       http:
         services:
           minio:

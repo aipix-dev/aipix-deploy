@@ -23,4 +23,7 @@ kubectl apply -k ../kustomize/deployments/${MSE_TEMPLATE}
 
 echo """
 MSE deployment script completed successfuly!
+
+List of used images:
 """
+../kubernetes/print-image-versions.sh ${NS_MS}

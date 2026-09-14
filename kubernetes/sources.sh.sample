@@ -61,8 +61,12 @@ export NS_MONITORING=monitoring                      #k8s namespace for monitori
 export INFLUX_USR=admin                              #define influxdb admin user
 export INFLUX_PSW=0hmSYYaRci6yJblARc6aHbHZ4YelTXTo   #define influxdb admin userpassword (use letters and numbers only)
 export INFLUX_TOKEN=2pORp9tDo40Lm32oGUKFLL8r1UuNbgUT #define influxdb API token (use letters and numbers only)
-export TELEGRAM_BOT_TOKEN=temporary-token            # define telegram bot token for notifications
-export TELEGRAM_CHAT_ID=temporary-chat-id            # define telegram chat id for notifications
+export CONTACT_POINT=Telegram						 #define default contact point for notifications (Telegram or Slack)
+export TELEGRAM_BOT_TOKEN=temporary-telegram-token            # define telegram bot token for notifications
+export TELEGRAM_CHAT_ID=temporary-telegram-chat-id            # define telegram chat id for notifications
+export SLACK_BOT_TOKEN=temporary-slack-token            	  # define slack bot token for notifications
+export SLACK_CHANNEL_ID=temporary-slack-channel-id            # define slack channel id for notifications
+
 
 #Portal parameters
 export PORTAL=no                                  #If portal will be deployed ("yes" or "no")

@@ -5,5 +5,5 @@ patches:
     group: apps
     version: v1
     kind: Deployment
-    name: (backend|vgw-backend|archive|cron|queue|queue-controller-webhooks|queue-intercom-calls|schedule|reports|analytic-events|analytic-statistics) 
+    name: (backend|vgw-backend|archive|cron|queue|queue-controller-webhooks|queue-intercom-calls|queue-intercom-setup|queue-mobile-push|queue-device-triggers|queue-analytics-webhook|queue-device-pollers|queue-websocket-pushes|schedule|reports|analytic-events|analytic-statistics|queue-analytics-events) 
   path: vms-backend-license.yaml

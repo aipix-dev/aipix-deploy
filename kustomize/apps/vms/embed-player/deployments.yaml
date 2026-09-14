@@ -17,8 +17,6 @@ spec:
       app.kubernetes.io/component: frontend
       app.kubernetes.io/part-of: vms
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -41,7 +39,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
       containers:
         - name: embed-player
-          image: download.aipix.ai:8443/vms-embed-player/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/embed-player/release:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80

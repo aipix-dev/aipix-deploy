@@ -17,8 +17,6 @@ spec:
       app.kubernetes.io/component: worker
       app.kubernetes.io/part-of: vms
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -54,7 +52,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: vms-backend-env
-          image: download.aipix.ai:8443/vms-backend/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/backend/release:latest
           imagePullPolicy: Always
           volumeMounts:
             - mountPath: /var/www/api/storage/oauth-private.key

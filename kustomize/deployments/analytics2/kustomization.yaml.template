@@ -9,23 +9,23 @@ ${CUSTOM_RESOURCES}
 components:
 - ../../components/storage-class-local-storage
 images:
-- name: download.aipix.ai:8443/analytics-worker/release
-  newName: download.aipix.ai:8443/analytics-worker/release
+- name: download.aipix.ai:8443/vsaas-analytics/worker/release
+  newName: download.aipix.ai:8443/vsaas-analytics/worker/release
   newTag: 25.12.0.0
-- name: download.aipix.ai:8443/analytics-orchestrator-server/release
-  newName: download.aipix.ai:8443/analytics-orchestrator-server/release
+- name: download.aipix.ai:8443/vsaas-analytics/orchestrator/release
+  newName: download.aipix.ai:8443/vsaas-analytics/orchestrator/release
+  newTag: 25.12.0.1
+- name: download.aipix.ai:8443/vsaas-analytics/tarantool/release
+  newName: download.aipix.ai:8443/vsaas-analytics/tarantool/release
+  newTag: 25.12.0.1
+- name: download.aipix.ai:8443/vsaas-analytics/licensing/release
+  newName: download.aipix.ai:8443/vsaas-analytics/licensing/release
   newTag: 25.12.0.0
-- name: download.aipix.ai:8443/analytics-tarantool/release
-  newName: download.aipix.ai:8443/analytics-tarantool/release
-  newTag: 25.12.0.0
-- name: download.aipix.ai:8443/analytics-licensing/release
-  newName: download.aipix.ai:8443/analytics-licensing/release
-  newTag: 25.12.0.0
-- name: download.aipix.ai:8443/analytics-face-vectorization-service/release
-  newName: download.aipix.ai:8443/analytics-face-vectorization-service/release
+- name: download.aipix.ai:8443/vsaas-analytics/face-vectorization/release
+  newName: download.aipix.ai:8443/vsaas-analytics/face-vectorization/release
   newTag: latest
-- name: download.aipix.ai:8443/analytics-metrics-pusher/release
-  newName: download.aipix.ai:8443/analytics-metrics-pusher/release
+- name: download.aipix.ai:8443/vsaas-analytics/metrics-pusher/release
+  newName: download.aipix.ai:8443/vsaas-analytics/metrics-pusher/release
   newTag: latest
 ${CUSTOM_IMAGES}
 

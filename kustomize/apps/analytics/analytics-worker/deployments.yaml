@@ -64,7 +64,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: analytics-worker-env
-          image: download.aipix.ai:8443/analytics-worker/release:latest
+          image: download.aipix.ai:8443/vsaas-analytics/worker/release:latest
           imagePullPolicy: Always
           resources:
             requests:

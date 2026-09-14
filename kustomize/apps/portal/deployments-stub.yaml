@@ -17,8 +17,6 @@ spec:
       app.kubernetes.io/component: backend
       app.kubernetes.io/part-of: vms
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -44,7 +42,7 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - cp -Rp /var/www/api/public/* /mnt/public/;
-          image: download.aipix.ai:8443/vms-portal-stub/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/portal-stub/release:latest
           imagePullPolicy: Always
           volumeMounts:
             - name: portal-stub-public
@@ -62,7 +60,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: vms-portal-stub-env
-          image: download.aipix.ai:8443/vms-portal-stub/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/portal-stub/release:latest
           imagePullPolicy: Always
           volumeMounts:
             - name: portal-stub-public

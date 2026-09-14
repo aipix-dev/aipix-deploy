@@ -2,8 +2,8 @@ Use this folder to patch your images.
 For example:
 ```
 cat << EOF >> my-images.yaml
-- name: download.aipix.ai:8443/analytics-orchestrator-server/release
-  newName: download.aipix.ai:8443/analytics-orchestrator-server/release
+- name: download.aipix.ai:8443/vsaas-analytics/orchestrator/release
+  newName: download.aipix.ai:8443/vsaas-analytics/orchestrator/release
   newTag: 25.06.0.3
 EOF
 ```

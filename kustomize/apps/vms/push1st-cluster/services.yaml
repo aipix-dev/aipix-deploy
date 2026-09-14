@@ -1,0 +1,57 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: push1st-cluster
+    app.kubernetes.io/component: message-broker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: push1st-cluster
+  namespace: vms
+spec:
+  clusterIP: None
+  ports:
+    - name: api
+      port: 6002
+      protocol: TCP
+      targetPort: api
+    - name: server
+      port: 6003
+      protocol: TCP
+      targetPort: server
+    - name: cluster
+      port: 8002
+      protocol: UDP
+      targetPort: cluster
+  selector:
+    app.kubernetes.io/name: push1st
+    app.kubernetes.io/component: message-broker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: push1st
+    app.kubernetes.io/component: message-broker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas
+  name: push1st
+  namespace: vms
+spec:
+  ports:
+    - name: api
+      port: 6002
+      protocol: TCP
+      targetPort: api
+    - name: server
+      port: 6003
+      protocol: TCP
+      targetPort: server
+  selector:
+    app.kubernetes.io/name: push1st
+    app.kubernetes.io/component: message-broker
+    app.kubernetes.io/part-of: vms
+    global-app-name: vsaas

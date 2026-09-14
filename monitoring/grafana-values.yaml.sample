@@ -67,6 +67,12 @@ alerting:
           - grafana_folder
           - alertname
         repeat_interval: 3d
+      - orgId: 1
+        receiver: Slack
+        group_by:
+          - grafana_folder
+          - alertname
+        repeat_interval: 3d
   contactpoints.yaml:
     secret:
       apiVersion: 1
@@ -79,36 +85,120 @@ alerting:
               settings:
                 bottoken: "${TELEGRAM_BOT_TOKEN}"
                 chatid: "${TELEGRAM_CHAT_ID}"
+                parse_mode: HTML
                 disable_notification: false
                 disable_web_page_preview: false
-                message: '{{ `{{ template "message" . }}` }}'
+                message: '{{ `{{ template "telegram-message" . }}` }}'
                 protect_content: false
+              disableResolveMessage: false
+        - orgId: 1
+          name: Slack
+          receivers:
+            - uid: slack
+              type: slack
+              settings:
+                recipient: "${SLACK_CHANNEL_ID}"
+                token: "${SLACK_BOT_TOKEN}"
+                text: '{{ `{{ template "slack-message" . }}` }}'
               disableResolveMessage: false
   templates.yaml:
     apiVersion: 1
     templates:
       - orgId: 1
-        name: alert
+        name: telegram-alert
         template: |
-          {{ `{{ define "alert" }}
-            **{{.Status | toUpper}}**
-            {{ .Labels.alertname }}
-            {{.Annotations.summary}}
-          {{ if gt (len .PanelURL) 0 }}
-            <a href="{{ .PanelURL }}">Link to Grafana</a>
+          {{ `{{ define "telegram-alert" -}}
+          <b>{{ .Status | toUpper }}</b>
+          {{- if eq (index .Labels "alertname") "DatasourceNoData" }}
+          ⚠️ DatasourceNoData
+          No data from datasource
+          {{- with index .Labels "rulename" }}
+          Rule: {{ . }}
+          {{- end }}
+          {{- with index .Labels "datasource_uid" }}
+          Datasource: {{ . }}
+          {{- end }}
+          {{- else if eq (index .Labels "alertname") "DatasourceError" }}
+          ❌ DatasourceError
+          Datasource query error
+          {{- with index .Labels "rulename" }}
+          Rule: {{ . }}
+          {{- end }}
+          {{- with index .Labels "datasource_uid" }}
+          Datasource: {{ . }}
+          {{- end }}
+          {{- else }}
+          {{ .Labels.alertname }}
+          {{ .Annotations.summary }}
+          {{- end }}
+          {{- if gt (len .PanelURL) 0 }}
+          <a href="{{ .PanelURL }}">Link to Grafana panel</a>
+          {{- end }}
+          {{ end }}` }}
+
+      - orgId: 1
+        name: slack-alert
+        template: |
+          {{ `{{ define "slack-alert" -}}
+          *{{ .Status | toUpper }}*
+          {{- if eq (index .Labels "alertname") "DatasourceNoData" }}
+          ⚠️ DatasourceNoData
+          No data from datasource
+          {{- with index .Labels "rulename" }}
+          Rule: {{ . }}
+          {{- end }}
+          {{- with index .Labels "datasource_uid" }}
+          Datasource: {{ . }}
+          {{- end }}
+          {{- else if eq (index .Labels "alertname") "DatasourceError" }}
+          ❌ DatasourceError
+          Datasource query error
+          {{- with index .Labels "rulename" }}
+          Rule: {{ . }}
+          {{- end }}
+          {{- with index .Labels "datasource_uid" }}
+          Datasource: {{ . }}
+          {{- end }}
+          {{- else }}
+          {{ .Labels.alertname }}
+          {{ .Annotations.summary }}
+          {{- end }}
+          {{- if gt (len .PanelURL) 0 }}
+          <{{ .PanelURL }}|Link to Grafana panel>
+          {{- end }}
+          {{ end }}` }}
+      - orgId: 1
+        name: telegram-message
+        template: |
+          {{ `{{ define "telegram-message" }}
+          Source: {{ .ExternalURL }}
+          {{ if gt (.Alerts.Firing | len) 0 }}🚨 {{ .Alerts.Firing | len }} firing alerts.
+          {{ range .Alerts.Firing }} {{ template "telegram-alert" .}}
+
+          {{ end }}
+          {{ end }}
+          {{ if gt (.Alerts.Resolved | len) 0 }}✅ {{ .Alerts.Resolved | len }} resolved alerts.
+          {{ range .Alerts.Resolved }} {{ template "telegram-alert" .}}
+
+          {{ end }}
           {{ end }}
           {{ end }}` }}
       - orgId: 1
-        name: message
+        name: slack-message
         template: |
-          {{ `{{ define "message" }}
-          {{ if gt (.Alerts.Firing | len) 0 }}🚨 {{ .Alerts.Firing | len }} firing alerts. 
-          {{ range .Alerts.Firing }} {{ template "alert" .}} {{ end }}
+          {{ `{{ define "slack-message" }}
+          Source: {{ .ExternalURL }}
+          {{ if gt (.Alerts.Firing | len) 0 }}🚨 {{ .Alerts.Firing | len }} firing alerts.
+          {{ range .Alerts.Firing }} {{ template "slack-alert" .}}
+
+          {{ end }}
           {{ end }}
           {{ if gt (.Alerts.Resolved | len) 0 }}✅ {{ .Alerts.Resolved | len }} resolved alerts.
-          {{ range .Alerts.Resolved }} {{ template "alert" .}} {{ end }}
+          {{ range .Alerts.Resolved }} {{ template "slack-alert" .}}
+
           {{ end }}
-          {{ end }}` }} 
+          {{ end }}
+          {{ end }}` }}
 
 grafana.ini:
   server:

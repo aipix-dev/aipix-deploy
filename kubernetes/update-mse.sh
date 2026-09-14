@@ -28,4 +28,7 @@ kubectl -n ${NS_MS} rollout status daemonset mse >/dev/null
 
 echo """
 MSE update script completed successfuly!
+
+List of used images:
 """
+../kubernetes/print-image-versions.sh ${NS_MS}

@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: tarantool
-          image: download.aipix.ai:8443/analytics-tarantool/release:latest
+          image: download.aipix.ai:8443/vsaas-analytics/tarantool/release:latest
           env:
             - name: TARANTOOL_PORT
               value: "3301"

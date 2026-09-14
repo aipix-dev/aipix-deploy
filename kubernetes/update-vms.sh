@@ -18,7 +18,8 @@ kubectl delete configmap vms-voip-p8 --namespace=${NS_VMS} || true
 kubectl delete configmap vms-frontend-env --namespace=${NS_VMS} || true
 kubectl delete configmap vms-frontend-admin-nginx --namespace=${NS_VMS} || true
 kubectl delete configmap vms-frontend-client-nginx --namespace=${NS_VMS} || true
-kubectl delete configmap push1st-server --namespace=${NS_VMS} || true
+#kubectl delete configmap push1st-server --namespace=${NS_VMS} || true
+kubectl delete configmap push1st-cluster --namespace=${NS_VMS} || true
 kubectl delete configmap push1st-app --namespace=${NS_VMS} || true
 kubectl delete configmap push1st-devices --namespace=${NS_VMS} || true
 
@@ -65,7 +66,8 @@ kubectl create configmap vms-frontend-admin-nginx --namespace=${NS_VMS} \
 kubectl create configmap vms-frontend-client-nginx --namespace=${NS_VMS} \
 	--from-file=nginx.conf=../vms-frontend/nginx-base-client.conf \
 	--from-file=default.conf=../vms-frontend/nginx-server-client.conf
-kubectl create configmap push1st-server --namespace=${NS_VMS} --from-file=server.yml=../push1st/server.yml
+# kubectl create configmap push1st-server --namespace=${NS_VMS} --from-file=server.yml=../push1st/server.yml
+kubectl create configmap push1st-cluster --namespace=${NS_VMS} --from-file=cluster.yml=../push1st/cluster.yml
 kubectl create configmap push1st-app --namespace=${NS_VMS} --from-file=../push1st/app.yml
 kubectl create configmap push1st-devices --namespace=${NS_VMS} --from-file=../push1st/devices.yml
 
@@ -146,18 +148,23 @@ echo -e "\033[32mManifests were successfully aplied\033[0m"
 
 #Rollout restart
 if [[ "${UPDATE_MODE:-}" == "full" ]]; then
-	echo -e "\033[32mUPDATE_MODE = 'full', restarting all deployments\033[0m"
-	for i in $(kubectl get deployments -n ${NS_VMS} | awk 'NR>1 { print $1 }'); do kubectl rollout restart deployment.apps/$i -n ${NS_VMS}; done
+	echo -e "\033[32mUPDATE_MODE = 'full', restarting all deployments and statefulsets\033[0m"
+	for i in $(kubectl get deployments -n ${NS_VMS} | awk 'NR>1 { print $1 }'); do 
+		kubectl -n ${NS_VMS} rollout restart deployment $i
+	done
+	kubectl -n ${NS_VMS} rollout restart statefulset push1st
 else
-	echo -e "\033[32mUPDATE_MODE = ' ', restarting all deployments except mysql-server, redis-server, beanstalkd and push1st\033[0m"
-	for i in $(kubectl get deployments -n ${NS_VMS} | awk 'NR>1 { print $1 }'); do
-		if [[ $i != "redis-server" ]] && [[ $i != "beanstalkd" ]] && [[ $i != "push1st" ]] && [[ $i != "mysql-server" ]]; then
-			kubectl rollout restart deployment.apps/$i -n ${NS_VMS}
+	echo -e "\033[32mUPDATE_MODE = ' ', restarting all deployments and statefulsets except mysql-server, redis-server, beanstalkd and push1st\033[0m"
+	for i in $(kubectl -n ${NS_VMS} get deployments | awk 'NR>1 { print $1 }'); do
+		if [[ $i != "redis-server" ]] && [[ $i != "beanstalkd" ]] && [[ $i != "mysql-server" ]]; then
+			kubectl -n ${NS_VMS} rollout restart deployment $i
 		fi
 	done
 fi
 kubectl -n ${NS_VMS} rollout status deployment backend >/dev/null
+kubectl -n ${NS_VMS} rollout status deployment cron >/dev/null
 kubectl -n ${NS_VMS} rollout status deployment controller-api >/dev/null
+kubectl -n ${NS_VMS} rollout status deployment controller-schedule >/dev/null
 kubectl -n ${NS_VMS} rollout status deployment redis-server >/dev/null
 kubectl -n ${NS_VMS} rollout status deployment beanstalkd >/dev/null
 if [ ${TYPE} != "prod" ]; then
@@ -165,31 +172,53 @@ if [ ${TYPE} != "prod" ]; then
 fi
 
 echo -e "\033[32mDeployments were successfully restarted\033[0m"
-sleep 15
-
-echo -e "\033[32mStart backend migrations\033[0m"
-kubectl -n ${NS_VMS} exec deployment.apps/backend -- ./scripts/update.sh
-kubectl -n ${NS_VMS} exec deployment.apps/backend -- chown www-data:www-data -R storage/logs
-echo -e "\033[32mEnd backend migrations\033[0m"
+# sleep 15 - comment due to rediness and liveness probes integration
 
 echo -e "\033[32mStart controller migrations\033[0m"
-kubectl -n ${NS_VMS} exec deployment.apps/controller-api -- ./scripts/update.sh
-echo -e "\033[32mEnd controller migrations\033[0m"
+kubectl -n ${NS_VMS} exec deployment.apps/controller-schedule -- ./scripts/update.sh
+if [ $? == 0 ]; then 
+	echo -e "\033[32mСontroller migrations completed successfully\033[0m"
+else
+	echo -e "\033[31mСontroller migrations failed\033[0m"
+fi
+
+echo -e "\033[32mStart backend migrations\033[0m"
+kubectl -n ${NS_VMS} exec deployment.apps/cron -- ./scripts/update.sh
+if [ $? == 0 ]; then 
+	echo -e "\033[32mBackend migrations completed successfully\033[0m"
+else
+	echo -e "\033[31mBackend migrations failed\033[0m"
+fi
+
+# kubectl -n ${NS_VMS} exec deployment.apps/backend -- chown www-data:www-data -R storage/logs
 
 if [ ${PORTAL} == "yes" ]; then
 	echo -e "\033[32mStart portal migrations\033[0m"
 	kubectl -n ${NS_VMS} rollout status deployment portal-backend >/dev/null
 	kubectl -n ${NS_VMS} rollout status deployment portal-stub >/dev/null
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-backend -- ./scripts/update.sh
-	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/update.sh
-	echo -e "\033[32mEnd portal migrations\033[0m"
+	if [ $? == 0 ]; then 
+		echo -e "\033[32mPortal-backend migrations completed successfully\033[0m"
+	else
+		echo -e "\033[31mPortal-backend migrations failed\033[0m"
+	fi
+	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub  -c portal-stub -- ./scripts/update.sh
+	if [ $? == 0 ]; then 
+		echo -e "\033[32mPortal-stub migrations completed successfully\033[0m"
+	else
+		echo -e "\033[31mPortal-stub migrations failed\033[0m"
+	fi
 fi
 
 if [ ${WB} == "yes" ]; then
 	echo -e "\033[32mStart WB migrations\033[0m"
 	kubectl -n ${NS_VMS} rollout status deployment integration-wb >/dev/null
 	kubectl -n ${NS_VMS} exec deployment.apps/integration-wb -- ./scripts/update.sh
-	echo -e "\033[32mEnd WB migrations\033[0m"
+	if [ $? == 0 ]; then 
+		echo -e "\033[32mIntegration-wb migrations completed successfully\033[0m"
+	else
+		echo -e "\033[31mIntegration-wb migrations failed\033[0m"
+	fi
 fi
 
 if [ ${BLE} == "yes" ]; then
@@ -201,7 +230,6 @@ fi
 echo """
 VMS update script completed successfuly!
 
-Update script completed successfuly!
-Access your VMS with the following URL:
-https://${VMS_DOMAIN}/admin
+List of used images:
 """
+../kubernetes/print-image-versions.sh ${NS_VMS}

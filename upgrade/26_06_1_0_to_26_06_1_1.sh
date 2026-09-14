@@ -6,11 +6,13 @@ cd "$scriptdir"
 source ../kubernetes/sources.sh
 source ../kubernetes/k8s-onprem/sources.sh
 
-### Delete unused envs
-#INTERCOM_USER_NUMBER_POSTFIX=
-#INTERCOM_AUTH_TOKEN=
-#INTERCOM_SIP_SERVER=
-INTERCOM_IS_BLE_KEYS_AVAILABLE
+### Delete unused resources
+rm ../push1st/cluster.yml
+kubectl -n ${NS_VMS} delete deployments.apps push1st || true
+kubectl -n ${NS_VMS} delete services push1st || true
+kubectl -n ${NS_VMS} delete ingressroutes.traefik.io push1st || true
+kubectl -n ${NS_VMS} delete configmaps push1st-server || true
+
 
 ### Update VMS
 ../kubernetes/configure-vms.sh
@@ -25,12 +27,12 @@ else
 fi
 
 ### Update Analytics
-# if [ ${ANALYTICS} == "yes" ]; then
-# 	../kubernetes/configure-analytics.sh
-# 	../kubernetes/update-analytics.sh
-# else
-# 	echo "Analytics is not installed, continue update"
-# fi
+if [ ${ANALYTICS} == "yes" ]; then
+	../kubernetes/configure-analytics.sh
+	../kubernetes/update-analytics.sh
+else
+	echo "Analytics is not installed, continue update"
+fi
 
 ### Update MSE
 if [[ $(kubectl get ns | grep ${NS_MS}) ]]; then

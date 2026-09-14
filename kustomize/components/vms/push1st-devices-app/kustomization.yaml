@@ -4,6 +4,6 @@ patches:
 - target:
     group: apps
     version: v1
-    kind: Deployment
-    name: push1st
+    kind: (Deployment|StatefulSet)
+    name: (push1st.*)
   path: push1st-devices-app.yaml

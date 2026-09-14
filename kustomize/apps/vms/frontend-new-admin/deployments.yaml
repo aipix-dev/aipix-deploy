@@ -14,7 +14,6 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: frontend-new-admin
-  strategy: {}
   template:
     metadata:
       labels:
@@ -34,7 +33,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
       containers:
         - name: frontend-new-admin
-          image: download.aipix.ai:8443/vms-frontend-new-admin/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/frontend-new-admin/release:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80

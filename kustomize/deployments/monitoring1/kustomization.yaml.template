@@ -11,9 +11,8 @@ ${CUSTOM_RESOURCES}
 components:
 - ../../components/tolerations
 images:
-- name: download.aipix.ai:8443/vsaas-media-logger/release
-  newName: download.aipix.ai:8443/vsaas-media-logger/release
-  newTag: 26.05.1.7
+- name: download.aipix.ai:8443/vsaas-mse/media-logger/release
+  newTag: 26.05.1.12
 ${CUSTOM_IMAGES}
 
 patches:
@@ -58,7 +57,6 @@ patches:
     kind: IngressRoute
     name: grafana
   path: patch-ingressroute-grafana.yaml
-${ADD_PATCH1}
 
 # Custom patches
 ${CUSTOM_PATCHES}

@@ -20,16 +20,17 @@ update_analytics-worker() {
 	kubectl create configmap analytics-worker-env --namespace=${NS_A} --from-env-file=../analytics/analytics-worker-env
 	TargetReplicas=$(kubectl get deployment analytics-worker --namespace=${NS_A} -o jsonpath='{.status.replicas}')
 	kubectl -n ${NS_A} rollout restart deployment analytics-worker
-	# Waiting for starting containers
-	while true; do
-		if [[ $(kubectl get deployment analytics-worker -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge ${TargetReplicas} ]]; then
-			break
-		fi
-		sleep 10
-		echo "Waiting for starting ${TargetReplicas} analytics-worker PODs (max 5 minutes) ..."
-	done
-	sleep 10
-
+	kubectl -n ${NS_A} rollout status deployment analytics-worker
+	sleep 5
+	# # Waiting for starting containers
+	# while true; do
+	# 	if [[ $(kubectl get deployment analytics-worker -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge ${TargetReplicas} ]]; then
+	# 		break
+	# 	fi
+	# 	sleep 10
+	# 	echo "Waiting for starting ${TargetReplicas} analytics-worker PODs (max 5 minutes) ..."
+	# done
+	# sleep 10
 }
 
 update_orchestrator() {
@@ -41,34 +42,39 @@ update_orchestrator() {
 	kubectl create configmap a-licensing-yaml --namespace=${NS_A} --from-file=../analytics/licensing.yaml
 	kubectl create configmap a-license-json --namespace=${NS_A} --from-file=../analytics/license.json
 	kubectl -n ${NS_A} rollout restart deployment orchestrator
-	# Waiting for starting containers
-	while true; do
-		if ([[ ${TYPE} == "prod" ]] || [[ $(kubectl get deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]) &&
-			[[ $(kubectl get deployment orchestrator -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]; then
-			break
-		fi
-		echo "Waiting for starting orchestrator and mysql container if presents (max 5 minutes) ..."
-		sleep 10
-	done
-	sleep 10
+	kubectl -n ${NS_A} rollout status deployment orchestrator
+	sleep 5
+	# # Waiting for starting containers
+	# while true; do
+	# 	if ([[ ${TYPE} == "prod" ]] || [[ $(kubectl get deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]) &&
+	# 		[[ $(kubectl get deployment orchestrator -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]; then
+	# 		break
+	# 	fi
+	# 	echo "Waiting for starting orchestrator and mysql container if presents (max 5 minutes) ..."
+	# 	sleep 10
+	# done
+	# sleep 10
 	kubectl exec -n ${NS_A} deployment.apps/orchestrator -c django -- python manage.py seed
 }
 
 update_tarantool() {
 	set -e
 	kubectl -n ${NS_A} rollout restart deployment tarantool
+	kubectl -n ${NS_A} rollout status deployment tarantool
 }
 
 update_vectorizator() {
 	set -e
 	kubectl -n ${NS_A} rollout restart deployment vectorizator
+	kubectl -n ${NS_A} rollout status deployment vectorizator
 }
 
 update_push1st() {
 	set -e
 	kubectl delete configmap push1st-orchestrator --namespace=${NS_VMS} || true
 	kubectl create configmap push1st-orchestrator --namespace=${NS_VMS} --from-file=../push1st/orchestrator.yml
-	kubectl -n ${NS_VMS} rollout restart deployment push1st
+	kubectl -n ${NS_VMS} rollout restart statefulset push1st
+	kubectl -n ${NS_VMS} rollout status statefulset push1st
 }
 
 update_clickhouse() {
@@ -86,15 +92,17 @@ update_clickhouse() {
 	kubectl create configmap clickhouse-timezone --namespace=${NS_A} --from-file=../clickhouse/timezone.xml
 	kubectl create configmap clickhouse-disable-logs --namespace=${NS_A} --from-file=../clickhouse/disable_logs.xml
 	kubectl -n ${NS_A} rollout restart deployment clickhouse-server
-	# Waiting for starting container
-	while true; do
-		if ([[ ${TYPE} == "prod" ]] || [[ $(kubectl get deployment clickhouse-server -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]); then
-			break
-		fi
-		echo "Waiting for starting clickhouse-server container if presents (max 5 minutes) ..."
-		sleep 10
-	done
-	sleep 10
+	kubectl -n ${NS_A} rollout status deployment clickhouse-server
+	sleep 5
+	# # Waiting for starting container
+	# while true; do
+	# 	if ([[ ${TYPE} == "prod" ]] || [[ $(kubectl get deployment clickhouse-server -n ${NS_A} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]); then
+	# 		break
+	# 	fi
+	# 	echo "Waiting for starting clickhouse-server container if presents (max 5 minutes) ..."
+	# 	sleep 10
+	# done
+	# sleep 10
 }
 
 update_metrics-pusher() {
@@ -104,6 +112,7 @@ update_metrics-pusher() {
 	kubectl create configmap metrics-pusher-env --namespace=${NS_A} --from-env-file=../analytics/metrics-pusher.env
 	kubectl create configmap telegraf-conf --namespace=${NS_A} --from-file=../analytics/telegraf.conf
 	kubectl -n ${NS_A} rollout restart deployment metrics-pusher
+	kubectl -n ${NS_A} rollout status deployment metrics-pusher
 }
 
 apply_manifests() {

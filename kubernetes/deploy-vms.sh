@@ -22,7 +22,8 @@ kubectl create configmap vms-frontend-admin-nginx --namespace=${NS_VMS} \
 kubectl create configmap vms-frontend-client-nginx --namespace=${NS_VMS} \
 	--from-file=nginx.conf=../vms-frontend/nginx-base-client.conf \
 	--from-file=default.conf=../vms-frontend/nginx-server-client.conf
-kubectl create configmap push1st-server --namespace=${NS_VMS} --from-file=server.yml=../push1st/server.yml
+# kubectl create configmap push1st-server --namespace=${NS_VMS} --from-file=server.yml=../push1st/server.yml
+kubectl create configmap push1st-cluster --namespace=${NS_VMS} --from-file=cluster.yml=../push1st/cluster.yml
 kubectl create configmap push1st-app --namespace=${NS_VMS} --from-file=../push1st/app.yml
 kubectl create configmap push1st-devices --namespace=${NS_VMS} --from-file=../push1st/devices.yml
 
@@ -90,7 +91,9 @@ sleep 10
 while true; do
 	if ([[ ${TYPE} == "prod" ]] || [[ $(kubectl get deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]) &&
 		[[ $(kubectl get deployment controller-api -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] &&
+		[[ $(kubectl get deployment controller-schedule -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] &&
 		[[ $(kubectl get deployment backend -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]; then
+		[[ $(kubectl get deployment cron -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]; then
 		break
 	fi
 	sleep 5
@@ -130,14 +133,14 @@ fi
 
 sleep 10
 echo -e "\033[32mStart backend migrations\033[0m"
-kubectl exec -n ${NS_VMS} deployment.apps/backend -- ./scripts/create_db.sh
-kubectl exec -n ${NS_VMS} deployment.apps/backend -- ./scripts/start.sh
-kubectl exec -n ${NS_VMS} deployment.apps/backend -- chown www-data:www-data -R storage/logs
+kubectl exec -n ${NS_VMS} deployment.apps/cron -- ./scripts/create_db.sh
+kubectl exec -n ${NS_VMS} deployment.apps/cron -- ./scripts/start.sh
+kubectl exec -n ${NS_VMS} deployment.apps/cron -- chown www-data:www-data -R storage/logs
 echo -e "\033[32mEnd backend migrations\033[0m"
 
 echo -e "\033[32mStart controller migrations\033[0m"
-kubectl exec -n ${NS_VMS} deployment.apps/controller-api -- ./scripts/create_db.sh
-kubectl exec -n ${NS_VMS} deployment.apps/controller-api -- ./scripts/start.sh
+kubectl exec -n ${NS_VMS} deployment.apps/controller-schedule -- ./scripts/create_db.sh
+kubectl exec -n ${NS_VMS} deployment.apps/controller-schedule -- ./scripts/start.sh
 echo -e "\033[32mEnd controller migrations\033[0m"
 
 if [ ${TYPE} != "prod" ]; then
@@ -155,8 +158,8 @@ if [ ${PORTAL} == "yes" ]; then
 	kubectl -n ${NS_VMS} exec deployment.apps/portal-backend -- ./scripts/start.sh
 	echo -e "\033[32mEnd portal-backend migrations\033[0m"
 	echo -e "\033[32mStart portal-stub migrations\033[0m"
-	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/create_db.sh
-	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -- ./scripts/start.sh
+	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -c portal-stub -- ./scripts/create_db.sh
+	kubectl -n ${NS_VMS} exec deployment.apps/portal-stub -c portal-stub -- ./scripts/start.sh
 	echo -e "\033[32mEnd portal-stub migrations\033[0m"
 fi
 
@@ -182,16 +185,15 @@ if [ ${BLE} == "yes" ]; then
 	CREATE_USER="CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';"
 	GRANT_PRIVILEGES="GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'%';FLUSH PRIVILEGES;"
 
-	kubectl exec -n ${NS_VMS} deployment.apps/backend -- mysql --protocol=TCP -u ${DB_ROOT_USERNAME} -p${DB_ROOT_PASSWORD} -P ${DB_PORT} -h ${DB_HOST} --execute="${CREATE_DATABASE}"
-	kubectl exec -n ${NS_VMS} deployment.apps/backend -- mysql --protocol=TCP -u ${DB_ROOT_USERNAME} -p${DB_ROOT_PASSWORD} -P ${DB_PORT} -h ${DB_HOST} --execute="${CREATE_USER}"
-	kubectl exec -n ${NS_VMS} deployment.apps/backend -- mysql --protocol=TCP -u ${DB_ROOT_USERNAME} -p${DB_ROOT_PASSWORD} -P ${DB_PORT} -h ${DB_HOST} --execute="${GRANT_PRIVILEGES}"
+	kubectl exec -n ${NS_VMS} deployment.apps/cron -- mysql --protocol=TCP -u ${DB_ROOT_USERNAME} -p${DB_ROOT_PASSWORD} -P ${DB_PORT} -h ${DB_HOST} --execute="${CREATE_DATABASE}"
+	kubectl exec -n ${NS_VMS} deployment.apps/cron -- mysql --protocol=TCP -u ${DB_ROOT_USERNAME} -p${DB_ROOT_PASSWORD} -P ${DB_PORT} -h ${DB_HOST} --execute="${CREATE_USER}"
+	kubectl exec -n ${NS_VMS} deployment.apps/cron -- mysql --protocol=TCP -u ${DB_ROOT_USERNAME} -p${DB_ROOT_PASSWORD} -P ${DB_PORT} -h ${DB_HOST} --execute="${GRANT_PRIVILEGES}"
 	echo -e "\033[32mEnd BLE migrations\033[0m"
 fi
 
 echo """
-
 VMS deployment script completed successfuly!
 
-Access your VMS with the following URL:
-https://${VMS_DOMAIN}/admin (${VMS_DOMAIN} should be resolved on DNS-server)
+List of used images:
 """
+../kubernetes/print-image-versions.sh ${NS_VMS}

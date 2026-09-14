@@ -7,8 +7,8 @@
 - target:
     group: apps
     version: v1
-    kind: Deployment
-    name: (archive|backend|beanstalkd|controller-.*|cron|frontend-.*|portal-.*|push1st|queue.*|redis-server|reports|vgw-backend)
+    kind: (Deployment|StatefulSet)
+    name: (archive|backend|beanstalkd|controller-.*|cron|frontend-.*|portal-.*|push1st.*|queue.*|redis-server|reports|vgw-backend)
   path: ./custom-patches.d/patch-image-pull-policy.yaml
 - target:
     group: traefik.io
@@ -20,3 +20,36 @@
       path: /spec/routes/0/middlewares/-
       value:
         name: admin-white-list
+- target:
+    group: "apps"
+    version: v1
+    kind: Deployment
+    name: wb-share-player
+  patch: |
+    $patch: delete
+    apiVersion: v1
+    kind: Deployment
+    metadata:
+      name: .*
+- target:
+    group: ""
+    version: v1
+    kind: Service
+    name: wb-share-player
+  patch: |
+    $patch: delete
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: .*
+- target:
+    group: "traefik.io"
+    version: v1alpha1
+    kind: IngressRoute
+    name: wb-share-player
+  patch: |
+    $patch: delete
+    apiVersion: v1alpha1
+    kind: IngressRoute
+    metadata:
+      name: .*

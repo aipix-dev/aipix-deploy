@@ -17,8 +17,6 @@ spec:
       app.kubernetes.io/component: controller
       app.kubernetes.io/part-of: controller
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -52,7 +50,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: controller-env
-          image: download.aipix.ai:8443/controller/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/controller/release:latest
           imagePullPolicy: Always
           lifecycle:
             preStop:
@@ -60,9 +58,6 @@ spec:
                 command:
                   - /bin/sleep
                   - "2"
-          volumeMounts:
-            - name: run-php
-              mountPath: /var/run/php/
           resources:
             requests:
               cpu: 150m
@@ -71,10 +66,6 @@ spec:
         - name: download-aipix-ai
       hostname: controller-api
       restartPolicy: Always
-      volumes:
-        - name: run-php
-          emptyDir: {}
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -94,8 +85,6 @@ spec:
       app.kubernetes.io/component: worker
       app.kubernetes.io/part-of: controller
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -132,7 +121,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: controller-env
-          image: download.aipix.ai:8443/controller/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/controller/release:latest
           imagePullPolicy: Always
           resources:
             requests:
@@ -156,14 +145,17 @@ metadata:
   namespace: controller
 spec:
   replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
   selector:
     matchLabels:
       app.kubernetes.io/name: controller-schedule
       app.kubernetes.io/component: job-scheduler
       app.kubernetes.io/part-of: controller
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -183,7 +175,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: controller-env
-          image: download.aipix.ai:8443/controller/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/controller/release:latest
           imagePullPolicy: Always
           resources:
             requests:
@@ -213,8 +205,6 @@ spec:
       app.kubernetes.io/component: controller-control-plane-hls
       app.kubernetes.io/part-of: controller
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -237,7 +227,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: controller-env
-          image: download.aipix.ai:8443/controller/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/controller/release:latest
           ports:
             - containerPort: 8888
               name: hls
@@ -271,8 +261,6 @@ spec:
       app.kubernetes.io/component: controller-control-plane-rtsp
       app.kubernetes.io/part-of: controller
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -295,7 +283,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: controller-env
-          image: download.aipix.ai:8443/controller/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/controller/release:latest
           ports:
             - containerPort: 5554
               name: rtsp
@@ -329,8 +317,6 @@ spec:
       app.kubernetes.io/component: worker
       app.kubernetes.io/part-of: controller
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -353,7 +339,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: controller-env
-          image: download.aipix.ai:8443/controller/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/controller/release:latest
           imagePullPolicy: Always
           resources:
             requests:
@@ -383,8 +369,6 @@ spec:
       app.kubernetes.io/component: worker
       app.kubernetes.io/part-of: controller
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -410,7 +394,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: controller-env
-          image: download.aipix.ai:8443/controller/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/controller/release:latest
           imagePullPolicy: Always
           resources:
             requests:
@@ -440,8 +424,6 @@ spec:
       app.kubernetes.io/component: worker
       app.kubernetes.io/part-of: controller
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -467,7 +449,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: controller-env
-          image: download.aipix.ai:8443/controller/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/controller/release:latest
           imagePullPolicy: Always
           resources:
             requests:
@@ -497,8 +479,6 @@ spec:
       app.kubernetes.io/component: worker
       app.kubernetes.io/part-of: controller
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -534,7 +514,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: controller-env
-          image: download.aipix.ai:8443/controller/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/controller/release:latest
           imagePullPolicy: Always
           resources:
             requests:
@@ -564,8 +544,6 @@ spec:
       app.kubernetes.io/component: worker
       app.kubernetes.io/part-of: controller
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -603,7 +581,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: controller-env
-          image: download.aipix.ai:8443/controller/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/controller/release:latest
           imagePullPolicy: Always
           resources:
             requests:
@@ -633,8 +611,6 @@ spec:
       app.kubernetes.io/component: worker
       app.kubernetes.io/part-of: controller
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -672,7 +648,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: controller-env
-          image: download.aipix.ai:8443/controller/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/controller/release:latest
           imagePullPolicy: Always
           resources:
             requests:
@@ -702,8 +678,6 @@ spec:
       app.kubernetes.io/component: worker
       app.kubernetes.io/part-of: controller
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -741,7 +715,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: controller-env
-          image: download.aipix.ai:8443/controller/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/controller/release:latest
           imagePullPolicy: Always
           resources:
             requests:
@@ -750,4 +724,72 @@ spec:
       imagePullSecrets:
         - name: download-aipix-ai
       hostname: controller-queue-cron-mse-server-info
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: controller-queue-media-control-q-subscriber
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/part-of: controller
+    global-app-name: vsaas
+  name: controller-queue-media-control-q-subscriber
+  namespace: vsaas-vms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: controller-queue-media-control-q-subscriber
+      app.kubernetes.io/component: worker
+      app.kubernetes.io/part-of: controller
+      global-app-name: vsaas
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: controller-queue-media-control-q-subscriber
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/part-of: controller
+        global-app-name: vsaas
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: controller-queue-media-control-q-subscriber
+                    app.kubernetes.io/component: worker
+                    app.kubernetes.io/part-of: controller
+                    global-app-name: vsaas
+                topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+      containers:
+        - name: controller-queue-media-control-q-subscriber
+          args:
+            - php
+            - /var/www/api/artisan
+            - queue:work
+            - --queue=vms-media-control-queue-subscriber
+            - --sleep=1
+            - --tries=2
+            - --memory=1500
+            - --max-jobs=500
+            - --backoff=10,30
+          envFrom:
+            - configMapRef:
+                name: controller-env
+          image: download.aipix.ai:8443/vsaas-vms/controller/release:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 200m
+              memory: 100Mi
+      imagePullSecrets:
+        - name: download-aipix-ai
+      hostname: controller-queue-media-control-q-subscriber
       restartPolicy: Always

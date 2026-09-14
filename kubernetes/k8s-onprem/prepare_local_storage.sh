@@ -1,4 +1,4 @@
-#!/bin/bash -e 
+#!/bin/bash -e
 
 n1=$1      #first rumber in volumes list
 n2=$2      #last number in volumes list
@@ -22,7 +22,7 @@ if [ -n "${make_fs}" ]; then
 	sudo mkfs.ext4 /dev/${disk}
 	sudo mkdir -p /mnt/disk-${disk}
 	sudo mount /dev/${disk} /mnt/disk-${disk}
-	echo "/dev/${disk} /mnt/disk-${disk} ext4 defaults 0 1" | sudo tee -a /etc/fstab 
+	echo "/dev/${disk} /mnt/disk-${disk} ext4 defaults 0 1" | sudo tee -a /etc/fstab
 fi
 
 if [ ${disk} != "folder" ]; then 

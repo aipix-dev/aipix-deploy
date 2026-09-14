@@ -9,5 +9,5 @@
   value:
     name: vms-backend-license
     mountPath: /var/www/api/storage/license.jwt
-    subPath: license.json
+    subPath: license.jwt
     readOnly: true

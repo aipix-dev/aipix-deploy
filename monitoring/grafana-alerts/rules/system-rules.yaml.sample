@@ -20,7 +20,7 @@ groups:
                     uid: prometheus
                 disableTextWrap: false
                 editorMode: builder
-                expr: count by(node) (kube_node_status_condition{condition="Ready", status="true", job="kube-state-metrics"})
+                expr: max by(node) (kube_node_status_condition{condition="Ready", status="true", job="kube-state-metrics"})
                 fullMetaSearch: false
                 includeNullMetadata: true
                 instant: true
@@ -72,7 +72,7 @@ groups:
           notification_settings:
             receiver: Telegram
         - uid: alert-002
-          title: Pod not Running
+          title: Pod not Ready
           condition: C
           data:
             - refId: A
@@ -82,16 +82,27 @@ groups:
               datasourceUid: prometheus
               model:
                 datasource:
-                    type: prometheus
-                    uid: prometheus
+                  type: prometheus
+                  uid: prometheus
                 disableTextWrap: false
                 editorMode: code
-                expr: sum by(namespace, pod) (last_over_time(kube_pod_status_ready{condition!="true"}[10m]) or kube_pod_deletion_timestamp > 0)
+                expr: |
+                  sum by (namespace, pod) (
+                    kube_pod_status_ready{
+                      job="kube-state-metrics",
+                      condition="false"
+                    }
+                    unless on(namespace, pod)
+                    kube_pod_labels{
+                      job="kube-state-metrics",
+                      label_kubernetes_executor="True"
+                    }
+                  )
                 fullMetaSearch: false
                 includeNullMetadata: true
                 instant: true
                 intervalMs: 30000
-                legendFormat: __auto
+                legendFormat: "{{ namespace }}/{{ pod }}"
                 maxDataPoints: 1000
                 range: false
                 refId: A
@@ -103,28 +114,28 @@ groups:
               datasourceUid: __expr__
               model:
                 conditions:
-                    - evaluator:
-                        params: []
-                        type: gt
-                      operator:
-                        type: and
-                      query:
-                        params:
-                            - B
-                      reducer:
-                        params: []
-                        type: last
-                      type: query
+                  - evaluator:
+                      params: []
+                      type: gt
+                    operator:
+                      type: and
+                    query:
+                      params:
+                        - B
+                    reducer:
+                      params: []
+                      type: last
+                    type: query
                 datasource:
-                    type: __expr__
-                    uid: __expr__
+                  type: __expr__
+                  uid: __expr__
                 expression: A
                 intervalMs: 1000
                 maxDataPoints: 43200
                 reducer: last
                 refId: B
                 settings:
-                    mode: dropNN
+                  mode: dropNN
                 type: reduce
             - refId: C
               relativeTimeRange:
@@ -133,22 +144,22 @@ groups:
               datasourceUid: __expr__
               model:
                 conditions:
-                    - evaluator:
-                        params:
-                            - 0
-                        type: gt
-                      operator:
-                        type: and
-                      query:
-                        params:
-                            - C
-                      reducer:
-                        params: []
-                        type: last
-                      type: query
+                  - evaluator:
+                      params:
+                        - 0
+                      type: gt
+                    operator:
+                      type: and
+                    query:
+                      params:
+                        - C
+                    reducer:
+                      params: []
+                      type: last
+                    type: query
                 datasource:
-                    type: __expr__
-                    uid: __expr__
+                  type: __expr__
+                  uid: __expr__
                 expression: B
                 intervalMs: 1000
                 maxDataPoints: 43200
@@ -156,13 +167,15 @@ groups:
                 type: threshold
           dashboardUid: garysdevil-kube-state-metrics-v2
           panelId: 30
-          noDataState: Alerting
-          execErrState: Error
+          noDataState: OK
+          execErrState: KeepLast
           for: 10m
           annotations:
             __dashboardUid__: garysdevil-kube-state-metrics-v2
             __panelId__: "30"
-            summary: Pod {{ $labels.pod }} in {{ $labels.namespace }} namespace is not in 'Running' state
+            summary: "Pod {{ $labels.pod }} in {{ $labels.namespace }} namespace has not been Ready for more than 10 minutes"
+          labels:
+            severity: warning
           isPaused: false
           notification_settings:
             receiver: Telegram

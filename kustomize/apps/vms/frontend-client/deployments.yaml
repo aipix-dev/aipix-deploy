@@ -17,7 +17,6 @@ spec:
       app.kubernetes.io/component: frontend
       app.kubernetes.io/part-of: vms
       global-app-name: vsaas
-  strategy: {}
   template:
     metadata:
       labels:
@@ -40,7 +39,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
       containers:
         - name: frontend-client
-          image: download.aipix.ai:8443/vms-frontend-client/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/frontend-client/release:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80

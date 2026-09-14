@@ -17,8 +17,6 @@ spec:
       app.kubernetes.io/component: message-broker
       app.kubernetes.io/part-of: vms
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:

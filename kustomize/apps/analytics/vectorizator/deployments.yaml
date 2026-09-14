@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: vectorizator
-          image: download.aipix.ai:8443/analytics-face-vectorization-service/release:latest
+          image: download.aipix.ai:8443/vsaas-analytics/face-vectorization/release:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

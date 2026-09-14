@@ -48,4 +48,7 @@ URL to access Grafana is
 https://${VMS_DOMAIN}/monitoring
 Default credentials are admin/admin.
 Replace them during first login.
+
+List of used images:
 """
+../kubernetes/print-image-versions.sh ${NS_MONITORING}

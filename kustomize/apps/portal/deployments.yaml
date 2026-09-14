@@ -17,8 +17,6 @@ spec:
       app.kubernetes.io/component: backend
       app.kubernetes.io/part-of: vms
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -52,7 +50,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: vms-portal-backend-env
-          image: download.aipix.ai:8443/vms-portal-backend/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/portal-backend/release:latest
           imagePullPolicy: Always
           resources:
             requests:
@@ -118,7 +116,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: vms-portal-backend-env
-          image: download.aipix.ai:8443/vms-portal-backend/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/portal-backend/release:latest
           imagePullPolicy: Always
           resources:
             requests:
@@ -148,8 +146,6 @@ spec:
       app.kubernetes.io/component: backend
       app.kubernetes.io/part-of: vms
       global-app-name: vsaas
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -171,7 +167,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: vms-portal-backend-env
-          image: download.aipix.ai:8443/vms-portal-backend/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/portal-backend/release:latest
           imagePullPolicy: Always
           resources:
             requests:
@@ -201,7 +197,6 @@ spec:
       app.kubernetes.io/component: frontend
       app.kubernetes.io/part-of: vms
       global-app-name: vsaas
-  strategy: {}
   template:
     metadata:
       labels:
@@ -224,7 +219,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
       containers:
         - name: portal-frontend-client
-          image: download.aipix.ai:8443/vms-portal-frontend-client/release:latest
+          image: download.aipix.ai:8443/vsaas-vms/portal-frontend-client/release:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80

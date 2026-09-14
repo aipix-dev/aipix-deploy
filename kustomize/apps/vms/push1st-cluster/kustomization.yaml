@@ -1,0 +1,4 @@
+resources:
+- statefulsets.yaml
+- services.yaml
+- ingressroutes.yaml
