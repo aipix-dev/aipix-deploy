@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 55,
+  "id": 217,
   "links": [],
   "panels": [
     {
@@ -36,15 +36,8 @@
             "cellOptions": {
               "type": "auto"
             },
-            "footer": {
-              "reducers": []
-            },
-            "inspect": false,
-            "tooltip": {
-              "placement": "right"
-            },
-            "wrapHeaderText": false,
-            "wrapText": true
+            "filterable": false,
+            "inspect": false
           },
           "mappings": [],
           "thresholds": {
@@ -52,7 +45,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": 0
+                "value": null
               },
               {
                 "color": "red",
@@ -65,7 +58,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 10,
         "w": 24,
         "x": 0,
         "y": 0
@@ -73,6 +66,15 @@
       "id": 107,
       "options": {
         "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
         "showHeader": true,
         "sortBy": [
           {
@@ -84,14 +86,22 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
           "editorMode": "builder",
           "exemplar": false,
           "expr": "mse_uptime_seconds",
           "format": "table",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
           "instant": true,
           "legendFormat": "__auto",
           "range": false,
-          "refId": "A"
+          "refId": "A",
+          "useBackend": false
         }
       ],
       "title": "MSE version",
@@ -103,10 +113,25 @@
               "Time": true,
               "Value": false,
               "__name__": true,
+              "app": true,
               "job": true
             },
             "includeByName": {},
-            "indexByName": {},
+            "indexByName": {
+              "Time": 0,
+              "Value": 12,
+              "__name__": 1,
+              "app": 3,
+              "brand": 4,
+              "build": 5,
+              "commit": 6,
+              "flags": 7,
+              "instance": 2,
+              "job": 8,
+              "revision": 9,
+              "timestamp": 10,
+              "version": 11
+            },
             "renameByName": {
               "Value": "uptime"
             }
@@ -132,7 +157,6 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -149,7 +173,6 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -165,7 +188,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": 0
+                "value": null
               },
               {
                 "color": "red",
@@ -181,7 +204,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 6
+        "y": 10
       },
       "id": 1,
       "options": {
@@ -198,7 +221,6 @@
           "sortDesc": true
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
@@ -268,7 +290,6 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -285,7 +306,6 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -301,15 +321,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": 0
-              },
-              {
-                "color": "#EAB839",
-                "value": 0.8
-              },
-              {
-                "color": "red",
-                "value": 1
+                "value": null
               }
             ]
           },
@@ -324,7 +336,7 @@
             "properties": [
               {
                 "id": "custom.axisPlacement",
-                "value": "right"
+                "value": "left"
               },
               {
                 "id": "unit",
@@ -354,14 +366,15 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 14
+        "y": 18
       },
       "id": 11,
       "options": {
         "legend": {
           "calcs": [
             "lastNotNull",
-            "max"
+            "max",
+            "min"
           ],
           "displayMode": "table",
           "placement": "right",
@@ -370,7 +383,6 @@
           "sortDesc": true
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "multi",
           "sort": "desc"
         }
@@ -408,10 +420,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "mse_stream_handle_seconds{instance=~\"$host\", type=\"duration\", quantile=\"0.6\"}",
+          "expr": "mse_stream_handle_seconds{instance=~\"$host\", type=\"duration\", quantile=\"0.9\"}",
           "hide": false,
           "instant": false,
-          "legendFormat": "Duration 60%",
+          "legendFormat": "Duration 90%",
           "range": true,
           "refId": "C"
         },
@@ -440,6 +452,109 @@
           "legendFormat": "Load Average",
           "range": true,
           "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "mse_stream_handle_seconds{instance=~\"$host\", type=\"duration\", quantile=\"0.99\"}",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Duration 99%",
+          "range": true,
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "mse_stream_handle_seconds{instance=~\"$host\", type=\"jitter\", quantile=\"0.99\"}",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "JItter 99%",
+          "range": true,
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "mse_stream_handle_seconds{instance=~\"$host\", type=\"jitter\", quantile=\"0.9\"}",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "JItter 90%",
+          "range": true,
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "mse_stream_handle_seconds{instance=~\"$host\", type=\"jitter\", quantile=\"0.999\"}",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "JItter 99.9%",
+          "range": true,
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "mse_camera_timer_on_tick_seconds{instance=\"$host\", quantile=\"0.9\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "Tick 90%",
+          "range": true,
+          "refId": "J",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "mse_camera_timer_on_tick_seconds{instance=\"$host\", quantile=\"0.99\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "Tick 99%",
+          "range": true,
+          "refId": "K",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "mse_camera_timer_on_tick_seconds{instance=\"$host\", quantile=\"0.999\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "Tick 99.9%",
+          "range": true,
+          "refId": "L",
+          "useBackend": false
         }
       ],
       "title": "Stream Load Average",
@@ -462,7 +577,6 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -479,7 +593,6 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -496,7 +609,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": 0
+                "value": null
               },
               {
                 "color": "red",
@@ -511,7 +624,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 27
       },
       "id": 15,
       "options": {
@@ -529,7 +642,6 @@
           "sortDesc": true
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
@@ -541,11 +653,49 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "editorMode": "code",
-          "expr": "mse_stream_state_total{instance=~\"$host\"}",
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "mse_stream_state_total{instance=~\"$host\", type!=\"deleted\"}",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
           "legendFormat": "{{type}}",
           "range": true,
-          "refId": "A"
+          "refId": "A",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "mse_stream_type_total{instance=\"$host\", type=\"capture\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "capture",
+          "range": true,
+          "refId": "B",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "mse_stream_type_total{instance=\"$host\", type=\"publish\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "publish",
+          "range": true,
+          "refId": "C",
+          "useBackend": false
         }
       ],
       "title": "Streams Status",
@@ -568,7 +718,6 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -585,7 +734,6 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -600,8 +748,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": 0
+                "color": "green"
               },
               {
                 "color": "red",
@@ -616,7 +763,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 31
+        "y": 35
       },
       "id": 3,
       "options": {
@@ -632,7 +779,6 @@
           "sortDesc": true
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
@@ -682,7 +828,6 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -699,7 +844,6 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -714,8 +858,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": 0
+                "color": "green"
               },
               {
                 "color": "red",
@@ -803,7 +946,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 39
+        "y": 43
       },
       "id": 106,
       "options": {
@@ -814,7 +957,6 @@
           "showLegend": true
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
@@ -1028,7 +1170,6 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -1045,7 +1186,6 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -1060,8 +1200,105 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": 0
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 52
+      },
+      "id": 108,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "mse_gc_garbage_active_total{instance=\"$host\"}",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "{{type}}",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Gc",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1076,7 +1313,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 48
+        "y": 61
       },
       "id": 6,
       "options": {
@@ -1092,7 +1329,6 @@
           "sortDesc": true
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
@@ -1187,7 +1423,6 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -1204,7 +1439,6 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -1219,8 +1453,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": 0
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1235,7 +1468,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 56
+        "y": 69
       },
       "id": 5,
       "options": {
@@ -1251,7 +1484,6 @@
           "sortDesc": true
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
@@ -1290,7 +1522,6 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
@@ -1307,7 +1538,6 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "showValues": false,
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -1322,8 +1552,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": 0
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1349,6 +1578,10 @@
               {
                 "id": "unit",
                 "value": "reqps"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
               }
             ]
           },
@@ -1371,7 +1604,7 @@
               },
               {
                 "id": "custom.axisPlacement",
-                "value": "right"
+                "value": "left"
               }
             ]
           }
@@ -1381,7 +1614,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 64
+        "y": 77
       },
       "id": 105,
       "options": {
@@ -1398,7 +1631,6 @@
           "sortDesc": true
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
@@ -1446,7 +1678,6 @@
             "axisLabel": "Ops / Errors",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
@@ -1463,7 +1694,6 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -1478,12 +1708,10 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": 0
+                "color": "green"
               }
             ]
-          },
-          "unit": "ops"
+          }
         },
         "overrides": [
           {
@@ -1540,9 +1768,16 @@
               },
               {
                 "id": "unit",
-                "value": "none"
+                "value": "bytes"
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": ""
+            },
+            "properties": []
           }
         ]
       },
@@ -1550,7 +1785,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 72
+        "y": 85
       },
       "id": 10,
       "options": {
@@ -1562,12 +1797,9 @@
           ],
           "displayMode": "table",
           "placement": "right",
-          "showLegend": true,
-          "sortBy": "Mean",
-          "sortDesc": true
+          "showLegend": true
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
@@ -1581,7 +1813,7 @@
           },
           "editorMode": "code",
           "expr": "sum(rate(mse_vfs_duration_seconds_count{instance=~\"$host\"}[$__rate_interval])) by (method)",
-          "legendFormat": "Ops: {{method}}",
+          "legendFormat": "OPS: {{method}}",
           "range": true,
           "refId": "A"
         },
@@ -1592,7 +1824,7 @@
           },
           "editorMode": "code",
           "expr": "mse_vfs_duration_seconds_sum{instance=~\"$host\"} / mse_vfs_duration_seconds_count{instance=~\"$host\"}",
-          "legendFormat": "Latency: {{method}}",
+          "legendFormat": "DUR: {{method}}",
           "range": true,
           "refId": "B"
         },
@@ -1623,6 +1855,74 @@
           "range": true,
           "refId": "D",
           "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "sum(mse_vfs_io_events_total{instance=\"$host\", driver=\"localfs\"})",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "Events: LocalFs",
+          "range": true,
+          "refId": "E",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "sum(mse_vfs_io_events_total{instance=\"$host\", driver=\"s3/mse-store\"})",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "Events: s3/mse-store",
+          "range": true,
+          "refId": "F",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "sum(mse_vfs_io_events_total{instance=\"$host\", driver=\"s3/mse-store2\"})",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "Events: s3/mse-store2",
+          "range": true,
+          "refId": "G",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "mse_vfs_require_volume_bytes{instance=\"$host\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "Require Bytes",
+          "range": true,
+          "refId": "H",
+          "useBackend": false
         }
       ],
       "title": "VFS Performance",
@@ -1645,7 +1945,6 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -1662,7 +1961,6 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -1677,8 +1975,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": 0
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1688,13 +1985,38 @@
           },
           "unit": "s"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "D"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "reqps"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "E"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "reqps"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 81
+        "y": 94
       },
       "id": 4,
       "options": {
@@ -1710,7 +2032,6 @@
           "sortDesc": true
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
@@ -1724,7 +2045,7 @@
           },
           "editorMode": "code",
           "expr": "sum(rate(mse_api_request_duration_seconds_sum{instance=~\"$host\"}[1m])) by (method) / sum(rate(mse_api_request_duration_seconds_count{instance=~\"$host\"}[1m])) by (method)",
-          "legendFormat": "API: {{method}}",
+          "legendFormat": "API DUR: {{method}}",
           "range": true,
           "refId": "A"
         },
@@ -1735,9 +2056,54 @@
           },
           "editorMode": "code",
           "expr": "sum(rate(mse_media_request_duration_seconds_sum{instance=~\"$host\"}[1m])) by (method) / sum(rate(mse_media_request_duration_seconds_count{instance=~\"$host\"}[1m])) by (method)",
-          "legendFormat": "Media: {{method}}",
+          "legendFormat": "MED DUR: {{method}}",
           "range": true,
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "",
+          "hide": false,
+          "instant": false,
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "expr": "sum(rate(mse_api_request_duration_seconds_count{instance=\"$host\"}[$__rate_interval])) by (method)",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "API RPS: {{method}}",
+          "range": true,
+          "refId": "D",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "sdYEC6snz"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "expr": "sum(rate(mse_media_request_duration_seconds_count{instance=\"$host\"}[$__rate_interval])) by (method)",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "MED RPS: {{method}}",
+          "range": true,
+          "refId": "E",
+          "useBackend": false
         }
       ],
       "title": "Api & Media Latency",
@@ -1755,17 +2121,17 @@
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(mse_inet_bitrate_bytes,instance)",
+        "definition": "label_values(mse_inet_bitrate_bytes, instance)",
+        "hide": 0,
         "includeAll": false,
+        "multi": false,
         "name": "host",
         "options": [],
-        "query": {
-          "qryType": 1,
-          "query": "label_values(mse_inet_bitrate_bytes,instance)",
-          "refId": "PrometheusVariableQueryEditor-VariableQuery"
-        },
+        "query": "label_values(mse_inet_bitrate_bytes, instance)",
         "refresh": 1,
         "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
         "type": "query"
       }
     ]

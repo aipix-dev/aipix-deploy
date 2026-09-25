@@ -29,7 +29,6 @@ else
 fi
 
 envsubst <../monitoring/grafana-values.yaml.sample >../monitoring/grafana-values.yaml
-sed -i "s@Source:.*@Source: ${VMS_DOMAIN}@g" ../monitoring/grafana-values.yaml
 envsubst <../monitoring/loki-values.yaml.sample >../monitoring/loki-values.yaml
 
 # Configure Grafana alert rules

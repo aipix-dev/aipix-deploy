@@ -2,4 +2,4 @@ resources:
   - ingressroutes.yaml
   - deployments.yaml
   - services.yaml
-  - middlewares.yaml
+  # - middlewares.yaml

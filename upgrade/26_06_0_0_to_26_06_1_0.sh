@@ -6,11 +6,11 @@ cd "$scriptdir"
 source ../kubernetes/sources.sh
 source ../kubernetes/k8s-onprem/sources.sh
 
-### Delete unused envs
-#INTERCOM_USER_NUMBER_POSTFIX=
-#INTERCOM_AUTH_TOKEN=
-#INTERCOM_SIP_SERVER=
-INTERCOM_IS_BLE_KEYS_AVAILABLE
+### Delete unused resources
+kubectl -n ${NS_VMS} delete deployments.apps embedded-player internal-player || true
+kubectl -n ${NS_VMS} delete services embedded-player internal-player || true
+kubectl -n ${NS_VMS} delete ingressroutes.traefik.io embedded-player internal-player || true
+kubectl -n ${NS_VMS} delete middlewares.traefik.io strip-prefix-internal-player || true
 
 ### Update VMS
 ../kubernetes/configure-vms.sh

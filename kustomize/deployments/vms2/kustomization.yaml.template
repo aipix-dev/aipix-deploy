@@ -30,52 +30,36 @@ ${ADD_COMPONENT1}
 ${ADD_COMPONENT2}
 images:
 - name: download.aipix.ai:8443/vsaas-vms/backend/release
-  newName: download.aipix.ai:8443/vsaas-vms/backend/release
-  newTag: 26.06.1.80
+  newTag: 26.06.1.96
 - name: download.aipix.ai:8443/vsaas-vms/frontend-admin/release
-  newName: download.aipix.ai:8443/vsaas-vms/frontend-admin/release
-  newTag: 26.06.1.14
+  newTag: 26.06.1.16
 - name: download.aipix.ai:8443/vsaas-vms/frontend-new-admin/release
-  newName: download.aipix.ai:8443/vsaas-vms/frontend-new-admin/release
-  newTag: 26.06.1.25
+  newTag: 26.06.1.28
 - name: download.aipix.ai:8443/vsaas-vms/frontend-client/release
-  newName: download.aipix.ai:8443/vsaas-vms/frontend-client/release
-  newTag: 26.06.1.25
+  newTag: 26.06.1.28
 - name: download.aipix.ai:8443/vsaas-vms/controller/release
-  newName: download.aipix.ai:8443/vsaas-vms/controller/release
-  newTag: 26.06.1.27
+  newTag: 26.06.1.39
 - name: download.aipix.ai:8443/vsaas-vms/portal-backend/release
-  newName: download.aipix.ai:8443/vsaas-vms/portal-backend/release
   newTag: 26.06.1.2
 - name: download.aipix.ai:8443/vsaas-vms/portal-frontend-client/release
-  newName: download.aipix.ai:8443/vsaas-vms/portal-frontend-client/release
   newTag: 26.06.1.25
 - name: download.aipix.ai:8443/vsaas-vms/portal-stub/release
-  newName: download.aipix.ai:8443/vsaas-vms/portal-stub/release
   newTag: latest
 - name: download.aipix.ai:8443/vsaas-vms/portal-landing/release
-  newName: download.aipix.ai:8443/vsaas-vms/portal-landing/release
   newTag: 26.06.1.25
 - name: download.aipix.ai:8443/vsaas-vms/integration-wb/release
-  newName: download.aipix.ai:8443/vsaas-vms/integration-wb/release
-  newTag: 26.06.1.1
+  newTag: 26.06.1.6
 - name: download.aipix.ai:8443/vsaas-vms/wb-share-player/release
-  newName: download.aipix.ai:8443/vsaas-vms/wb-share-player/release
-  newTag: 26.06.1.25
+  newTag: 26.06.1.28
 - name: download.aipix.ai:8443/vsaas-vms/embed-player/release
-  newName: download.aipix.ai:8443/vsaas-vms/embed-player/release
-  newTag: 26.06.1.25
+  newTag: 26.06.1.28
 - name: download.aipix.ai:8443/vsaas-vms/ble-service/release
-  newName: download.aipix.ai:8443/vsaas-vms/ble-service/release
   newTag: 26.06.1.6
 - name: download.aipix.ai:8443/push1st/release
-  newName: download.aipix.ai:8443/push1st/release
   newTag: 26.06.0.2
 - name: download.aipix.ai:8443/beanstalkd
-  newName: download.aipix.ai:8443/beanstalkd
   newTag: "1.13"
 - name: download.aipix.ai:8443/beanstalkd-exporter
-  newName: download.aipix.ai:8443/beanstalkd-exporter
   newTag: 2.0.0
 ${CUSTOM_IMAGES}
 
@@ -90,13 +74,6 @@ patches:
     - op: replace
       path: /spec/replicas
       value: 2
-#    - op: replace
-#      path: /spec/strategy
-#      value:
-#        rollingUpdate:
-#          maxSurge: 25%
-#          maxUnavailable: 25%
-#        type: RollingUpdate
 - target:
     group: apps
     version: v1
@@ -106,18 +83,11 @@ patches:
     - op: replace
       path: /spec/replicas
       value: 3
-#    - op: replace
-#      path: /spec/strategy
-#      value:
-#        rollingUpdate:
-#          maxSurge: 25%
-#          maxUnavailable: 25%
-#        type: RollingUpdate
 - target:
     group: apps
     version: v1
     kind: Deployment
-    name: "(cron|schedule|controller-schedule)"
+    name: "(cron|schedule|controller-schedule|portal-schedule|portal-stub)"
   patch: |-
     - op: replace
       path: /spec/replicas

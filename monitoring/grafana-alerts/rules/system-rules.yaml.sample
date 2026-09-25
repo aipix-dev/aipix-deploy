@@ -367,7 +367,7 @@ groups:
           notification_settings:
             receiver: Telegram
         - uid: alert-006
-          title: Free Space (/mnt/disk-sdb, /storage) (k8s)
+          title: Free Space (/mnt/disk-*, /storage) (k8s)
           condition: B
           data:
             - refId: A
@@ -381,7 +381,7 @@ groups:
                     uid: prometheus
                 disableTextWrap: false
                 editorMode: code
-                expr: 100 - sum(node_filesystem_free_bytes{job="node-exporter", mountpoint=~"/mnt/disk-sdb|/storage.*"}) by (instance, mountpoint) / sum(node_filesystem_size_bytes{job="node-exporter", mountpoint=~"/mnt/disk-sdb|/storage.*"}) by (instance, mountpoint) * 100
+                expr: 100 - sum(node_filesystem_free_bytes{job="node-exporter", mountpoint=~"/mnt/disk-.*|/storage.*"}) by (instance, mountpoint) / sum(node_filesystem_size_bytes{job="node-exporter", mountpoint=~"/mnt/disk-.*|/storage.*"}) by (instance, mountpoint) * 100
                 fullMetaSearch: false
                 includeNullMetadata: true
                 instant: true

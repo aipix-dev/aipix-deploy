@@ -97,7 +97,7 @@ if [ $? = 0 ]; then
 fi
 
 #Install minio client
-curl -L https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o $HOME/minio-binaries/mc
+curl -L https://dl.min.io/aistor/mc/release/linux-amd64/mc --create-dirs -o $HOME/minio-binaries/mc
 chmod +x $HOME/minio-binaries/mc
 export PATH=$PATH:$HOME/minio-binaries/
 echo 'export PATH=$PATH:$HOME/minio-binaries/' >>$HOME/.bashrc

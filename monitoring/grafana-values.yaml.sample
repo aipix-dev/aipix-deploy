@@ -171,7 +171,7 @@ alerting:
         name: telegram-message
         template: |
           {{ `{{ define "telegram-message" }}
-          Source: {{ .ExternalURL }}
+          Source: ${VMS_DOMAIN}
           {{ if gt (.Alerts.Firing | len) 0 }}🚨 {{ .Alerts.Firing | len }} firing alerts.
           {{ range .Alerts.Firing }} {{ template "telegram-alert" .}}
 
@@ -187,7 +187,7 @@ alerting:
         name: slack-message
         template: |
           {{ `{{ define "slack-message" }}
-          Source: {{ .ExternalURL }}
+          Source: ${VMS_DOMAIN}
           {{ if gt (.Alerts.Firing | len) 0 }}🚨 {{ .Alerts.Firing | len }} firing alerts.
           {{ range .Alerts.Firing }} {{ template "slack-alert" .}}
 
@@ -212,7 +212,7 @@ grafana.ini:
 
 extraInitContainers:
   - name: download-dashboards
-    image: quay.io/minio/minio:latest
+    image: download.aipix.ai:8443/minio:latest
     command: ["/bin/sh", "-c"]
     args:
       - |
@@ -272,3 +272,7 @@ resources:
   requests:
     memory: 500M
     cpu: "500m"
+
+image:
+  pullSecrets:
+    - download-aipix-ai

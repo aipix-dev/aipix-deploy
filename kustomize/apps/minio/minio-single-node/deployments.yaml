@@ -31,7 +31,7 @@ spec:
               secretKeyRef:
                 name: minio-secret
                 key: password
-          image: quay.io/minio/minio:latest
+          image: download.aipix.ai:8443/minio:latest
           command:
             - /bin/bash
             - -c
@@ -42,6 +42,8 @@ spec:
               name: localvolume
       hostname: minio
       restartPolicy: Always
+      imagePullSecrets:
+        - name: download-aipix-ai
       volumes:
         - name: localvolume
           persistentVolumeClaim:

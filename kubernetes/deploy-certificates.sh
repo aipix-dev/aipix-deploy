@@ -34,7 +34,7 @@ cd "$scriptdir"
 
 source ./sources.sh
 
-CERT_MANAGER_VER=v1.17.1
+CERT_MANAGER_VER=v1.21.2
 NS_CERT_MANAGER=cert-manager
 OPTSTRING=":iu:c:h"
 while getopts ${OPTSTRING} opt; do

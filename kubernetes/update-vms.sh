@@ -194,9 +194,9 @@ fi
 
 if [ ${PORTAL} == "yes" ]; then
 	echo -e "\033[32mStart portal migrations\033[0m"
-	kubectl -n ${NS_VMS} rollout status deployment portal-backend >/dev/null
+	kubectl -n ${NS_VMS} rollout status deployment portal-schedule >/dev/null
 	kubectl -n ${NS_VMS} rollout status deployment portal-stub >/dev/null
-	kubectl -n ${NS_VMS} exec deployment.apps/portal-backend -- ./scripts/update.sh
+	kubectl -n ${NS_VMS} exec deployment.apps/portal-schedule -- ./scripts/update.sh
 	if [ $? == 0 ]; then 
 		echo -e "\033[32mPortal-backend migrations completed successfully\033[0m"
 	else

@@ -10,6 +10,10 @@ export PATH=$PATH:$HOME/minio-binaries/
 kubectl create ns ${NS_MINIO}
 
 kubectl create secret generic minio-secret -n ${NS_MINIO} --from-literal="username=${MINIO_USR}" --from-literal="password=${MINIO_PSW}"
+kubectl create secret docker-registry download-aipix-ai --namespace=${NS_MINIO} \
+	--docker-server=https://download.aipix.ai:8443 \
+	--docker-username=${DOCKER_USERNAME} \
+	--docker-password=${DOCKER_PASSWORD}
 
 # Deploying Minio s3
 ../kustomize/deployments/${MINIO_TEMPLATE}/update-kustomization.sh || exit 1

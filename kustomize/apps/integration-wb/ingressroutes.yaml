@@ -34,9 +34,10 @@ spec:
   routes:
     - kind: Rule
       match: Host (`vms.example.com`) && PathPrefix(`/wb/iframe`)
-      middlewares:
-      - name: strip-prefix-iframe
+      # middlewares:
+      # - name: strip-prefix-iframe
       services:
         - kind: Service
-          name: wb-share-player
+          # name: wb-share-player
+          name: integration-wb
           port: 80
