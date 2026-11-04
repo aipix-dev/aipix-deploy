@@ -56,6 +56,12 @@ spec:
                 name: vms-backend-env
           image: download.aipix.ai:8443/vsaas-vms/backend/release:latest
           imagePullPolicy: Always
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sleep
+                  - "2"
           volumeMounts:
             # - mountPath: /var/run/php/
             #   name: run-php

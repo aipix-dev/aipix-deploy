@@ -120,6 +120,10 @@ fi
 if [ ${BLE} == "yes" ]; then
 	kubectl create configmap ble-service-env --namespace=${NS_VMS} --from-env-file=../ble-service/environments/.env
 fi
+if [ ${VMS_LIC_OFFLINE} == "yes" ]; then
+	kubectl delete configmap ble-service-license --namespace=${NS_VMS} || true
+	kubectl create configmap ble-service-license --namespace=${NS_VMS} --from-file=../ble-service/license/license.jwt
+fi
 
 #Reapplying vms manifests
 ../kustomize/deployments/${VMS_TEMPLATE}/update-kustomization.sh || exit 1

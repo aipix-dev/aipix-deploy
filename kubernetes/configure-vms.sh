@@ -42,7 +42,7 @@ sed -i "s@PRIVATE_AWS_ENDPOINT=.*@PRIVATE_AWS_ENDPOINT=http://minio.${NS_MINIO}.
 sed -i "s@PRIVATE_AWS_URL=.*@PRIVATE_AWS_URL=https://${VMS_DOMAIN}/s3@g" ../vms-backend/environments/.env
 
 sed -i "s@K8S_CLUSTER_NAME=.*@K8S_CLUSTER_NAME=${VMS_DOMAIN}@g" ../vms-backend/environments/.env
-sed -i "s@K8S_NAMESPACE=.*@K8S_NAMESPACE=${NS_VMS}@g" ../vms-backend/environments/.env
+# sed -i "s@K8S_NAMESPACE=.*@K8S_NAMESPACE=${NS_VMS}@g" ../vms-backend/environments/.env
 
 if grep -q '^APP_KEY=[[:space:]]*$' "../vms-backend/environments/.env"; then
 	echo -e "\033[32mSetting backend APP_KEY\033[0m"
@@ -190,7 +190,10 @@ if [ ${BLE} == "yes" ]; then
 	sed -i "s@MINIO_SECRET_KEY=.*@MINIO_SECRET_KEY=${MINIO_BLE_SECRET_KEY}@g" ../ble-service/environments/.env
 	sed -i "s@MINIO_BUCKET=.*@MINIO_BUCKET=${MINIO_BLE_BUCKET_NAME}@g" ../ble-service/environments/.env
 	sed -i "s@JWT_SECRET=.*@JWT_SECRET=${BLE_JWT_SECRET}@g" ../ble-service/environments/.env
+	sed -i "s@K8S_CLUSTER_NAME=.*@K8S_CLUSTER_NAME=ble-${VMS_DOMAIN}@g" ../ble-service/environments/.env
 fi
+
+cp -n ../ble-service/license/license.jwt.sample ../ble-service/license/license.jwt
 
 echo """
 

@@ -81,6 +81,10 @@ if [ ${BLE} == "yes" ]; then
 	kubectl create configmap ble-service-env --namespace=${NS_VMS} --from-env-file=../ble-service/environments/.env
 fi
 
+if [ ${VMS_LIC_OFFLINE} == "yes" ]; then
+	kubectl create configmap ble-service-license --namespace=${NS_VMS} --from-file=../ble-service/license/license.jwt
+fi
+
 # Deploying VMS
 ../kustomize/deployments/${VMS_TEMPLATE}/update-kustomization.sh || exit 1
 kubectl apply -k ../kustomize/deployments/${VMS_TEMPLATE}
@@ -92,7 +96,7 @@ while true; do
 	if ([[ ${TYPE} == "prod" ]] || [[ $(kubectl get deployment mysql-server -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]) &&
 		[[ $(kubectl get deployment controller-api -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] &&
 		[[ $(kubectl get deployment controller-schedule -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] &&
-		[[ $(kubectl get deployment backend -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]; then
+		[[ $(kubectl get deployment backend -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]] &&
 		[[ $(kubectl get deployment cron -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]; then
 		break
 	fi
@@ -118,16 +122,6 @@ if [ ${WB} == "yes" ]; then
 		fi
 		sleep 5
 		echo "Waiting for starting integration-wb container ..."
-	done
-fi
-
-if [ ${BLE} == "yes" ]; then
-	while true; do
-		if [[ $(kubectl get deployment ble-service -n ${NS_VMS} -o jsonpath='{.status.readyReplicas}') -ge 1 ]]; then
-			break
-		fi
-		sleep 5
-		echo "Waiting for starting ble-service container ..."
 	done
 fi
 
@@ -189,6 +183,8 @@ if [ ${BLE} == "yes" ]; then
 	kubectl exec -n ${NS_VMS} deployment.apps/cron -- mysql --protocol=TCP -u ${DB_ROOT_USERNAME} -p${DB_ROOT_PASSWORD} -P ${DB_PORT} -h ${DB_HOST} --execute="${CREATE_USER}"
 	kubectl exec -n ${NS_VMS} deployment.apps/cron -- mysql --protocol=TCP -u ${DB_ROOT_USERNAME} -p${DB_ROOT_PASSWORD} -P ${DB_PORT} -h ${DB_HOST} --execute="${GRANT_PRIVILEGES}"
 	echo -e "\033[32mEnd BLE migrations\033[0m"
+	kubectl -n ${NS_VMS} rollout restart deployment ble-service
+	kubectl -n ${NS_VMS} rollout status deployment ble-service >/dev/null
 fi
 
 echo """

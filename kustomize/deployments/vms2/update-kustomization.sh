@@ -12,7 +12,8 @@ if [ ${ANALYTICS} == "yes" ]; then
 fi
 
 if [ ${VMS_LIC_OFFLINE} == "yes" ]; then
-	export ADD_COMPONENT2="- ../../components/vms/vms-backend-license"
+	export ADD_COMPONENT2="- ../../components/vms/vms-backend-offline-license
+- ../../components/vms/ble-service-offline-license"
 fi
 
 if [ ${PORTAL} == "yes" ]; then

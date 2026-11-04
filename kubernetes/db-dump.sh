@@ -28,7 +28,7 @@ if [ ${TYPE} != "prod" ]; then
 	fi
 	if [ ${BLE} == "yes" ]; then
 		kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysqldump -uroot -pmysql --no-data --single-transaction --no-tablespaces locks > ${BACKUP_PATH}/locks-schema-backup.sql
-		kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysqldump -uroot -pmysql --single-transaction locks > ${BACKUP_PATH}/locks-backup.sql
+		kubectl exec -n ${NS_VMS} deployment.apps/mysql-server -- mysqldump -uroot -pmysql --single-transaction --ignore-table=locks.service_logs locks > ${BACKUP_PATH}/locks-backup.sql
 	fi
 	echo -e "\033[32mDatabases were backuped successfuly into folder $BACKUP_PATH!\033[0m"
 else
