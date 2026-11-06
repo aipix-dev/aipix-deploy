@@ -31,15 +31,15 @@ ${ADD_COMPONENT1}
 ${ADD_COMPONENT2}
 images:
 - name: download.aipix.ai:8443/vsaas-vms/backend/release
-  newTag: 26.09.0.13
+  newTag: 26.09.0.19
 - name: download.aipix.ai:8443/vsaas-vms/frontend-admin/release
-  newTag: 26.09.0.4
+  newTag: 26.09.0.7
 - name: download.aipix.ai:8443/vsaas-vms/frontend-new-admin/release
-  newTag: 26.09.0.8
+  newTag: 26.09.0.12
 - name: download.aipix.ai:8443/vsaas-vms/frontend-client/release
-  newTag: 26.09.0.8
+  newTag: 26.09.0.12
 - name: download.aipix.ai:8443/vsaas-vms/controller/release
-  newTag: 26.09.0.5
+  newTag: 26.09.0.7
 - name: download.aipix.ai:8443/vsaas-vms/portal-backend/release
   newTag: 26.09.0.1
 - name: download.aipix.ai:8443/vsaas-vms/portal-frontend-client/release
@@ -51,11 +51,11 @@ images:
 - name: download.aipix.ai:8443/vsaas-vms/integration-wb/release
   newTag: 26.09.0.0
 - name: download.aipix.ai:8443/vsaas-vms/wb-share-player/release
-  newTag: 26.09.0.8
+  newTag: 26.09.0.12
 - name: download.aipix.ai:8443/vsaas-vms/embed-player/release
-  newTag: 26.09.0.10
+  newTag: 26.09.0.12
 - name: download.aipix.ai:8443/vsaas-vms/ble-service/release
-  newTag: 26.06.1.9
+  newTag: 26.06.1.10
 - name: download.aipix.ai:8443/push1st/release
   newTag: 26.06.0.3
 - name: download.aipix.ai:8443/beanstalkd

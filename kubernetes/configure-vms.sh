@@ -164,11 +164,11 @@ if [ ${PORTAL} == "yes" ]; then
 	fi
 
 	if grep -q '^APP_KEY=[[:space:]]*$' "../portal/environments-stub/.env"; then
-		echo -e "\033[32mSetting portal APP_KEY\033[0m"
+		echo -e "\033[32mSetting portal-stub APP_KEY\033[0m"
 		APP_KEY="base64:$(openssl rand -base64 32)"
 		sed -i "s@^APP_KEY=.*@APP_KEY=${APP_KEY}@" ../portal/environments-stub/.env
 	else
-		echo -e "\033[32mPortal APP_KEY has been already set\033[0m"
+		echo -e "\033[32mPortal-stub APP_KEY has been already set\033[0m"
 	fi
 fi
 

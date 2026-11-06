@@ -288,6 +288,7 @@ spec:
             - queue:work
             - --queue=vms
             - --sleep=3
+            - --memory=512
           envFrom:
             - configMapRef:
                 name: vms-backend-env

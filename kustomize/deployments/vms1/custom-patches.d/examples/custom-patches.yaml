@@ -60,3 +60,18 @@
     kind: IngressRoute
     metadata:
       name: .*
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: queue
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/args
+      value:
+        - php
+        - /var/www/api/artisan
+        - queue:work
+        - --queue=vms
+        - --sleep=3
+        - --memory=512

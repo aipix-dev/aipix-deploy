@@ -1,10 +1,22 @@
 {
+  "dns": {
+    "workers": 1,
+    "poll": 64
+  },
+  "dvr": {
+    "workers": 6,
+    "poll": 1024
+  },
+  "camera": {
+    "workers": 6,
+    "poll": 1024
+  },
   "proxy": {
     "listen": "*:8776:/",
     "poll": 1024,
     "ip": 4,
     "ssl": true,
-    "workers": 4,
+    "workers": 1,
     "max-response-size": 65536,
     "max-request-size": 65536
   },
@@ -17,7 +29,7 @@
   "rtsp": {
     "listen": "*:8554:/",
     "sink": "*:8998:/",
-    "workers": 16,
+    "workers": 6,
     "poll": 1024,
     "ip": 4
   },
@@ -25,25 +37,28 @@
   "media": {
     "listen": "*:8443:/",
     "ip": 4,
-    "workers": 16,
+    "workers": 4,
     "poll": 1024,
     "ssl": true
   },
   "api": {
     "listen": "*:8665:/api/",
-    "workers": 8,
+    "workers": 2,
     "poll": 1024,
     "ssl": true,
     "ip": 4
   },
   "webui": {
     "listen": "*:9665:/",
-    "accept": 1,
     "path": "/opt/vsaas/services/webui",
     "workers": 1,
     "poll": 1024,
     "ssl": true,
-    "routes": ["streams", "server", "cluster"],
+    "routes": [
+      "streams",
+      "server",
+      "cluster"
+    ],
     "ip": 4
   },
   "ssl": {
@@ -61,6 +76,7 @@
       "stream:state",
       "stream:reconnect",
       "stream:delete",
+      "stream:pulse",
       "stream:dvr",
       "stream:dvr:delete",
       "server:capture",
@@ -72,19 +88,41 @@
       "onvif:delete"
     ]
   },
-  "storage": {
-    "localfs": {
-      "max-io-events": 4096
-    }
-  },
   "license": "<url or path to license files>",
   "secret": "I9REYLxj*YCG44hvEKjXP(b5TCh)xmFxZPN+Dxuwfw2*tkRxnLQH6nuPMv#99@8e",
   "max-fd-limit": 4096,
-  "#coroutine": {
-    "once": 8,
-    "periodic": 4
-  },
   "hostname": "example.com",
+  "ip": "192.168.0.1",
+  "storage": {
+    "localfs/storage": {
+      "max-io-events": 1024,
+      "writers": 4,
+      "readers": 2,
+      "max-read-events": 4096,
+      "gc": {
+        "timestart": "02:00:00",
+        "limit": "5h",
+        "period": "1d",
+        "max-age": "31d"
+      }
+    },
+    "#s3/my-bucket": {
+      "endpoint": "https://s3.amazonaws.com:443",
+      "access-key": "XXX",
+      "secret-key": "XXX",
+      "region": "us-east-1",
+      "tls-verify": true,
+      "cache-dir": "/tmp/vsaas/s3cache",
+      "cache-size": "1G",
+      "staging-dir": "/tmp/vsaas/s3staging",
+      "staging-size": "100G",
+      "max-connections": 64,
+      "max-retry-chunks": 1,
+      "max-io-events": 1024,
+      "writers": 4,
+      "readers": 2
+    }
+  },
   "log": {
     "#stdout": {
       "tag": "media-server",
